@@ -2,8 +2,5 @@
 .env.*
 !.env.example
 
-/database/*.sqlite
-/database/*.sqlite3
-
 /node_modules
 /public/build
