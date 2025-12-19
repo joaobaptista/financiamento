@@ -31,6 +31,17 @@
             font-size: 1.5rem;
         }
 
+        .app-navbar {
+            background-color: #ffffff !important;
+        }
+
+        .app-navbar .navbar-brand,
+        .app-navbar .nav-link,
+        .app-navbar .dropdown-toggle,
+        .app-navbar .navbar-toggler {
+            color: #000000 !important;
+        }
+
         .campaign-card {
             transition: transform 0.2s;
             height: 100%;
@@ -56,10 +67,10 @@
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-light app-navbar">
         <div class="container">
             <a class="navbar-brand" href="{{ route('home') }}">
-                <i class="bi bi-rocket-takeoff"></i> Catarse
+                <img src="{{ asset('img/logo.svg') }}" alt="{{ config('app.name', 'Catarse') }}" height="55" class="me-2 align-text-bottom">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
