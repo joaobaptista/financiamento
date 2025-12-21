@@ -6,6 +6,7 @@ use App\Domain\Campaign\Campaign;
 use App\Actions\CreatePledge;
 use App\Actions\ConfirmPayment;
 use App\Services\Payments\MockPaymentService;
+use App\Services\Money\Money;
 use Illuminate\Http\Request;
 
 class PledgeController extends Controller
@@ -19,7 +20,7 @@ class PledgeController extends Controller
         ]);
 
         $campaign = Campaign::findOrFail($validated['campaign_id']);
-        $amount = $validated['amount'] * 100; // Converter para centavos
+        $amount = Money::toCents($validated['amount']);
 
         try {
             // Criar pledge
@@ -38,10 +39,10 @@ class PledgeController extends Controller
                 'user_id' => auth()->id(),
             ]);
 
-            if ($paymentResult['success']) {
+            if ($paymentResult->success) {
                 // Confirmar pagamento
                 $confirmPaymentAction = new ConfirmPayment();
-                $confirmPaymentAction->execute($pledge, $paymentResult['payment_id']);
+                $confirmPaymentAction->execute($pledge, $paymentResult->paymentId);
 
                 return redirect()->route('campaigns.show', $campaign->slug)
                     ->with('success', 'Apoio realizado com sucesso! Obrigado por apoiar este projeto.');

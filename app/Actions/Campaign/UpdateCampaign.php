@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Actions\Campaign;
+
+use App\Data\Campaign\UpdateCampaignData;
+use App\Domain\Campaign\Campaign;
+use App\Domain\Campaign\Reward;
+
+class UpdateCampaign
+{
+    public function execute(UpdateCampaignData $data): Campaign
+    {
+        $campaign = Campaign::query()
+            ->where('id', $data->campaignId)
+            ->where('user_id', $data->userId)
+            ->firstOrFail();
+
+        if ($campaign->status !== 'draft') {
+            throw new \RuntimeException('Apenas campanhas em rascunho podem ser editadas.');
+        }
+
+        $campaign->update([
+            'title' => $data->title,
+            'description' => $data->description,
+            'goal_amount' => $data->goalAmount,
+            'ends_at' => $data->endsAt,
+            'cover_image_path' => $data->coverImagePath,
+        ]);
+
+        $campaign->rewards()->delete();
+
+        foreach ($data->rewards as $rewardData) {
+            Reward::create([
+                'campaign_id' => $campaign->id,
+                'title' => $rewardData->title,
+                'description' => $rewardData->description,
+                'min_amount' => $rewardData->minAmount,
+                'quantity' => $rewardData->quantity,
+                'remaining' => $rewardData->quantity,
+            ]);
+        }
+
+        return $campaign;
+    }
+}

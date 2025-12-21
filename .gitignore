@@ -2,5 +2,8 @@
 .env.*
 !.env.example
 
+.DS_Store
+.phpunit.result.cache
+
 /node_modules
 /public/build
