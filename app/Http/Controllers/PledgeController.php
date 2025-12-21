@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Campaign\Campaign;
-use App\Actions\CreatePledge;
-use App\Actions\ConfirmPayment;
+use App\Actions\Pledge\ConfirmPayment;
+use App\Actions\Pledge\CreatePledge;
+use App\Data\Pledge\CreatePledgeData;
 use App\Services\Payments\MockPaymentService;
 use App\Services\Money\Money;
 use Illuminate\Http\Request;
@@ -19,23 +19,24 @@ class PledgeController extends Controller
             'reward_id' => 'nullable|exists:rewards,id',
         ]);
 
-        $campaign = Campaign::findOrFail($validated['campaign_id']);
         $amount = Money::toCents($validated['amount']);
 
         try {
             // Criar pledge
-            $createPledgeAction = new CreatePledge();
-            $pledge = $createPledgeAction->execute(
-                $campaign,
-                auth()->user(),
-                $amount,
-                $validated['reward_id'] ?? null
+            $data = new CreatePledgeData(
+                campaignId: (int) $validated['campaign_id'],
+                userId: auth()->id(),
+                amount: $amount,
+                rewardId: $validated['reward_id'] ?? null,
             );
+
+            $createPledgeAction = new CreatePledge();
+            $pledge = $createPledgeAction->execute($data);
 
             // Processar pagamento (mock)
             $paymentService = new MockPaymentService();
             $paymentResult = $paymentService->processPayment($amount, [
-                'campaign_id' => $campaign->id,
+                'campaign_id' => (int) $validated['campaign_id'],
                 'user_id' => auth()->id(),
             ]);
 
@@ -44,7 +45,7 @@ class PledgeController extends Controller
                 $confirmPaymentAction = new ConfirmPayment();
                 $confirmPaymentAction->execute($pledge, $paymentResult->paymentId);
 
-                return redirect()->route('campaigns.show', $campaign->slug)
+                return redirect()->route('campaigns.show', $pledge->campaign->slug)
                     ->with('success', 'Apoio realizado com sucesso! Obrigado por apoiar este projeto.');
             } else {
                 return redirect()->back()
