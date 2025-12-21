@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -63,6 +64,17 @@ class User extends Authenticatable
     public function creatorProfile(): HasOne
     {
         return $this->hasOne(CreatorProfile::class);
+    }
+
+    public function creatorPages(): HasMany
+    {
+        return $this->hasMany(CreatorPage::class, 'owner_user_id');
+    }
+
+    public function followingCreatorPages(): BelongsToMany
+    {
+        return $this->belongsToMany(CreatorPage::class, 'creator_page_followers', 'follower_id', 'creator_page_id')
+            ->withTimestamps();
     }
 
     public function supportedCreators(): BelongsToMany

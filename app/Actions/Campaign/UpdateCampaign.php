@@ -21,6 +21,7 @@ class UpdateCampaign
         }
 
         $campaign->update([
+            'creator_page_id' => $data->creatorPageId,
             'title' => $data->title,
             'description' => $data->description,
             'goal_amount' => $data->goalAmount,

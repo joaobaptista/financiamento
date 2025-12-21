@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CampaignController;
+use App\Http\Controllers\Api\CreatorPageFollowController;
 use App\Http\Controllers\Api\CreatorProfileController;
 use App\Http\Controllers\Api\CreatorSupportController;
 use App\Http\Controllers\Api\DashboardController;
@@ -36,6 +37,9 @@ Route::middleware(['web'])->group(function () {
     // Support a creator ("seguir" / "apoiar")
     Route::get('/creators/{creator}/support', [CreatorSupportController::class, 'show']);
 
+    // Follow a creator page (fanpage)
+    Route::get('/creator-pages/{creatorPage}/follow', [CreatorPageFollowController::class, 'show']);
+
     // Creator/dashboard
     Route::middleware('auth')->group(function () {
         // Creator onboarding/profile
@@ -49,6 +53,9 @@ Route::middleware(['web'])->group(function () {
 
         Route::post('/creators/{creator}/support', [CreatorSupportController::class, 'store']);
         Route::delete('/creators/{creator}/support', [CreatorSupportController::class, 'destroy']);
+
+        Route::post('/creator-pages/{creatorPage}/follow', [CreatorPageFollowController::class, 'store']);
+        Route::delete('/creator-pages/{creatorPage}/follow', [CreatorPageFollowController::class, 'destroy']);
 
         Route::get('/dashboard/campaigns', [DashboardController::class, 'index']);
         Route::get('/dashboard/campaigns/{id}', [DashboardController::class, 'show']);

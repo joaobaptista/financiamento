@@ -10,7 +10,7 @@ class PublicCampaignController
     public function index()
     {
         $campaigns = Campaign::active()
-            ->with('user')
+            ->with(['user', 'creatorPage'])
             ->orderByDesc('created_at')
             ->paginate(12);
 
@@ -26,7 +26,7 @@ class PublicCampaignController
                     $query->where('status', 'paid');
                 },
             ])
-            ->with(['user', 'rewards'])
+            ->with(['user', 'rewards', 'creatorPage'])
             ->firstOrFail();
 
         return new CampaignResource($campaign);

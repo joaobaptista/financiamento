@@ -36,14 +36,15 @@ class PublishCampaign
         $saved = $campaign->save();
 
         if ($saved) {
-            $campaign->loadMissing('user');
-            $creator = $campaign->user;
+            $campaign->loadMissing(['creatorPage', 'user']);
 
-            if ($creator) {
-                $creator->supporters()
+            $page = $campaign->creatorPage;
+
+            if ($page) {
+                $page->followers()
                     ->select('users.*')
-                    ->chunkById(200, function ($supporters) use ($campaign) {
-                        Notification::send($supporters, new NewCampaignPublished($campaign));
+                    ->chunkById(200, function ($followers) use ($campaign) {
+                        Notification::send($followers, new NewCampaignPublished($campaign));
                     });
             }
         }

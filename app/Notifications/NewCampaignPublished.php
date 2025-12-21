@@ -22,9 +22,11 @@ class NewCampaignPublished extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $this->campaign->loadMissing('user');
+        $this->campaign->loadMissing(['creatorPage', 'user']);
 
-        $creatorName = $this->campaign->user?->name ?? 'um criador que você apoia';
+        $creatorName = $this->campaign->creatorPage?->name
+            ?? $this->campaign->user?->name
+            ?? 'um criador que você apoia';
         $url = rtrim((string) config('app.url'), '/') . '/campaigns/' . $this->campaign->slug;
 
         return (new MailMessage)
@@ -40,13 +42,16 @@ class NewCampaignPublished extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $this->campaign->loadMissing('user');
+        $this->campaign->loadMissing(['creatorPage', 'user']);
 
         return [
             'type' => 'campaign_published',
             'campaign_id' => $this->campaign->id,
             'campaign_slug' => $this->campaign->slug,
             'campaign_title' => $this->campaign->title,
+            'creator_page_id' => $this->campaign->creatorPage?->id,
+            'creator_page_slug' => $this->campaign->creatorPage?->slug,
+            'creator_page_name' => $this->campaign->creatorPage?->name,
             'creator_id' => $this->campaign->user?->id,
             'creator_name' => $this->campaign->user?->name,
         ];

@@ -10,6 +10,7 @@ final readonly class UpdateCampaignData
     public function __construct(
         public int $campaignId,
         public int $userId,
+        public ?int $creatorPageId,
         public string $title,
         public string $description,
         public int $goalAmount,

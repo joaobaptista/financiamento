@@ -3,6 +3,7 @@
 namespace App\Domain\Campaign;
 
 use App\Enums\CampaignStatus;
+use App\Models\CreatorPage;
 use App\Models\User;
 use App\Domain\Pledge\Pledge;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,7 @@ class Campaign extends Model
 {
     protected $fillable = [
         'user_id',
+        'creator_page_id',
         'title',
         'slug',
         'description',
@@ -50,6 +52,11 @@ class Campaign extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function creatorPage(): BelongsTo
+    {
+        return $this->belongsTo(CreatorPage::class);
     }
 
     public function rewards(): HasMany

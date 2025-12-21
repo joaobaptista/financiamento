@@ -13,23 +13,25 @@
                             Por <strong>{{ campaign.user?.name ?? '—' }}</strong>
                         </div>
 
-                        <template v-if="campaign.user?.id && (!user || user.id !== campaign.user.id)">
+                        <template
+                            v-if="campaign.creator_page?.id && (!user || user.id !== campaign.creator_page.owner_user_id)"
+                        >
                             <template v-if="user">
                                 <button
                                     type="button"
                                     class="btn btn-sm"
-                                    :class="isSupportingCreator ? 'btn-outline-secondary' : 'btn-outline-primary'"
+                                    :class="isFollowingPage ? 'btn-outline-secondary' : 'btn-outline-primary'"
                                     :disabled="supportingBusy"
-                                    @click="toggleCreatorSupport"
+                                    @click="togglePageFollow"
                                 >
-                                    {{ supportingBusy ? '…' : isSupportingCreator ? 'Deixar de apoiar' : 'Apoiar criador' }}
+                                    {{ supportingBusy ? '…' : isFollowingPage ? 'Deixar de seguir' : 'Seguir página' }}
                                 </button>
-                                <span v-if="creatorSupportersCount != null" class="small text-muted">
-                                    {{ creatorSupportersCount }} apoiadores
+                                <span v-if="pageFollowersCount != null" class="small text-muted">
+                                    {{ pageFollowersCount }} seguidores
                                 </span>
                             </template>
                             <template v-else>
-                                <RouterLink to="/login" class="btn btn-sm btn-outline-primary">Entrar para apoiar</RouterLink>
+                                <RouterLink to="/login" class="btn btn-sm btn-outline-primary">Entrar para seguir</RouterLink>
                             </template>
                         </template>
 
@@ -276,8 +278,8 @@ const message = ref('');
 const supportBox = ref(null);
 
 const supportingBusy = ref(false);
-const isSupportingCreator = ref(false);
-const creatorSupportersCount = ref(null);
+const isFollowingPage = ref(false);
+const pageFollowersCount = ref(null);
 
 function formatMoney(cents) {
     const value = (Number(cents || 0) / 100).toFixed(2);
@@ -380,35 +382,35 @@ async function fetchCampaign() {
         amount.value = '25.00';
     }
 
-    await fetchCreatorSupport();
+    await fetchPageFollow();
     loading.value = false;
 }
 
-async function fetchCreatorSupport() {
-    const creatorId = campaign.value?.user?.id;
-    if (!creatorId) return;
+async function fetchPageFollow() {
+    const creatorPageSlug = campaign.value?.creator_page?.slug;
+    if (!creatorPageSlug) return;
 
     try {
-        const data = await apiGet(`/api/creators/${creatorId}/support`);
-        isSupportingCreator.value = !!data?.is_supporting;
-        creatorSupportersCount.value = Number(data?.supporters_count ?? 0);
+        const data = await apiGet(`/api/creator-pages/${creatorPageSlug}/follow`);
+        isFollowingPage.value = !!data?.is_following;
+        pageFollowersCount.value = Number(data?.followers_count ?? 0);
     } catch {
         // Ignore (e.g. creator deleted)
     }
 }
 
-async function toggleCreatorSupport() {
-    const creatorId = campaign.value?.user?.id;
-    if (!creatorId) return;
+async function togglePageFollow() {
+    const creatorPageSlug = campaign.value?.creator_page?.slug;
+    if (!creatorPageSlug) return;
     if (!props.user) return;
 
     supportingBusy.value = true;
     try {
-        const data = isSupportingCreator.value
-            ? await apiDelete(`/api/creators/${creatorId}/support`)
-            : await apiPost(`/api/creators/${creatorId}/support`, {});
-        isSupportingCreator.value = !!data?.is_supporting;
-        creatorSupportersCount.value = Number(data?.supporters_count ?? creatorSupportersCount.value ?? 0);
+        const data = isFollowingPage.value
+            ? await apiDelete(`/api/creator-pages/${creatorPageSlug}/follow`)
+            : await apiPost(`/api/creator-pages/${creatorPageSlug}/follow`, {});
+        isFollowingPage.value = !!data?.is_following;
+        pageFollowersCount.value = Number(data?.followers_count ?? pageFollowersCount.value ?? 0);
     } finally {
         supportingBusy.value = false;
     }

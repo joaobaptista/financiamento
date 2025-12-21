@@ -12,6 +12,7 @@ use App\Data\Campaign\UpdateCampaignData;
 use App\Enums\CampaignStatus;
 use App\Http\Requests\StoreCampaignRequest;
 use App\Http\Requests\UpdateCampaignRequest;
+use App\Models\CreatorPage;
 use App\Services\Images\CampaignCoverImageService;
 use App\Services\Money\Money;
 use Illuminate\Support\Carbon;
@@ -37,6 +38,12 @@ class CampaignController extends Controller
     {
         $validated = $request->validated();
 
+        $creatorPageId = null;
+        $user = $request->user();
+        if ($user) {
+            $creatorPageId = CreatorPage::ensureDefaultForUser($user)->id;
+        }
+
         $rewards = [];
         if ($request->has('rewards')) {
             foreach ($request->rewards as $rewardData) {
@@ -53,6 +60,7 @@ class CampaignController extends Controller
 
         $data = new CreateCampaignData(
             userId: auth()->id(),
+            creatorPageId: $creatorPageId,
             title: $validated['title'],
             description: $validated['description'],
             goalAmount: Money::toCents($validated['goal_amount']),
@@ -80,6 +88,12 @@ class CampaignController extends Controller
     {
         $validated = $request->validated();
 
+        $creatorPageId = null;
+        $user = $request->user();
+        if ($user) {
+            $creatorPageId = CreatorPage::ensureDefaultForUser($user)->id;
+        }
+
         $rewards = [];
         if ($request->has('rewards')) {
             foreach ($request->rewards as $rewardData) {
@@ -98,6 +112,7 @@ class CampaignController extends Controller
             $data = new UpdateCampaignData(
                 campaignId: (int) $id,
                 userId: auth()->id(),
+                creatorPageId: $creatorPageId,
                 title: $validated['title'],
                 description: $validated['description'],
                 goalAmount: Money::toCents($validated['goal_amount']),

@@ -9,6 +9,7 @@ final readonly class CreateCampaignData
     /** @param list<RewardData> $rewards */
     public function __construct(
         public int $userId,
+        public ?int $creatorPageId,
         public string $title,
         public string $description,
         public int $goalAmount,
