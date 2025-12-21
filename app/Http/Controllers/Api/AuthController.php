@@ -76,6 +76,13 @@ class AuthController
 
     public function redirectToGoogle(): RedirectResponse
     {
+        $clientId = (string) config('services.google.client_id');
+        $clientSecret = (string) config('services.google.client_secret');
+
+        if ($clientId === '' || $clientSecret === '') {
+            return redirect('/login?oauth=google_not_configured');
+        }
+
         return Socialite::driver('google')
             ->scopes(['openid', 'email', 'profile'])
             ->redirect();

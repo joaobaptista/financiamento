@@ -101,12 +101,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { apiPost } from '../api';
 
 const emit = defineEmits(['auth-updated']);
 const router = useRouter();
+const route = useRoute();
 
 const logoUrl = '/img/logo.svg';
 
@@ -118,6 +119,12 @@ const wantsNews = ref(false);
 const notRobot = ref(false);
 const error = ref('');
 const submitting = ref(false);
+
+onMounted(() => {
+    if (route.query?.oauth === 'google_not_configured') {
+        error.value = 'Login com Google não está configurado. Configure GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET no .env.';
+    }
+});
 
 async function onGoogleSignIn() {
     window.location.href = '/api/oauth/google/redirect';
