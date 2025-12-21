@@ -1,7 +1,7 @@
 <template>
     <div>
         <!-- Navbar (Bootstrap) -->
-        <nav v-if="!isLoginRoute" class="navbar navbar-expand-lg navbar-light app-navbar border-bottom">
+        <nav v-if="!isAuthRoute" class="navbar navbar-expand-lg navbar-light app-navbar border-bottom">
             <div class="container">
                 <RouterLink class="navbar-brand d-flex align-items-center" to="/">
                     <img :src="logoUrl" alt="Logo" height="40" class="me-2" />
@@ -81,7 +81,7 @@
         </nav>
 
         <!-- Categories bar -->
-        <div v-if="!isLoginRoute" class="border-bottom bg-white app-categories">
+        <div v-if="!isAuthRoute" class="border-bottom bg-white app-categories">
             <div class="container">
                 <nav class="nav flex-nowrap overflow-auto py-2" aria-label="Categorias">
                     <RouterLink
@@ -111,7 +111,7 @@
         </div>
 
         <!-- Main Content -->
-        <main :class="isLoginRoute ? 'py-0' : 'py-4'">
+        <main :class="isAuthRoute ? 'py-0' : 'py-4'">
             <div v-if="loading" class="container text-muted">Carregando…</div>
             <RouterView
                 v-else
@@ -124,7 +124,7 @@
         </main>
 
         <!-- Footer -->
-        <footer v-if="!isLoginRoute" class="py-4">
+        <footer v-if="!isAuthRoute" class="py-4">
             <div class="container">
                 <div class="row">
                     <div class="col-md-6">
@@ -155,7 +155,7 @@ const flashError = ref('');
 
 const year = computed(() => new Date().getFullYear());
 
-const isLoginRoute = computed(() => route.name === 'login');
+const isAuthRoute = computed(() => route.name === 'login' || route.name === 'register');
 
 const logoUrl = '/img/logo.svg';
 

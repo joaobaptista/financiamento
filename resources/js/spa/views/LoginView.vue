@@ -11,7 +11,18 @@
                 <div class="col-12 col-sm-10 col-md-6 col-lg-4">
                     <div class="card shadow-sm">
                         <div class="card-body p-4">
-                            <h1 class="h3 fw-normal mb-4">Log in</h1>
+                            <h1 class="h3 fw-normal mb-3">Entrar</h1>
+
+                            <button type="button" class="btn btn-outline-secondary w-100 py-2" @click="onGoogleSignIn">
+                                <span class="me-2" aria-hidden="true">G</span>
+                                Entrar com Google
+                            </button>
+
+                            <div class="d-flex align-items-center my-4">
+                                <hr class="flex-grow-1" />
+                                <span class="mx-3 text-muted small">ou</span>
+                                <hr class="flex-grow-1" />
+                            </div>
 
                             <form @submit.prevent="submit">
                                 <div class="mb-3">
@@ -41,7 +52,7 @@
                                 </div>
 
                                 <button type="submit" class="btn btn-success w-100 py-2" :disabled="submitting">
-                                    {{ submitting ? 'Logando…' : 'Log in' }}
+                                    {{ submitting ? 'Entrando…' : 'Entrar' }}
                                 </button>
 
                                 <div class="form-check mt-3">
@@ -53,31 +64,12 @@
                                     {{ error }}
                                 </div>
 
-                                <div class="d-flex align-items-center my-4">
-                                    <hr class="flex-grow-1" />
-                                    <span class="mx-3 text-muted small">or</span>
-                                    <hr class="flex-grow-1" />
-                                </div>
-
-                                <button type="button" class="btn btn-dark w-100 py-2" disabled>
-                                    <i class="bi bi-apple me-2"></i>
-                                    Sign in with Apple
-                                </button>
-                                <button type="button" class="btn btn-primary w-100 py-2 mt-2" disabled>
-                                    <i class="bi bi-facebook me-2"></i>
-                                    Continue with Facebook
-                                </button>
-
-                                <div class="mt-3 text-muted small">
-                                    Get notified when your friends back and launch projects. We'll never post anything on Facebook without your permission.
-                                    <a href="#" class="link-primary" @click.prevent>Read more</a>
-                                </div>
                             </form>
                         </div>
 
                         <div class="border-top p-3 text-center">
-                            <span class="text-muted">New to Catarse?</span>
-                            <RouterLink to="/register" class="link-primary">Sign up</RouterLink>
+                            <span class="text-muted">Novo por aqui?</span>
+                            <RouterLink to="/register" class="link-primary">Cadastre-se</RouterLink>
                         </div>
 
                         <div class="border-top p-3 text-center text-muted small">
@@ -109,6 +101,15 @@ const password = ref('');
 const remember = ref(false);
 const error = ref('');
 const submitting = ref(false);
+
+async function onGoogleSignIn() {
+    error.value = '';
+    try {
+        await apiPost('/api/oauth/google', {});
+    } catch (e) {
+        error.value = e?.response?.data?.message ?? 'Login com Google indisponível.';
+    }
+}
 
 async function submit() {
     error.value = '';

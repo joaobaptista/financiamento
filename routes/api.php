@@ -22,6 +22,7 @@ Route::middleware(['web'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
     Route::post('/register', [AuthController::class, 'register'])->middleware('guest');
+    Route::post('/oauth/google', [AuthController::class, 'google'])->middleware('guest');
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');
 
     // Public campaigns

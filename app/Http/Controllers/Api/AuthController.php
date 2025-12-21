@@ -70,4 +70,11 @@ class AuthController
             'ok' => true,
         ]);
     }
+
+    public function google(Request $request)
+    {
+        return response()->json([
+            'message' => 'Login com Google ainda não foi configurado.',
+        ], 501);
+    }
 }
