@@ -120,12 +120,7 @@ const error = ref('');
 const submitting = ref(false);
 
 async function onGoogleSignIn() {
-    error.value = '';
-    try {
-        await apiPost('/api/oauth/google', {});
-    } catch (e) {
-        error.value = e?.response?.data?.message ?? 'Login com Google indisponível.';
-    }
+    window.location.href = '/api/oauth/google/redirect';
 }
 
 async function submit() {
