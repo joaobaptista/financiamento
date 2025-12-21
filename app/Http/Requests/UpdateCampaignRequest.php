@@ -19,6 +19,7 @@ class UpdateCampaignRequest extends FormRequest
             'goal_amount' => 'required|numeric|min:1',
             'ends_at' => 'required|date|after:today',
             'cover_image_path' => 'nullable|string',
+            'cover_image' => 'nullable|file|image|max:5120',
             'rewards' => 'nullable|array',
             'rewards.*.title' => 'nullable|string',
             'rewards.*.description' => 'nullable|string',

@@ -12,13 +12,24 @@
 
                 <div v-if="featuredCampaign" class="card campaign-card">
                     <div class="ratio ratio-16x9 bg-light">
-                        <img
-                            v-if="featuredCampaign.cover_image_path"
-                            :src="featuredCampaign.cover_image_path"
-                            class="w-100 h-100"
-                            :alt="featuredCampaign.title"
-                            style="object-fit: cover"
-                        />
+                        <template v-if="featuredCampaign.cover_image_path">
+                            <picture v-if="featuredCampaign.cover_image_webp_path">
+                                <source :srcset="absoluteUrl(featuredCampaign.cover_image_webp_path)" type="image/webp" />
+                                <img
+                                    :src="absoluteUrl(featuredCampaign.cover_image_path)"
+                                    class="w-100 h-100"
+                                    :alt="featuredCampaign.title"
+                                    style="object-fit: cover"
+                                />
+                            </picture>
+                            <img
+                                v-else
+                                :src="absoluteUrl(featuredCampaign.cover_image_path)"
+                                class="w-100 h-100"
+                                :alt="featuredCampaign.title"
+                                style="object-fit: cover"
+                            />
+                        </template>
                         <div v-else class="d-flex align-items-center justify-content-center text-muted">
                             <i class="bi bi-image" style="font-size: 2rem"></i>
                         </div>
@@ -61,13 +72,24 @@
                     <div v-for="c in recommended" :key="c.id" class="col">
                         <div class="card campaign-card h-100">
                             <div class="ratio ratio-16x9 bg-light">
-                                <img
-                                    v-if="c.cover_image_path"
-                                    :src="c.cover_image_path"
-                                    class="w-100 h-100"
-                                    :alt="c.title"
-                                    style="object-fit: cover"
-                                />
+                                <template v-if="c.cover_image_path">
+                                    <picture v-if="c.cover_image_webp_path">
+                                        <source :srcset="absoluteUrl(c.cover_image_webp_path)" type="image/webp" />
+                                        <img
+                                            :src="absoluteUrl(c.cover_image_path)"
+                                            class="w-100 h-100"
+                                            :alt="c.title"
+                                            style="object-fit: cover"
+                                        />
+                                    </picture>
+                                    <img
+                                        v-else
+                                        :src="absoluteUrl(c.cover_image_path)"
+                                        class="w-100 h-100"
+                                        :alt="c.title"
+                                        style="object-fit: cover"
+                                    />
+                                </template>
                                 <div v-else class="d-flex align-items-center justify-content-center text-muted">
                                     <i class="bi bi-image" style="font-size: 1.5rem"></i>
                                 </div>
@@ -111,6 +133,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { apiGet } from '../api';
+import { absoluteUrl } from '../seo';
 
 defineProps({
     user: { type: Object, default: null },

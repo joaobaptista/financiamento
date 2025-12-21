@@ -23,13 +23,24 @@
                     <div class="col-lg-8">
                         <div class="card mb-3">
                             <div class="ratio ratio-16x9 bg-light">
-                                <img
-                                    v-if="campaign.cover_image_path"
-                                    :src="campaign.cover_image_path"
-                                    class="w-100 h-100"
-                                    :alt="campaign.title"
-                                    style="object-fit: cover"
-                                />
+                                <template v-if="campaign.cover_image_path">
+                                    <picture v-if="campaign.cover_image_webp_path">
+                                        <source :srcset="absoluteUrl(campaign.cover_image_webp_path)" type="image/webp" />
+                                        <img
+                                            :src="absoluteUrl(campaign.cover_image_path)"
+                                            class="w-100 h-100"
+                                            :alt="campaign.title"
+                                            style="object-fit: cover"
+                                        />
+                                    </picture>
+                                    <img
+                                        v-else
+                                        :src="absoluteUrl(campaign.cover_image_path)"
+                                        class="w-100 h-100"
+                                        :alt="campaign.title"
+                                        style="object-fit: cover"
+                                    />
+                                </template>
                                 <div v-else class="d-flex align-items-center justify-content-center text-muted">
                                     <i class="bi bi-image" style="font-size: 2rem"></i>
                                 </div>
@@ -224,7 +235,7 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { apiGet, apiPost } from '../api';
-import { applyCampaignSeo } from '../seo';
+import { absoluteUrl, applyCampaignSeo } from '../seo';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 

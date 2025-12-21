@@ -13,6 +13,7 @@ use App\Enums\CampaignStatus;
 use App\Http\Requests\StoreCampaignRequest;
 use App\Http\Requests\UpdateCampaignRequest;
 use App\Http\Resources\CampaignResource;
+use App\Services\Images\CampaignCoverImageService;
 use App\Services\Money\Money;
 use Illuminate\Support\Carbon;
 
@@ -29,7 +30,7 @@ class CampaignController
         return new CampaignResource($campaign);
     }
 
-    public function store(StoreCampaignRequest $request, CreateCampaign $createCampaign)
+    public function store(StoreCampaignRequest $request, CreateCampaign $createCampaign, CampaignCoverImageService $coverImages)
     {
         $validated = $request->validated();
 
@@ -59,12 +60,17 @@ class CampaignController
 
         $campaign = $createCampaign->execute($data)->loadMissing(['user', 'rewards']);
 
+        if ($request->hasFile('cover_image')) {
+            $coverImages->storeForCampaign($campaign, $request->file('cover_image'));
+            $campaign->refresh()->loadMissing(['user', 'rewards']);
+        }
+
         return (new CampaignResource($campaign))
             ->response()
             ->setStatusCode(201);
     }
 
-    public function update(UpdateCampaignRequest $request, int $id, UpdateCampaign $updateCampaign)
+    public function update(UpdateCampaignRequest $request, int $id, UpdateCampaign $updateCampaign, CampaignCoverImageService $coverImages)
     {
         $validated = $request->validated();
 
@@ -95,6 +101,11 @@ class CampaignController
             );
 
             $campaign = $updateCampaign->execute($data)->loadMissing(['user', 'rewards']);
+
+            if ($request->hasFile('cover_image')) {
+                $coverImages->storeForCampaign($campaign, $request->file('cover_image'));
+                $campaign->refresh()->loadMissing(['user', 'rewards']);
+            }
 
             return new CampaignResource($campaign);
         } catch (\RuntimeException $e) {

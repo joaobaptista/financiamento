@@ -24,6 +24,7 @@ class Campaign extends Model
         'ends_at',
         'status',
         'cover_image_path',
+        'cover_image_webp_path',
     ];
 
     protected $casts = [
@@ -137,6 +138,16 @@ class Campaign extends Model
     }
 
     public function getCoverImagePathAttribute($value): ?string
+    {
+        return $this->normalizePublicImagePath($value);
+    }
+
+    public function getCoverImageWebpPathAttribute($value): ?string
+    {
+        return $this->normalizePublicImagePath($value);
+    }
+
+    private function normalizePublicImagePath($value): ?string
     {
         if ($value === null) {
             return null;

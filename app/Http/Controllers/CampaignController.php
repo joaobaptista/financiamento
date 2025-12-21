@@ -12,6 +12,7 @@ use App\Data\Campaign\UpdateCampaignData;
 use App\Enums\CampaignStatus;
 use App\Http\Requests\StoreCampaignRequest;
 use App\Http\Requests\UpdateCampaignRequest;
+use App\Services\Images\CampaignCoverImageService;
 use App\Services\Money\Money;
 use Illuminate\Support\Carbon;
 
@@ -32,7 +33,7 @@ class CampaignController extends Controller
         return view('spa');
     }
 
-    public function store(StoreCampaignRequest $request, CreateCampaign $createCampaign)
+    public function store(StoreCampaignRequest $request, CreateCampaign $createCampaign, CampaignCoverImageService $coverImages)
     {
         $validated = $request->validated();
 
@@ -60,7 +61,11 @@ class CampaignController extends Controller
             rewards: $rewards,
         );
 
-        $createCampaign->execute($data);
+        $campaign = $createCampaign->execute($data);
+
+        if ($request->hasFile('cover_image')) {
+            $coverImages->storeForCampaign($campaign, $request->file('cover_image'));
+        }
 
         return redirect()->route('dashboard.index')
             ->with('success', 'Campanha criada com sucesso!');
@@ -71,7 +76,7 @@ class CampaignController extends Controller
         return view('spa');
     }
 
-    public function update(UpdateCampaignRequest $request, $id, UpdateCampaign $updateCampaign)
+    public function update(UpdateCampaignRequest $request, $id, UpdateCampaign $updateCampaign, CampaignCoverImageService $coverImages)
     {
         $validated = $request->validated();
 
@@ -101,7 +106,11 @@ class CampaignController extends Controller
                 rewards: $rewards,
             );
 
-            $updateCampaign->execute($data);
+            $campaign = $updateCampaign->execute($data);
+
+            if ($request->hasFile('cover_image')) {
+                $coverImages->storeForCampaign($campaign, $request->file('cover_image'));
+            }
         } catch (\RuntimeException $e) {
             return redirect()->route('dashboard.index')
                 ->with('error', $e->getMessage());

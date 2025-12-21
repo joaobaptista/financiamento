@@ -42,6 +42,19 @@
                                     placeholder="https://exemplo.com/imagem.jpg"
                                 />
                             </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Upload da Imagem de Capa (Opcional)</label>
+                                <input
+                                    type="file"
+                                    class="form-control"
+                                    accept="image/*"
+                                    @change="onCoverFileChange"
+                                />
+                                <div class="form-text">
+                                    Enviaremos a imagem e geraremos versões otimizadas (WebP + JPG).
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -117,6 +130,8 @@ const router = useRouter();
 const submitting = ref(false);
 const error = ref('');
 
+const coverFile = ref(null);
+
 const form = ref({
     title: '',
     description: '',
@@ -125,6 +140,11 @@ const form = ref({
     cover_image_path: '',
     rewards: [],
 });
+
+function onCoverFileChange(e) {
+    const file = e?.target?.files?.[0] ?? null;
+    coverFile.value = file;
+}
 
 function addReward() {
     form.value.rewards.push({ title: '', description: '', min_amount: '0.00', quantity: '' });
@@ -135,17 +155,41 @@ async function submit() {
     submitting.value = true;
 
     try {
-        const payload = {
-            ...form.value,
-            rewards: form.value.rewards.map(r => ({
-                title: r.title,
-                description: r.description,
-                min_amount: r.min_amount,
-                quantity: r.quantity === '' ? null : Number(r.quantity),
-            })),
-        };
+        let created;
 
-        const created = await apiPost('/api/me/campaigns', payload);
+        if (coverFile.value) {
+            const fd = new FormData();
+            fd.append('title', form.value.title);
+            fd.append('description', form.value.description);
+            fd.append('goal_amount', String(form.value.goal_amount || ''));
+            fd.append('ends_at', String(form.value.ends_at || ''));
+            if (form.value.cover_image_path) fd.append('cover_image_path', form.value.cover_image_path);
+            fd.append('cover_image', coverFile.value);
+
+            (form.value.rewards || []).forEach((r, idx) => {
+                fd.append(`rewards[${idx}][title]`, r.title || '');
+                fd.append(`rewards[${idx}][description]`, r.description || '');
+                fd.append(`rewards[${idx}][min_amount]`, String(r.min_amount || '0'));
+                if (r.quantity !== '' && r.quantity !== null && r.quantity !== undefined) {
+                    fd.append(`rewards[${idx}][quantity]`, String(r.quantity));
+                }
+            });
+
+            created = await apiPost('/api/me/campaigns', fd);
+        } else {
+            const payload = {
+                ...form.value,
+                rewards: form.value.rewards.map(r => ({
+                    title: r.title,
+                    description: r.description,
+                    min_amount: r.min_amount,
+                    quantity: r.quantity === '' ? null : Number(r.quantity),
+                })),
+            };
+
+            created = await apiPost('/api/me/campaigns', payload);
+        }
+
         router.push(`/dashboard/campaigns/${created.id}`);
     } catch (e) {
         error.value = e?.response?.data?.message ?? 'Erro ao criar campanha.';

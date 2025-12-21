@@ -44,6 +44,19 @@
                                     placeholder="https://exemplo.com/imagem.jpg"
                                 />
                             </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Substituir Imagem de Capa (Upload)</label>
+                                <input
+                                    type="file"
+                                    class="form-control"
+                                    accept="image/*"
+                                    @change="onCoverFileChange"
+                                />
+                                <div class="form-text">
+                                    Se você fizer upload, geraremos versões otimizadas (WebP + JPG) e substituiremos a capa atual.
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -112,7 +125,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { apiGet, apiPut } from '../api';
+import { apiGet, apiPost, apiPut } from '../api';
 
 const props = defineProps({
     id: { type: [String, Number], required: true },
@@ -124,6 +137,8 @@ const loading = ref(true);
 const submitting = ref(false);
 const error = ref('');
 
+const coverFile = ref(null);
+
 const form = ref({
     title: '',
     description: '',
@@ -132,6 +147,11 @@ const form = ref({
     cover_image_path: '',
     rewards: [],
 });
+
+function onCoverFileChange(e) {
+    const file = e?.target?.files?.[0] ?? null;
+    coverFile.value = file;
+}
 
 function toDateInput(iso) {
     if (!iso) return '';
@@ -172,17 +192,40 @@ async function submit() {
     submitting.value = true;
 
     try {
-        const payload = {
-            ...form.value,
-            rewards: form.value.rewards.map(r => ({
-                title: r.title,
-                description: r.description,
-                min_amount: r.min_amount,
-                quantity: r.quantity === '' ? null : Number(r.quantity),
-            })),
-        };
+        if (coverFile.value) {
+            const fd = new FormData();
+            fd.append('_method', 'PUT');
+            fd.append('title', form.value.title);
+            fd.append('description', form.value.description);
+            fd.append('goal_amount', String(form.value.goal_amount || ''));
+            fd.append('ends_at', String(form.value.ends_at || ''));
+            if (form.value.cover_image_path) fd.append('cover_image_path', form.value.cover_image_path);
+            fd.append('cover_image', coverFile.value);
 
-        await apiPut(`/api/me/campaigns/${props.id}`, payload);
+            (form.value.rewards || []).forEach((r, idx) => {
+                fd.append(`rewards[${idx}][title]`, r.title || '');
+                fd.append(`rewards[${idx}][description]`, r.description || '');
+                fd.append(`rewards[${idx}][min_amount]`, String(r.min_amount || '0'));
+                if (r.quantity !== '' && r.quantity !== null && r.quantity !== undefined) {
+                    fd.append(`rewards[${idx}][quantity]`, String(r.quantity));
+                }
+            });
+
+            await apiPost(`/api/me/campaigns/${props.id}`, fd);
+        } else {
+            const payload = {
+                ...form.value,
+                rewards: form.value.rewards.map(r => ({
+                    title: r.title,
+                    description: r.description,
+                    min_amount: r.min_amount,
+                    quantity: r.quantity === '' ? null : Number(r.quantity),
+                })),
+            };
+
+            await apiPut(`/api/me/campaigns/${props.id}`, payload);
+        }
+
         router.push('/dashboard');
     } catch (e) {
         error.value = e?.response?.data?.message ?? 'Erro ao salvar campanha.';

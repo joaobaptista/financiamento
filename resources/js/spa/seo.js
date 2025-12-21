@@ -65,7 +65,7 @@ function getDefaults() {
     return window.__SEO__ || {};
 }
 
-function absoluteUrl(pathOrUrl) {
+export function absoluteUrl(pathOrUrl) {
     const value = String(pathOrUrl ?? '').trim();
     if (!value) return '';
 
