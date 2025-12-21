@@ -10,9 +10,37 @@ import CampaignEditView from './views/CampaignEditView.vue';
 import StaticPageView from './views/StaticPageView.vue';
 
 export const routes = [
-    { path: '/', name: 'home', component: HomeView },
-    { path: '/campaigns', name: 'campaigns.index', component: CampaignIndexView },
-    { path: '/campaigns/:slug', name: 'campaigns.show', component: CampaignShowView, props: true },
+    {
+        path: '/',
+        name: 'home',
+        component: HomeView,
+        meta: {
+            title: 'Crowdfunding para projetos criativos',
+            description: 'Apoie criadores, escolha recompensas e acompanhe campanhas em tempo real.',
+            ogType: 'website',
+        },
+    },
+    {
+        path: '/campaigns',
+        name: 'campaigns.index',
+        component: CampaignIndexView,
+        meta: {
+            title: 'Explorar campanhas',
+            description: 'Descubra campanhas ativas e apoie projetos criativos com recompensas.',
+            ogType: 'website',
+        },
+    },
+    {
+        path: '/campaigns/:slug',
+        name: 'campaigns.show',
+        component: CampaignShowView,
+        props: true,
+        meta: {
+            title: 'Campanha',
+            description: 'Veja detalhes, recompensas e apoie esta campanha.',
+            ogType: 'article',
+        },
+    },
 
     // Institucional / Ajuda (usado no footer)
     {
@@ -22,6 +50,8 @@ export const routes = [
         meta: {
             title: 'Quem somos',
             lead: 'Conheça a Origo e nossa missão.',
+            description: 'Conheça a Origo e nossa missão.',
+            ogType: 'website',
             content: [
                 'A Origo é uma plataforma de crowdfunding para projetos criativos.',
                 'Aqui você encontra iniciativas independentes e pode apoiar criadores diretamente.',
@@ -35,6 +65,8 @@ export const routes = [
         meta: {
             title: 'Como funciona',
             lead: 'O básico do financiamento coletivo na Origo.',
+            description: 'O básico do financiamento coletivo: explorar campanhas, escolher recompensas e apoiar criadores.',
+            ogType: 'website',
             content: [
                 'Explore campanhas, escolha uma recompensa e faça seu apoio.',
                 'Criadores publicam atualizações e entregam recompensas conforme o cronograma.',
@@ -48,6 +80,8 @@ export const routes = [
         meta: {
             title: 'Blog',
             lead: 'Novidades, dicas e histórias de bastidores.',
+            description: 'Novidades, dicas e histórias de bastidores sobre crowdfunding e criação.',
+            ogType: 'website',
             content: 'Conteúdo em breve.',
         },
     },
@@ -58,6 +92,8 @@ export const routes = [
         meta: {
             title: 'Nosso time',
             lead: 'Pessoas por trás da plataforma.',
+            description: 'Conheça o time por trás da plataforma.',
+            ogType: 'website',
             content: 'Conteúdo em breve.',
         },
     },
@@ -68,6 +104,8 @@ export const routes = [
         meta: {
             title: 'Imprensa',
             lead: 'Materiais e contato para imprensa.',
+            description: 'Materiais e contato para imprensa.',
+            ogType: 'website',
             content: 'Conteúdo em breve.',
         },
     },
@@ -88,6 +126,8 @@ export const routes = [
         meta: {
             title: 'Central de suporte',
             lead: 'Tire dúvidas e encontre ajuda rápida.',
+            description: 'Tire dúvidas e encontre ajuda rápida.',
+            ogType: 'website',
             content: 'Conteúdo em breve.',
         },
     },
@@ -98,6 +138,8 @@ export const routes = [
         meta: {
             title: 'Contato',
             lead: 'Fale com a gente.',
+            description: 'Fale com a gente.',
+            ogType: 'website',
             content: 'Conteúdo em breve.',
         },
     },
@@ -138,6 +180,8 @@ export const routes = [
         meta: {
             title: 'Termos de uso',
             lead: 'Regras e condições de uso da plataforma.',
+            description: 'Regras e condições de uso da plataforma.',
+            ogType: 'website',
             content: 'Conteúdo em breve.',
         },
     },
@@ -148,6 +192,8 @@ export const routes = [
         meta: {
             title: 'Política de privacidade',
             lead: 'Como tratamos seus dados.',
+            description: 'Como tratamos seus dados.',
+            ogType: 'website',
             content: 'Conteúdo em breve.',
         },
     },
@@ -192,12 +238,68 @@ export const routes = [
         },
     },
 
-    { path: '/login', name: 'login', component: LoginView },
-    { path: '/register', name: 'register', component: RegisterView },
+    {
+        path: '/login',
+        name: 'login',
+        component: LoginView,
+        meta: {
+            title: 'Entrar',
+            description: 'Acesse sua conta para apoiar campanhas e acompanhar recompensas.',
+            robots: 'noindex, nofollow',
+        },
+    },
+    {
+        path: '/register',
+        name: 'register',
+        component: RegisterView,
+        meta: {
+            title: 'Criar conta',
+            description: 'Crie sua conta para apoiar campanhas e criar projetos.',
+            robots: 'noindex, nofollow',
+        },
+    },
 
-    { path: '/dashboard', name: 'dashboard.index', component: DashboardIndexView },
-    { path: '/dashboard/campaigns/:id', name: 'dashboard.show', component: DashboardShowView, props: true },
+    {
+        path: '/dashboard',
+        name: 'dashboard.index',
+        component: DashboardIndexView,
+        meta: {
+            title: 'Dashboard',
+            description: 'Área do criador para acompanhar suas campanhas.',
+            robots: 'noindex, nofollow',
+        },
+    },
+    {
+        path: '/dashboard/campaigns/:id',
+        name: 'dashboard.show',
+        component: DashboardShowView,
+        props: true,
+        meta: {
+            title: 'Dashboard da campanha',
+            description: 'Acompanhe apoios e métricas da sua campanha.',
+            robots: 'noindex, nofollow',
+        },
+    },
 
-    { path: '/me/campaigns/create', name: 'me.campaigns.create', component: CampaignCreateView },
-    { path: '/me/campaigns/:id/edit', name: 'me.campaigns.edit', component: CampaignEditView, props: true },
+    {
+        path: '/me/campaigns/create',
+        name: 'me.campaigns.create',
+        component: CampaignCreateView,
+        meta: {
+            title: 'Criar campanha',
+            description: 'Crie uma nova campanha de crowdfunding.',
+            robots: 'noindex, nofollow',
+        },
+    },
+    {
+        path: '/me/campaigns/:id/edit',
+        name: 'me.campaigns.edit',
+        component: CampaignEditView,
+        props: true,
+        meta: {
+            title: 'Editar campanha',
+            description: 'Edite detalhes da sua campanha.',
+            robots: 'noindex, nofollow',
+        },
+    },
 ];

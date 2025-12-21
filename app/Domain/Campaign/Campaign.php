@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
+
 class Campaign extends Model
 {
     protected $fillable = [
@@ -133,5 +134,35 @@ class Campaign extends Model
     public function getFormattedPledgedAttribute(): string
     {
         return 'R$ ' . number_format($this->pledged_amount / 100, 2, ',', '.');
+    }
+
+    public function getCoverImagePathAttribute($value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        // Keep absolute URLs (http, https, s3, etc.) and data URIs untouched.
+        if (preg_match('#^[a-z][a-z0-9+\-.]*://#i', $value) === 1 || str_starts_with($value, 'data:')) {
+            return $value;
+        }
+
+        // Root-relative paths are safe as-is.
+        if (str_starts_with($value, '/')) {
+            return $value;
+        }
+
+        // If user stored something like "storage/foo.jpg", fix missing leading slash.
+        if (str_starts_with($value, 'storage/') || str_starts_with($value, 'img/') || str_starts_with($value, 'build/')) {
+            return '/' . $value;
+        }
+
+        // Otherwise treat as a path under the public disk (served via /storage symlink).
+        return '/storage/' . ltrim($value, '/');
     }
 }

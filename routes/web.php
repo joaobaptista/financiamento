@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 // SPA entrypoints (GET) — serve Vue for all screens
@@ -23,6 +24,9 @@ Route::middleware(['auth'])->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+
+// SEO
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
 // Fallback for Vue Router
 Route::view('/{any}', 'spa')->where('any', '.*');

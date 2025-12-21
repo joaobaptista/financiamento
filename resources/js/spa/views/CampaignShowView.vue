@@ -224,6 +224,7 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { apiGet, apiPost } from '../api';
+import { applyCampaignSeo } from '../seo';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 
@@ -331,6 +332,8 @@ async function fetchCampaign() {
     campaign.value = await apiGet(`/api/campaigns/${props.slug}`);
     progress.value = calcProgress(campaign.value);
     daysRemaining.value = calcDaysRemaining(campaign.value);
+
+    applyCampaignSeo(campaign.value);
 
     // Escolha inicial de valor: se houver recompensa selecionada, usa mínimo; senão, um valor sugerido.
     if (selectedReward.value) {
