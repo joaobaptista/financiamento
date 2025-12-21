@@ -38,6 +38,7 @@ class PledgeController
             ]);
 
             if (! $paymentResult->success) {
+                $pledge->markAsCanceled();
                 return response()->json([
                     'message' => 'Erro ao processar pagamento. Tente novamente.',
                 ], 422);

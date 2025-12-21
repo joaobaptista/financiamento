@@ -20,10 +20,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['web'])->group(function () {
     // Auth (session-based)
     Route::get('/me', [AuthController::class, 'me']);
-    Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
-    Route::post('/register', [AuthController::class, 'register'])->middleware('guest');
-    Route::get('/oauth/google/redirect', [AuthController::class, 'redirectToGoogle'])->middleware('guest');
-    Route::get('/oauth/google/callback', [AuthController::class, 'handleGoogleCallback'])->middleware('guest');
+    Route::post('/login', [AuthController::class, 'login'])->middleware(['guest', 'throttle:20,1']);
+    Route::post('/register', [AuthController::class, 'register'])->middleware(['guest', 'throttle:10,1']);
+    Route::get('/oauth/google/redirect', [AuthController::class, 'redirectToGoogle'])->middleware(['guest', 'throttle:30,1']);
+    Route::get('/oauth/google/callback', [AuthController::class, 'handleGoogleCallback'])->middleware(['guest', 'throttle:30,1']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');
 
     // Public campaigns
@@ -40,6 +40,6 @@ Route::middleware(['web'])->group(function () {
         Route::put('/me/campaigns/{id}', [CampaignController::class, 'update']);
         Route::post('/me/campaigns/{id}/publish', [CampaignController::class, 'publish']);
 
-        Route::post('/pledges', [PledgeController::class, 'store']);
+        Route::post('/pledges', [PledgeController::class, 'store'])->middleware('throttle:10,1');
     });
 });

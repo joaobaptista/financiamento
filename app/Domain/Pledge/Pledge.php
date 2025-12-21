@@ -79,6 +79,16 @@ class Pledge extends Model
         return $this->save();
     }
 
+    public function markAsCanceled(): bool
+    {
+        if ($this->status === PledgeStatus::Paid) {
+            return false;
+        }
+
+        $this->status = PledgeStatus::Canceled;
+        return $this->save();
+    }
+
     public function getFormattedAmountAttribute(): string
     {
         return 'R$ ' . number_format($this->amount / 100, 2, ',', '.');

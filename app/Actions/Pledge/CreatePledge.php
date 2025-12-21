@@ -53,10 +53,6 @@ class CreatePledge
 
         $pledge->save();
 
-        if ($reward) {
-            $reward->decrementRemaining();
-        }
-
         return $pledge;
     }
 }

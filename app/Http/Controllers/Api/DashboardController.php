@@ -18,12 +18,15 @@ class DashboardController
 
     public function show(int $id, GetCampaignDashboardData $getCampaignDashboardData)
     {
-        $data = $getCampaignDashboardData->execute(auth()->id(), $id);
+        $perPage = (int) request()->query('per_page', 25);
+        $perPage = max(1, min($perPage, 100));
+
+        $data = $getCampaignDashboardData->execute(auth()->id(), $id, $perPage);
 
         return response()->json([
-            'campaign' => new CampaignResource($data['campaign']->loadMissing(['user', 'rewards'])),
+            'campaign' => new CampaignResource($data['campaign']),
             'stats' => $data['stats']->toArray(),
-            'pledges' => PledgeResource::collection($data['campaign']->pledges),
+            'pledges' => PledgeResource::collection($data['pledges']),
         ]);
     }
 }
