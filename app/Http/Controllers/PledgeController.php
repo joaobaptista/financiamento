@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Actions\Pledge\ConfirmPayment;
 use App\Actions\Pledge\CreatePledge;
+use App\Contracts\Payments\PaymentService;
 use App\Data\Pledge\CreatePledgeData;
-use App\Services\Payments\MockPaymentService;
 use App\Services\Money\Money;
 use Illuminate\Http\Request;
 
 class PledgeController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, PaymentService $paymentService)
     {
         $validated = $request->validate([
             'campaign_id' => 'required|exists:campaigns,id',
@@ -34,7 +34,6 @@ class PledgeController extends Controller
             $pledge = $createPledgeAction->execute($data);
 
             // Processar pagamento (mock)
-            $paymentService = new MockPaymentService();
             $paymentResult = $paymentService->processPayment($amount, [
                 'campaign_id' => (int) $validated['campaign_id'],
                 'user_id' => auth()->id(),
