@@ -19,26 +19,17 @@ class CampaignController extends Controller
 {
     public function index()
     {
-        $campaigns = Campaign::active()
-            ->with('user')
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
-
-        return view('campaigns.index', compact('campaigns'));
+        return view('spa');
     }
 
     public function show($slug)
     {
-        $campaign = Campaign::where('slug', $slug)
-            ->with(['user', 'rewards'])
-            ->firstOrFail();
-
-        return view('campaigns.show', compact('campaign'));
+        return view('spa');
     }
 
     public function create()
     {
-        return view('campaigns.create');
+        return view('spa');
     }
 
     public function store(StoreCampaignRequest $request, CreateCampaign $createCampaign)
@@ -77,17 +68,7 @@ class CampaignController extends Controller
 
     public function edit($id)
     {
-        $campaign = Campaign::where('id', $id)
-            ->where('user_id', auth()->id())
-            ->with('rewards')
-            ->firstOrFail();
-
-        if ($campaign->status !== CampaignStatus::Draft) {
-            return redirect()->route('dashboard.index')
-                ->with('error', 'Apenas campanhas em rascunho podem ser editadas.');
-        }
-
-        return view('campaigns.edit', compact('campaign'));
+        return view('spa');
     }
 
     public function update(UpdateCampaignRequest $request, $id, UpdateCampaign $updateCampaign)

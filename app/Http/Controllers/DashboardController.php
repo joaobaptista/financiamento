@@ -10,17 +10,11 @@ class DashboardController extends Controller
 {
     public function index(ListUserCampaigns $listUserCampaigns)
     {
-        $campaigns = $listUserCampaigns->execute(auth()->id());
-
-        return view('dashboard.index', compact('campaigns'));
+        return view('spa');
     }
 
     public function show($id, GetCampaignDashboardData $getCampaignDashboardData)
     {
-        $data = $getCampaignDashboardData->execute(auth()->id(), (int) $id);
-        $campaign = $data['campaign'];
-        $stats = $data['stats']->toArray();
-
-        return view('dashboard.show', compact('campaign', 'stats'));
+        return view('spa');
     }
 }
