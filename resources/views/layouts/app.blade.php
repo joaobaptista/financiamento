@@ -153,13 +153,11 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5>Catarse</h5>
-                    <p class="text-muted">Plataforma de crowdfunding para projetos criativos.</p>
-                </div>
+                    <h5>Origo</h5>
+                        <p class="text-muted">Plataforma de crowdfunding para projetos criativos.</p>
                 <div class="col-md-6 text-md-end">
-                    <p class="text-muted mb-0">&copy; {{ date('Y') }} Catarse. Todos os direitos reservados.</p>
-                </div>
-            </div>
+                    <p class="text-muted mb-0">&copy; {{ date('Y') }} Origo. Todos os direitos reservados.</p>
+                        <p class="text-muted mb-0">&copy; {{ date('Y') }} Origo. Todos os direitos reservados.</p>
         </div>
     </footer>
 
