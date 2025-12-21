@@ -2,6 +2,7 @@
 
 namespace App\Domain\Campaign;
 
+use App\Enums\CampaignStatus;
 use App\Models\User;
 use App\Domain\Pledge\Pledge;
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +30,7 @@ class Campaign extends Model
         'pledged_amount' => 'integer',
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
+        'status' => CampaignStatus::class,
     ];
 
     protected static function boot()
@@ -61,32 +63,32 @@ class Campaign extends Model
     // Scopes
     public function scopeActive($query)
     {
-        return $query->where('status', 'active');
+        return $query->where('status', CampaignStatus::Active->value);
     }
 
     public function scopeDraft($query)
     {
-        return $query->where('status', 'draft');
+        return $query->where('status', CampaignStatus::Draft->value);
     }
 
     public function scopeSuccessful($query)
     {
-        return $query->where('status', 'successful');
+        return $query->where('status', CampaignStatus::Successful->value);
     }
 
     public function scopeFailed($query)
     {
-        return $query->where('status', 'failed');
+        return $query->where('status', CampaignStatus::Failed->value);
     }
 
     // Business Logic
     public function publish(): bool
     {
-        if ($this->status !== 'draft') {
+        if ($this->status !== CampaignStatus::Draft) {
             return false;
         }
 
-        $this->status = 'active';
+        $this->status = CampaignStatus::Active;
 
         if (!$this->starts_at) {
             $this->starts_at = now();

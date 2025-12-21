@@ -5,6 +5,7 @@ namespace App\Actions\Campaign;
 use App\Data\Campaign\UpdateCampaignData;
 use App\Domain\Campaign\Campaign;
 use App\Domain\Campaign\Reward;
+use App\Enums\CampaignStatus;
 
 class UpdateCampaign
 {
@@ -15,7 +16,7 @@ class UpdateCampaign
             ->where('user_id', $data->userId)
             ->firstOrFail();
 
-        if ($campaign->status !== 'draft') {
+        if ($campaign->status !== CampaignStatus::Draft) {
             throw new \RuntimeException('Apenas campanhas em rascunho podem ser editadas.');
         }
 

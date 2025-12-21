@@ -4,6 +4,7 @@ namespace App\Domain\Pledge;
 
 use App\Domain\Campaign\Campaign;
 use App\Domain\Campaign\Reward;
+use App\Enums\PledgeStatus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,6 +25,7 @@ class Pledge extends Model
     protected $casts = [
         'amount' => 'integer',
         'paid_at' => 'datetime',
+        'status' => PledgeStatus::class,
     ];
 
     // Relationships
@@ -45,23 +47,23 @@ class Pledge extends Model
     // Scopes
     public function scopePaid($query)
     {
-        return $query->where('status', 'paid');
+        return $query->where('status', PledgeStatus::Paid->value);
     }
 
     public function scopePending($query)
     {
-        return $query->where('status', 'pending');
+        return $query->where('status', PledgeStatus::Pending->value);
     }
 
     public function scopeRefunded($query)
     {
-        return $query->where('status', 'refunded');
+        return $query->where('status', PledgeStatus::Refunded->value);
     }
 
     // Business Logic
     public function markAsPaid(?string $paymentId = null): bool
     {
-        $this->status = 'paid';
+        $this->status = PledgeStatus::Paid;
         $this->paid_at = now();
 
         if ($paymentId) {
@@ -73,7 +75,7 @@ class Pledge extends Model
 
     public function markAsRefunded(): bool
     {
-        $this->status = 'refunded';
+        $this->status = PledgeStatus::Refunded;
         return $this->save();
     }
 

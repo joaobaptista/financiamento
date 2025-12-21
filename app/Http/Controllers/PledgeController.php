@@ -6,18 +6,19 @@ use App\Actions\Pledge\ConfirmPayment;
 use App\Actions\Pledge\CreatePledge;
 use App\Contracts\Payments\PaymentService;
 use App\Data\Pledge\CreatePledgeData;
+use App\Http\Requests\StorePledgeRequest;
 use App\Services\Money\Money;
-use Illuminate\Http\Request;
 
 class PledgeController extends Controller
 {
-    public function store(Request $request, PaymentService $paymentService)
+    public function store(
+        StorePledgeRequest $request,
+        PaymentService $paymentService,
+        CreatePledge $createPledge,
+        ConfirmPayment $confirmPayment,
+    )
     {
-        $validated = $request->validate([
-            'campaign_id' => 'required|exists:campaigns,id',
-            'amount' => 'required|numeric|min:1',
-            'reward_id' => 'nullable|exists:rewards,id',
-        ]);
+        $validated = $request->validated();
 
         $amount = Money::toCents($validated['amount']);
 
@@ -30,8 +31,7 @@ class PledgeController extends Controller
                 rewardId: $validated['reward_id'] ?? null,
             );
 
-            $createPledgeAction = new CreatePledge();
-            $pledge = $createPledgeAction->execute($data);
+            $pledge = $createPledge->execute($data);
 
             // Processar pagamento (mock)
             $paymentResult = $paymentService->processPayment($amount, [
@@ -41,8 +41,7 @@ class PledgeController extends Controller
 
             if ($paymentResult->success) {
                 // Confirmar pagamento
-                $confirmPaymentAction = new ConfirmPayment();
-                $confirmPaymentAction->execute($pledge, $paymentResult->paymentId);
+                $confirmPayment->execute($pledge, $paymentResult->paymentId);
 
                 return redirect()->route('campaigns.show', $pledge->campaign->slug)
                     ->with('success', 'Apoio realizado com sucesso! Obrigado por apoiar este projeto.');

@@ -4,6 +4,7 @@ namespace App\Services\Payments;
 
 use App\Contracts\Payments\PaymentService;
 use App\Data\Payments\PaymentResultData;
+use App\Enums\PledgeStatus;
 
 class MockPaymentService implements PaymentService
 {
@@ -16,7 +17,7 @@ class MockPaymentService implements PaymentService
             success: true,
             paymentId: 'mock_' . uniqid(),
             amount: $amount,
-            status: 'paid',
+            status: PledgeStatus::Paid->value,
             message: 'Pagamento simulado processado com sucesso',
             raw: [
                 'metadata' => $metadata,
@@ -31,7 +32,7 @@ class MockPaymentService implements PaymentService
             success: true,
             paymentId: $paymentId,
             amount: 0,
-            status: 'refunded',
+            status: PledgeStatus::Refunded->value,
             message: 'Estorno simulado processado com sucesso',
         );
     }

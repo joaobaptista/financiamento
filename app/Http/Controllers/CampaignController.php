@@ -9,9 +9,11 @@ use App\Domain\Campaign\Campaign;
 use App\Data\Campaign\CreateCampaignData;
 use App\Data\Campaign\RewardData;
 use App\Data\Campaign\UpdateCampaignData;
+use App\Enums\CampaignStatus;
+use App\Http\Requests\StoreCampaignRequest;
+use App\Http\Requests\UpdateCampaignRequest;
 use App\Services\Money\Money;
 use Illuminate\Support\Carbon;
-use Illuminate\Http\Request;
 
 class CampaignController extends Controller
 {
@@ -39,15 +41,9 @@ class CampaignController extends Controller
         return view('campaigns.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreCampaignRequest $request, CreateCampaign $createCampaign)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'goal_amount' => 'required|numeric|min:1',
-            'ends_at' => 'required|date|after:today',
-            'cover_image_path' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         $rewards = [];
         if ($request->has('rewards')) {
@@ -73,7 +69,7 @@ class CampaignController extends Controller
             rewards: $rewards,
         );
 
-        (new CreateCampaign())->execute($data);
+        $createCampaign->execute($data);
 
         return redirect()->route('dashboard.index')
             ->with('success', 'Campanha criada com sucesso!');
@@ -86,7 +82,7 @@ class CampaignController extends Controller
             ->with('rewards')
             ->firstOrFail();
 
-        if ($campaign->status !== 'draft') {
+        if ($campaign->status !== CampaignStatus::Draft) {
             return redirect()->route('dashboard.index')
                 ->with('error', 'Apenas campanhas em rascunho podem ser editadas.');
         }
@@ -94,15 +90,9 @@ class CampaignController extends Controller
         return view('campaigns.edit', compact('campaign'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateCampaignRequest $request, $id, UpdateCampaign $updateCampaign)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'goal_amount' => 'required|numeric|min:1',
-            'ends_at' => 'required|date|after:today',
-            'cover_image_path' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         $rewards = [];
         if ($request->has('rewards')) {
@@ -130,7 +120,7 @@ class CampaignController extends Controller
                 rewards: $rewards,
             );
 
-            (new UpdateCampaign())->execute($data);
+            $updateCampaign->execute($data);
         } catch (\RuntimeException $e) {
             return redirect()->route('dashboard.index')
                 ->with('error', $e->getMessage());
@@ -140,15 +130,14 @@ class CampaignController extends Controller
             ->with('success', 'Campanha atualizada com sucesso!');
     }
 
-    public function publish($id)
+    public function publish($id, PublishCampaign $publishCampaign)
     {
         $campaign = Campaign::where('id', $id)
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
         try {
-            $action = new PublishCampaign();
-            $action->execute($campaign);
+            $publishCampaign->execute($campaign);
 
             return redirect()->route('dashboard.index')
                 ->with('success', 'Campanha publicada com sucesso!');

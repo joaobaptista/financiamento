@@ -4,6 +4,7 @@ namespace App\Actions\Dashboard;
 
 use App\Data\Dashboard\CampaignStatsData;
 use App\Domain\Campaign\Campaign;
+use App\Enums\PledgeStatus;
 
 class GetCampaignDashboardData
 {
@@ -18,13 +19,13 @@ class GetCampaignDashboardData
             ->with([
                 'pledges.user',
                 'pledges' => function ($query) {
-                    $query->where('status', 'paid')->orderBy('paid_at', 'desc');
+                    $query->where('status', PledgeStatus::Paid->value)->orderBy('paid_at', 'desc');
                 },
             ])
             ->firstOrFail();
 
         $stats = new CampaignStatsData(
-            totalBackers: $campaign->pledges()->where('status', 'paid')->count(),
+            totalBackers: $campaign->pledges()->where('status', PledgeStatus::Paid->value)->count(),
             totalRaised: $campaign->pledged_amount,
             progress: $campaign->calculateProgress(),
             daysRemaining: $campaign->daysRemaining(),

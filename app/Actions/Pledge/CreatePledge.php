@@ -6,6 +6,8 @@ use App\Data\Pledge\CreatePledgeData;
 use App\Domain\Campaign\Campaign;
 use App\Domain\Campaign\Reward;
 use App\Domain\Pledge\Pledge;
+use App\Enums\CampaignStatus;
+use App\Enums\PledgeStatus;
 use App\Models\User;
 
 class CreatePledge
@@ -15,7 +17,7 @@ class CreatePledge
         $campaign = Campaign::query()->findOrFail($data->campaignId);
         $user = User::query()->findOrFail($data->userId);
 
-        if ($campaign->status !== 'active') {
+        if ($campaign->status !== CampaignStatus::Active) {
             throw new \RuntimeException('Apenas campanhas ativas podem receber apoios.');
         }
 
@@ -45,7 +47,7 @@ class CreatePledge
             'user_id' => $user->id,
             'reward_id' => $data->rewardId,
             'amount' => $data->amount,
-            'status' => 'pending',
+            'status' => PledgeStatus::Pending,
             'provider' => 'mock',
         ]);
 

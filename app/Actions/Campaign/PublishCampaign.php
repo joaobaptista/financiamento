@@ -3,12 +3,13 @@
 namespace App\Actions\Campaign;
 
 use App\Domain\Campaign\Campaign;
+use App\Enums\CampaignStatus;
 
 class PublishCampaign
 {
     public function execute(Campaign $campaign): bool
     {
-        if ($campaign->status !== 'draft') {
+        if ($campaign->status !== CampaignStatus::Draft) {
             throw new \RuntimeException('Apenas campanhas em rascunho podem ser publicadas.');
         }
 
@@ -24,7 +25,7 @@ class PublishCampaign
             throw new \RuntimeException('Campanha precisa ter uma data de término.');
         }
 
-        $campaign->status = 'active';
+        $campaign->status = CampaignStatus::Active;
 
         if (!$campaign->starts_at) {
             $campaign->starts_at = now();
