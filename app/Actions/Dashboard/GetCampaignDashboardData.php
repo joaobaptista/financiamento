@@ -18,6 +18,7 @@ class GetCampaignDashboardData
             ->where('user_id', $userId)
             ->with([
                 'pledges.user',
+                'pledges.reward',
                 'pledges' => function ($query) {
                     $query->where('status', PledgeStatus::Paid->value)->orderBy('paid_at', 'desc');
                 },

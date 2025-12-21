@@ -1,40 +1,29 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CampaignController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PledgeController;
 use Illuminate\Support\Facades\Route;
 
-// Página inicial
-Route::get('/', function () {
-    return view('home');
-})->name('home');
+// SPA entrypoints (GET) — serve Vue for all screens
+Route::view('/', 'spa')->name('home');
 
-// Rotas públicas de campanhas
-Route::get('/campaigns', [CampaignController::class, 'index'])->name('campaigns.index');
-Route::get('/campaigns/{slug}', [CampaignController::class, 'show'])->name('campaigns.show');
+Route::view('/campaigns', 'spa')->name('campaigns.index');
+Route::view('/campaigns/{slug}', 'spa')->name('campaigns.show');
 
-// Dashboard do criador (autenticado)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
-    Route::get('/dashboard/campaigns/{id}', [DashboardController::class, 'show'])->name('dashboard.show');
+	Route::view('/dashboard', 'spa')->name('dashboard.index');
+	Route::view('/dashboard/campaigns/{id}', 'spa')->name('dashboard.show');
 
-    // CRUD de campanhas
-    Route::get('/me/campaigns/create', [CampaignController::class, 'create'])->name('campaigns.create');
-    Route::post('/me/campaigns', [CampaignController::class, 'store'])->name('campaigns.store');
-    Route::get('/me/campaigns/{id}/edit', [CampaignController::class, 'edit'])->name('campaigns.edit');
-    Route::put('/me/campaigns/{id}', [CampaignController::class, 'update'])->name('campaigns.update');
-    Route::post('/me/campaigns/{id}/publish', [CampaignController::class, 'publish'])->name('campaigns.publish');
+	Route::view('/me/campaigns/create', 'spa')->name('campaigns.create');
+	Route::view('/me/campaigns/{id}/edit', 'spa')->name('campaigns.edit');
 
-    // Apoios
-    Route::post('/pledges', [PledgeController::class, 'store'])->name('pledges.store');
+	Route::view('/profile', 'spa')->name('profile.edit');
 
-    // Perfil
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+	Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+	Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__ . '/auth.php';
+
+// Fallback for Vue Router
+Route::view('/{any}', 'spa')->where('any', '.*');
 
