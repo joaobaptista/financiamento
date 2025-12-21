@@ -1,16 +1,16 @@
 <template>
     <div class="container">
-        <div v-if="loading" class="text-muted">Carregando…</div>
+        <div v-if="loading" class="text-muted">{{ t('common.loading') }}</div>
 
         <div v-else>
             <div class="mb-4">
                 <RouterLink to="/dashboard" class="btn btn-sm btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Voltar
+                    <i class="bi bi-arrow-left"></i> {{ t('common.back') }}
                 </RouterLink>
             </div>
 
             <div class="py-2">
-                <div class="text-uppercase text-muted small">Estatísticas</div>
+                <div class="text-uppercase text-muted small">{{ t('dashboard.stats') }}</div>
                 <h1 class="h3 fw-normal mb-0">{{ data?.campaign?.title }}</h1>
             </div>
 
@@ -20,14 +20,14 @@
                         <div class="card-body">
                             <h6 class="text-muted">Total Arrecadado</h6>
                             <h3 class="text-success">{{ formatMoney(data?.campaign?.pledged_amount) }}</h3>
-                            <small class="text-muted">de {{ formatMoney(data?.campaign?.goal_amount) }}</small>
+                            <small class="text-muted">{{ t('common.ofGoal', { goal: formatMoney(data?.campaign?.goal_amount) }) }}</small>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="card text-center">
                         <div class="card-body">
-                            <h6 class="text-muted">Apoiadores</h6>
+                            <h6 class="text-muted">{{ t('dashboard.backers') }}</h6>
                             <h3>{{ data?.stats?.total_backers ?? 0 }}</h3>
                         </div>
                     </div>
@@ -35,7 +35,7 @@
                 <div class="col-md-3">
                     <div class="card text-center">
                         <div class="card-body">
-                            <h6 class="text-muted">Progresso</h6>
+                            <h6 class="text-muted">{{ t('dashboard.progress') }}</h6>
                             <h3>{{ Math.round(data?.stats?.progress ?? 0) }}%</h3>
                         </div>
                     </div>
@@ -43,7 +43,7 @@
                 <div class="col-md-3">
                     <div class="card text-center">
                         <div class="card-body">
-                            <h6 class="text-muted">Dias Restantes</h6>
+                            <h6 class="text-muted">{{ t('dashboard.daysRemaining') }}</h6>
                             <h3>{{ data?.stats?.days_remaining ?? 0 }}</h3>
                         </div>
                     </div>
@@ -59,23 +59,23 @@
                     @click="publish"
                 >
                     <i class="bi bi-rocket-takeoff"></i>
-                    {{ publishing ? 'Publicando…' : 'Publicar' }}
+                    {{ publishing ? t('common.publishing') : t('common.publish') }}
                 </button>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <div class="text-uppercase text-muted small">Lista de apoiadores</div>
+                    <div class="text-uppercase text-muted small">{{ t('dashboard.backersList') }}</div>
                 </div>
                 <div class="card-body">
                     <div v-if="(data?.pledges || []).length" class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Apoiador</th>
-                                    <th>Valor</th>
-                                    <th>Data</th>
-                                    <th>Recompensa</th>
+                                    <th>{{ t('dashboard.table.backer') }}</th>
+                                    <th>{{ t('dashboard.table.amount') }}</th>
+                                    <th>{{ t('dashboard.table.date') }}</th>
+                                    <th>{{ t('dashboard.table.reward') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -88,7 +88,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <p v-else class="text-muted text-center py-4">Nenhum apoio recebido ainda.</p>
+                    <p v-else class="text-muted text-center py-4">{{ t('dashboard.noPledges') }}</p>
                 </div>
             </div>
 
@@ -99,6 +99,7 @@
 
 <script setup>
 import { onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { apiGet, apiPost } from '../api';
 
 const props = defineProps({
@@ -110,15 +111,19 @@ const data = ref(null);
 const publishing = ref(false);
 const message = ref('');
 
+const { t, locale } = useI18n({ useScope: 'global' });
+
 function formatMoney(cents) {
-    const value = (Number(cents || 0) / 100).toFixed(2);
-    return `R$ ${value}`;
+    const value = Number(cents || 0) / 100;
+    const intlLocale = String(locale.value || 'pt_BR').replace('_', '-');
+    return new Intl.NumberFormat(intlLocale, { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 function formatDateTime(iso) {
     if (!iso) return '-';
     const date = new Date(iso);
-    return date.toLocaleString('pt-BR');
+        const intlLocale = String(locale.value || 'pt_BR').replace('_', '-');
+        return date.toLocaleString(intlLocale);
 }
 
 async function load() {
@@ -133,10 +138,10 @@ async function publish() {
 
     try {
         await apiPost(`/api/me/campaigns/${props.id}/publish`, {});
-        message.value = 'Campanha publicada.';
+        message.value = t('dashboard.publishDone');
         await load();
     } catch (e) {
-        message.value = e?.response?.data?.message ?? 'Erro ao publicar.';
+        message.value = e?.response?.data?.message ?? t('dashboard.publishError');
     } finally {
         publishing.value = false;
     }

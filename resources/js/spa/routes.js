@@ -16,8 +16,8 @@ export const routes = [
         name: 'home',
         component: HomeView,
         meta: {
-            title: 'Crowdfunding para projetos criativos',
-            description: 'Apoie criadores, escolha recompensas e acompanhe campanhas em tempo real.',
+            titleKey: 'routes.home.title',
+            descriptionKey: 'routes.home.description',
             ogType: 'website',
         },
     },
@@ -26,8 +26,8 @@ export const routes = [
         name: 'campaigns.index',
         component: CampaignIndexView,
         meta: {
-            title: 'Explorar campanhas',
-            description: 'Descubra campanhas ativas e apoie projetos criativos com recompensas.',
+            titleKey: 'routes.campaignsIndex.title',
+            descriptionKey: 'routes.campaignsIndex.description',
             ogType: 'website',
         },
     },
@@ -37,8 +37,8 @@ export const routes = [
         component: CampaignShowView,
         props: true,
         meta: {
-            title: 'Campanha',
-            description: 'Veja detalhes, recompensas e apoie esta campanha.',
+            titleKey: 'routes.campaignsShow.title',
+            descriptionKey: 'routes.campaignsShow.description',
             ogType: 'article',
         },
     },
@@ -49,14 +49,11 @@ export const routes = [
         name: 'pages.about',
         component: StaticPageView,
         meta: {
-            title: 'Quem somos',
-            lead: 'Conheça a Origo e nossa missão.',
-            description: 'Conheça a Origo e nossa missão.',
+            titleKey: 'routes.pages.about.title',
+            leadKey: 'routes.pages.about.lead',
+            descriptionKey: 'routes.pages.about.description',
             ogType: 'website',
-            content: [
-                'A Origo é uma plataforma de crowdfunding para projetos criativos.',
-                'Aqui você encontra iniciativas independentes e pode apoiar criadores diretamente.',
-            ],
+            contentKeys: ['routes.pages.about.content.1', 'routes.pages.about.content.2'],
         },
     },
     {
@@ -64,14 +61,11 @@ export const routes = [
         name: 'pages.how',
         component: StaticPageView,
         meta: {
-            title: 'Como funciona',
-            lead: 'O básico do financiamento coletivo na Origo.',
-            description: 'O básico do financiamento coletivo: explorar campanhas, escolher recompensas e apoiar criadores.',
+            titleKey: 'routes.pages.how.title',
+            leadKey: 'routes.pages.how.lead',
+            descriptionKey: 'routes.pages.how.description',
             ogType: 'website',
-            content: [
-                'Explore campanhas, escolha uma recompensa e faça seu apoio.',
-                'Criadores publicam atualizações e entregam recompensas conforme o cronograma.',
-            ],
+            contentKeys: ['routes.pages.how.content.1', 'routes.pages.how.content.2'],
         },
     },
     {
@@ -79,11 +73,11 @@ export const routes = [
         name: 'pages.blog',
         component: StaticPageView,
         meta: {
-            title: 'Blog',
-            lead: 'Novidades, dicas e histórias de bastidores.',
-            description: 'Novidades, dicas e histórias de bastidores sobre crowdfunding e criação.',
+            titleKey: 'routes.pages.blog.title',
+            leadKey: 'routes.pages.blog.lead',
+            descriptionKey: 'routes.pages.blog.description',
             ogType: 'website',
-            content: 'Conteúdo em breve.',
+            contentKey: 'pages.contentSoon',
         },
     },
     {
@@ -91,11 +85,11 @@ export const routes = [
         name: 'pages.team',
         component: StaticPageView,
         meta: {
-            title: 'Nosso time',
-            lead: 'Pessoas por trás da plataforma.',
-            description: 'Conheça o time por trás da plataforma.',
+            titleKey: 'routes.pages.team.title',
+            leadKey: 'routes.pages.team.lead',
+            descriptionKey: 'routes.pages.team.description',
             ogType: 'website',
-            content: 'Conteúdo em breve.',
+            contentKey: 'pages.contentSoon',
         },
     },
     {
@@ -103,11 +97,11 @@ export const routes = [
         name: 'pages.press',
         component: StaticPageView,
         meta: {
-            title: 'Imprensa',
-            lead: 'Materiais e contato para imprensa.',
-            description: 'Materiais e contato para imprensa.',
+            titleKey: 'routes.pages.press.title',
+            leadKey: 'routes.pages.press.lead',
+            descriptionKey: 'routes.pages.press.description',
             ogType: 'website',
-            content: 'Conteúdo em breve.',
+            contentKey: 'pages.contentSoon',
         },
     },
     {
@@ -115,9 +109,9 @@ export const routes = [
         name: 'pages.retrospective2020',
         component: StaticPageView,
         meta: {
-            title: 'Retrospectiva 2020',
-            lead: 'Um resumo simbólico para manter o footer completo.',
-            content: 'Conteúdo em breve.',
+            titleKey: 'routes.pages.retrospective2020.title',
+            leadKey: 'routes.pages.retrospective2020.lead',
+            contentKey: 'pages.contentSoon',
         },
     },
     {
@@ -125,11 +119,11 @@ export const routes = [
         name: 'pages.support',
         component: StaticPageView,
         meta: {
-            title: 'Central de suporte',
-            lead: 'Tire dúvidas e encontre ajuda rápida.',
-            description: 'Tire dúvidas e encontre ajuda rápida.',
+            titleKey: 'routes.pages.support.title',
+            leadKey: 'routes.pages.support.lead',
+            descriptionKey: 'routes.pages.support.description',
             ogType: 'website',
-            content: 'Conteúdo em breve.',
+            contentKey: 'pages.contentSoon',
         },
     },
     {
@@ -137,11 +131,11 @@ export const routes = [
         name: 'pages.contact',
         component: StaticPageView,
         meta: {
-            title: 'Contato',
-            lead: 'Fale com a gente.',
-            description: 'Fale com a gente.',
+            titleKey: 'routes.pages.contact.title',
+            leadKey: 'routes.pages.contact.lead',
+            descriptionKey: 'routes.pages.contact.description',
             ogType: 'website',
-            content: 'Conteúdo em breve.',
+            contentKey: 'pages.contentSoon',
         },
     },
     {
@@ -149,9 +143,9 @@ export const routes = [
         name: 'pages.updates',
         component: StaticPageView,
         meta: {
-            title: 'Atualizações',
-            lead: 'Histórico de melhorias e mudanças.',
-            content: 'Conteúdo em breve.',
+            titleKey: 'routes.pages.updates.title',
+            leadKey: 'routes.pages.updates.lead',
+            contentKey: 'pages.contentSoon',
         },
     },
     {
@@ -159,9 +153,9 @@ export const routes = [
         name: 'pages.fees',
         component: StaticPageView,
         meta: {
-            title: 'Nossa taxa',
-            lead: 'Como funcionam as taxas da plataforma.',
-            content: 'Conteúdo em breve.',
+            titleKey: 'routes.pages.fees.title',
+            leadKey: 'routes.pages.fees.lead',
+            contentKey: 'pages.contentSoon',
         },
     },
     {
@@ -169,9 +163,9 @@ export const routes = [
         name: 'pages.security',
         component: StaticPageView,
         meta: {
-            title: 'Responsabilidades e segurança',
-            lead: 'Boas práticas e informações importantes.',
-            content: 'Conteúdo em breve.',
+            titleKey: 'routes.pages.security.title',
+            leadKey: 'routes.pages.security.lead',
+            contentKey: 'pages.contentSoon',
         },
     },
     {
@@ -179,11 +173,11 @@ export const routes = [
         name: 'pages.terms',
         component: StaticPageView,
         meta: {
-            title: 'Termos de uso',
-            lead: 'Regras e condições de uso da plataforma.',
-            description: 'Regras e condições de uso da plataforma.',
+            titleKey: 'routes.pages.terms.title',
+            leadKey: 'routes.pages.terms.lead',
+            descriptionKey: 'routes.pages.terms.description',
             ogType: 'website',
-            content: 'Conteúdo em breve.',
+            contentKey: 'pages.contentSoon',
         },
     },
     {
@@ -191,11 +185,11 @@ export const routes = [
         name: 'pages.privacy',
         component: StaticPageView,
         meta: {
-            title: 'Política de privacidade',
-            lead: 'Como tratamos seus dados.',
-            description: 'Como tratamos seus dados.',
+            titleKey: 'routes.pages.privacy.title',
+            leadKey: 'routes.pages.privacy.lead',
+            descriptionKey: 'routes.pages.privacy.description',
             ogType: 'website',
-            content: 'Conteúdo em breve.',
+            contentKey: 'pages.contentSoon',
         },
     },
     {
@@ -203,9 +197,9 @@ export const routes = [
         name: 'pages.popular',
         component: StaticPageView,
         meta: {
-            title: 'Populares',
-            lead: 'Curadoria e destaques.',
-            content: 'Conteúdo em breve.',
+            titleKey: 'routes.pages.popular.title',
+            leadKey: 'routes.pages.popular.lead',
+            contentKey: 'pages.contentSoon',
         },
     },
     {
@@ -213,9 +207,9 @@ export const routes = [
         name: 'pages.onAir',
         component: StaticPageView,
         meta: {
-            title: 'No ar',
-            lead: 'Campanhas ativas no momento.',
-            content: 'Explore as campanhas na página de exploração.',
+            titleKey: 'routes.pages.onAir.title',
+            leadKey: 'routes.pages.onAir.lead',
+            contentKey: 'routes.pages.onAir.content',
         },
     },
     {
@@ -223,9 +217,9 @@ export const routes = [
         name: 'pages.finished',
         component: StaticPageView,
         meta: {
-            title: 'Finalizados',
-            lead: 'Projetos concluídos.',
-            content: 'Conteúdo em breve.',
+            titleKey: 'routes.pages.finished.title',
+            leadKey: 'routes.pages.finished.lead',
+            contentKey: 'pages.contentSoon',
         },
     },
     {
@@ -233,9 +227,9 @@ export const routes = [
         name: 'pages.subscriptions',
         component: StaticPageView,
         meta: {
-            title: 'Assinaturas',
-            lead: 'Apoio recorrente.',
-            content: 'Conteúdo em breve.',
+            titleKey: 'routes.pages.subscriptions.title',
+            leadKey: 'routes.pages.subscriptions.lead',
+            contentKey: 'pages.contentSoon',
         },
     },
 
@@ -244,8 +238,8 @@ export const routes = [
         name: 'login',
         component: LoginView,
         meta: {
-            title: 'Entrar',
-            description: 'Acesse sua conta para apoiar campanhas e acompanhar recompensas.',
+            titleKey: 'routes.login.title',
+            descriptionKey: 'routes.login.description',
             robots: 'noindex, nofollow',
         },
     },
@@ -254,8 +248,8 @@ export const routes = [
         name: 'register',
         component: RegisterView,
         meta: {
-            title: 'Criar conta',
-            description: 'Crie sua conta para apoiar campanhas e criar projetos.',
+            titleKey: 'routes.register.title',
+            descriptionKey: 'routes.register.description',
             robots: 'noindex, nofollow',
         },
     },
@@ -265,8 +259,8 @@ export const routes = [
         name: 'dashboard.index',
         component: DashboardIndexView,
         meta: {
-            title: 'Dashboard',
-            description: 'Área do criador para acompanhar suas campanhas.',
+            titleKey: 'routes.dashboard.title',
+            descriptionKey: 'routes.dashboard.description',
             robots: 'noindex, nofollow',
         },
     },
@@ -276,8 +270,8 @@ export const routes = [
         component: DashboardShowView,
         props: true,
         meta: {
-            title: 'Dashboard da campanha',
-            description: 'Acompanhe apoios e métricas da sua campanha.',
+            titleKey: 'routes.dashboardCampaign.title',
+            descriptionKey: 'routes.dashboardCampaign.description',
             robots: 'noindex, nofollow',
         },
     },
@@ -287,8 +281,8 @@ export const routes = [
         name: 'me.creator.setup',
         component: CreatorSetupCategoryView,
         meta: {
-            title: 'Configurar perfil de criador',
-            description: 'Configure sua categoria como criador antes de criar campanhas.',
+            titleKey: 'routes.creatorSetup.title',
+            descriptionKey: 'routes.creatorSetup.description',
             robots: 'noindex, nofollow',
         },
     },
@@ -298,8 +292,8 @@ export const routes = [
         name: 'me.campaigns.create',
         component: CampaignCreateView,
         meta: {
-            title: 'Criar campanha',
-            description: 'Crie uma nova campanha de crowdfunding.',
+            titleKey: 'routes.campaignCreate.title',
+            descriptionKey: 'routes.campaignCreate.description',
             robots: 'noindex, nofollow',
         },
     },
@@ -309,8 +303,8 @@ export const routes = [
         component: CampaignEditView,
         props: true,
         meta: {
-            title: 'Editar campanha',
-            description: 'Edite detalhes da sua campanha.',
+            titleKey: 'routes.campaignEdit.title',
+            descriptionKey: 'routes.campaignEdit.description',
             robots: 'noindex, nofollow',
         },
     },

@@ -1,14 +1,18 @@
 <template>
     <div class="container">
         <div class="text-center py-4 py-md-5">
-            <h1 class="display-5 fw-normal mb-0">Dê vida a um projeto criativo.</h1>
+            <h1 class="display-5 fw-normal mb-0">{{ t('home.heroTitle') }}</h1>
         </div>
 
-        <div v-if="loading" class="text-center text-muted py-5">Carregando…</div>
+        <div v-if="loading" class="text-center text-muted py-5">{{ t('common.loading') }}</div>
+
+        <div v-else-if="loadError" class="alert alert-danger" role="alert">
+            {{ loadError }}
+        </div>
 
         <div v-else class="row g-4 align-items-start">
             <div class="col-lg-6">
-                <div class="text-uppercase text-muted small mb-2">Projeto em destaque</div>
+                <div class="text-uppercase text-muted small mb-2">{{ t('home.featuredLabel') }}</div>
 
                 <div v-if="featuredCampaign" class="card campaign-card">
                     <div class="ratio ratio-16x9 bg-light">
@@ -47,26 +51,26 @@
                         </div>
 
                         <div class="d-flex justify-content-between small">
-                            <span class="text-success fw-semibold">{{ Math.round(progress(featuredCampaign)) }}% financiado</span>
-                            <span class="text-muted">{{ daysRemaining(featuredCampaign) }} dias restantes</span>
+                            <span class="text-success fw-semibold">{{ t('common.percentFunded', { percent: Math.round(progress(featuredCampaign)) }) }}</span>
+                            <span class="text-muted">{{ t('common.daysRemaining', { days: daysRemaining(featuredCampaign) }) }}</span>
                         </div>
 
                         <div class="mt-2">
                             <strong>{{ formatMoney(featuredCampaign.pledged_amount) }}</strong>
-                            <span class="text-muted">de {{ formatMoney(featuredCampaign.goal_amount) }}</span>
+                            <span class="text-muted">{{ t('common.ofGoal', { goal: formatMoney(featuredCampaign.goal_amount) }) }}</span>
                         </div>
 
                         <RouterLink :to="`/campaigns/${featuredCampaign.slug}`" class="btn btn-outline-primary mt-3">
-                            Ver projeto
+                            {{ t('common.viewProject') }}
                         </RouterLink>
                     </div>
                 </div>
 
-                <div v-else class="text-muted">Nenhuma campanha ativa no momento.</div>
+                <div v-else class="text-muted">{{ t('home.noActiveCampaign') }}</div>
             </div>
 
             <div class="col-lg-6">
-                <div class="text-uppercase text-muted small mb-2">Recomendado para você</div>
+                <div class="text-uppercase text-muted small mb-2">{{ t('home.recommendedLabel') }}</div>
 
                 <div class="row row-cols-1 row-cols-md-2 g-3">
                     <div v-for="c in recommended" :key="c.id" class="col">
@@ -101,7 +105,7 @@
 
                                 <div class="mt-auto">
                                     <div class="d-flex justify-content-between small text-muted mb-2">
-                                        <span>{{ daysRemaining(c) }} dias</span>
+                                        <span>{{ t('common.daysShort', { days: daysRemaining(c) }) }}</span>
                                         <span class="text-success fw-semibold">{{ Math.round(progress(c)) }}%</span>
                                     </div>
 
@@ -112,7 +116,7 @@
                                     <RouterLink
                                         :to="`/campaigns/${c.slug}`"
                                         class="stretched-link"
-                                        aria-label="Ver projeto"
+                                        :aria-label="t('common.viewProject')"
                                     ></RouterLink>
                                 </div>
                             </div>
@@ -121,7 +125,7 @@
                 </div>
 
                 <div class="mt-4">
-                    <RouterLink to="/campaigns" class="btn btn-outline-primary">Descobrir mais</RouterLink>
+                    <RouterLink to="/campaigns" class="btn btn-outline-primary">{{ t('home.discoverMore') }}</RouterLink>
                 </div>
             </div>
         </div>
@@ -132,6 +136,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { apiGet } from '../api';
 import { absoluteUrl } from '../seo';
 
@@ -141,6 +146,9 @@ defineProps({
 
 const loading = ref(true);
 const campaigns = ref([]);
+const loadError = ref('');
+
+const { t, locale } = useI18n({ useScope: 'global' });
 
 const featuredCampaign = computed(() => campaigns.value[0] || null);
 const recommended = computed(() => campaigns.value.slice(1, 5));
@@ -167,14 +175,25 @@ function daysRemaining(c) {
 }
 
 function formatMoney(cents) {
-    const value = (Number(cents || 0) / 100).toFixed(2);
-    return `R$ ${value}`;
+    const value = Number(cents || 0) / 100;
+    const intlLocale = String(locale.value || 'pt_BR').replace('_', '-');
+    return new Intl.NumberFormat(intlLocale, { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 onMounted(async () => {
-    const data = await apiGet('/api/campaigns');
-    const all = data.data ?? [];
-    campaigns.value = all.slice(0, 5);
-    loading.value = false;
+    loadError.value = '';
+    loading.value = true;
+
+    try {
+        const data = await apiGet('/api/campaigns');
+        const all = data.data ?? [];
+        campaigns.value = all.slice(0, 5);
+    } catch (error) {
+        console.error('Failed to load /api/campaigns', error);
+        campaigns.value = [];
+        loadError.value = t('errors.loadFailed');
+    } finally {
+        loading.value = false;
+    }
 });
 </script>

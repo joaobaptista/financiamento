@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -36,7 +36,7 @@
     <link rel="canonical" href="{{ $effectiveCanonical }}">
 
     <!-- Open Graph (Facebook/WhatsApp/LinkedIn) -->
-    <meta property="og:locale" content="pt_BR">
+    <meta property="og:locale" content="{{ app()->getLocale() }}">
     <meta property="og:site_name" content="{{ $seoSiteName }}">
     <meta property="og:type" content="{{ $effectiveOgType }}">
     <meta property="og:title" content="{{ $documentTitle }}">

@@ -29,8 +29,8 @@
                                 v-model="searchQuery"
                                 type="search"
                                 class="form-control"
-                                placeholder="Buscar projetos, criadores e categorias"
-                                aria-label="Buscar"
+                                :placeholder="t('navbar.searchPlaceholder')"
+                                :aria-label="t('navbar.searchAria')"
                             />
                         </div>
                     </form>
@@ -38,7 +38,7 @@
                     <ul class="navbar-nav ms-lg-auto align-items-lg-center">
                         <template v-if="user">
                             <li class="nav-item">
-                                <RouterLink class="nav-link" to="/me/creator/setup">Para criadores</RouterLink>
+                                <RouterLink class="nav-link" to="/me/creator/setup">{{ t('navbar.forCreators') }}</RouterLink>
                             </li>
                             <li class="nav-item dropdown">
                                 <a
@@ -53,15 +53,15 @@
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li>
                                         <RouterLink class="dropdown-item" to="/dashboard">
-                                            <i class="bi bi-speedometer2"></i> Meu Dashboard
+                                            <i class="bi bi-speedometer2"></i> {{ t('navbar.dashboard') }}
                                         </RouterLink>
                                     </li>
                                     <li>
-                                        <RouterLink class="dropdown-item" to="/profile">Perfil</RouterLink>
+                                        <RouterLink class="dropdown-item" to="/profile">{{ t('navbar.profile') }}</RouterLink>
                                     </li>
                                     <li><hr class="dropdown-divider" /></li>
                                     <li>
-                                        <button type="button" class="dropdown-item" @click="logout">Sair</button>
+                                        <button type="button" class="dropdown-item" @click="logout">{{ t('navbar.logout') }}</button>
                                     </li>
                                 </ul>
                             </li>
@@ -69,10 +69,10 @@
 
                         <template v-else>
                             <li class="nav-item">
-                                <RouterLink class="nav-link" to="/me/creator/setup">Para criadores</RouterLink>
+                                <RouterLink class="nav-link" to="/me/creator/setup">{{ t('navbar.forCreators') }}</RouterLink>
                             </li>
                             <li class="nav-item">
-                                <RouterLink class="nav-link" to="/login">Entrar</RouterLink>
+                                <RouterLink class="nav-link" to="/login">{{ t('navbar.login') }}</RouterLink>
                             </li>
                         </template>
                     </ul>
@@ -90,7 +90,7 @@
                         class="nav-link text-nowrap"
                         :to="{ path: '/campaigns', query: { category: cat.key } }"
                     >
-                        {{ cat.label }}
+                        {{ t(cat.labelKey) }}
                     </RouterLink>
                 </nav>
             </div>
@@ -112,7 +112,7 @@
 
         <!-- Main Content -->
         <main :class="isAuthRoute ? 'py-0' : 'py-4'">
-            <div v-if="loading" class="container text-muted">Carregando…</div>
+            <div v-if="loading" class="container text-muted">{{ t('common.loading') }}</div>
             <RouterView
                 v-else
                 :key="$route.fullPath"
@@ -128,22 +128,22 @@
             <div class="container">
                 <div class="row g-4">
                     <div class="col-6 col-md-3">
-                        <h6 class="fw-semibold">Bem-vindo</h6>
+                        <h6 class="fw-semibold">{{ t('footer.welcome') }}</h6>
                         <ul class="list-unstyled mt-3 mb-0">
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/about">Quem Somos</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/about">{{ t('footer.aboutUs') }}</RouterLink></li>
                             <li class="mb-2">
-                                <RouterLink class="link-light text-decoration-none" to="/how-it-works">Como funciona</RouterLink>
+                                <RouterLink class="link-light text-decoration-none" to="/how-it-works">{{ t('footer.howItWorks') }}</RouterLink>
                             </li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/blog">Blog</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/team">Nosso time</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/press">Imprensa</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/blog">{{ t('footer.blog') }}</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/team">{{ t('footer.team') }}</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/press">{{ t('footer.press') }}</RouterLink></li>
                             <li class="mb-2">
-                                <RouterLink class="link-light text-decoration-none" to="/retrospectiva-2020">Retrospectiva 2020</RouterLink>
+                                <RouterLink class="link-light text-decoration-none" to="/retrospectiva-2020">{{ t('footer.retro2020') }}</RouterLink>
                             </li>
                         </ul>
 
                         <div class="mt-4">
-                            <h6 class="fw-semibold">Redes Sociais</h6>
+                            <h6 class="fw-semibold">{{ t('footer.socialTitle') }}</h6>
                             <ul class="list-unstyled mt-3 mb-0">
                                 <li class="mb-2">
                                     <a class="link-light text-decoration-none" href="https://facebook.com" target="_blank" rel="noopener">
@@ -170,27 +170,27 @@
                     </div>
 
                     <div class="col-6 col-md-3">
-                        <h6 class="fw-semibold">Ajuda</h6>
+                        <h6 class="fw-semibold">{{ t('footer.help') }}</h6>
                         <ul class="list-unstyled mt-3 mb-0">
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/support">Central de Suporte</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/contact">Contato</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/updates">Atualizações</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/fees">Nossa Taxa</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/security">Responsabilidades e Segurança</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/terms">Termos de uso</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/privacy">Política de privacidade</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/support">{{ t('footer.supportCenter') }}</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/contact">{{ t('footer.contact') }}</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/updates">{{ t('footer.updates') }}</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/fees">{{ t('footer.fees') }}</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/security">{{ t('footer.security') }}</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/terms">{{ t('footer.terms') }}</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/privacy">{{ t('footer.privacy') }}</RouterLink></li>
                         </ul>
                     </div>
 
                     <div class="col-6 col-md-3">
-                        <h6 class="fw-semibold">Faça uma campanha</h6>
+                        <h6 class="fw-semibold">{{ t('footer.makeCampaign') }}</h6>
                         <ul class="list-unstyled mt-3 mb-0">
                             <li class="mb-2">
-                                <RouterLink class="link-light text-decoration-none" to="/me/creator/setup">Comece seu projeto</RouterLink>
+                                <RouterLink class="link-light text-decoration-none" to="/me/creator/setup">{{ t('footer.startProject') }}</RouterLink>
                             </li>
                             <li class="mb-2">
                                 <RouterLink class="link-light text-decoration-none" :to="{ path: '/campaigns', query: { category: 'musica' } }">
-                                    Música no Origo
+                                    {{ t('footer.musicOnOrigo') }}
                                 </RouterLink>
                             </li>
                             <li class="mb-2">
@@ -198,52 +198,67 @@
                                     class="link-light text-decoration-none"
                                     :to="{ path: '/campaigns', query: { category: 'publicacao' } }"
                                 >
-                                    Publicações Independentes
+                                    {{ t('footer.indiePublishing') }}
                                 </RouterLink>
                             </li>
                             <li class="mb-2">
                                 <RouterLink class="link-light text-decoration-none" :to="{ path: '/campaigns', query: { category: 'jornalismo' } }">
-                                    Jornalismo
+                                    {{ t('footer.journalism') }}
                                 </RouterLink>
                             </li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/assinaturas">Assinaturas</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/assinaturas">{{ t('footer.subscriptions') }}</RouterLink></li>
                         </ul>
 
                         <div class="mt-4">
-                            <h6 class="fw-semibold">Apoie projetos no Origo</h6>
+                            <h6 class="fw-semibold">{{ t('footer.supportProjects') }}</h6>
                             <ul class="list-unstyled mt-3 mb-0">
-                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/campaigns">Explore projetos</RouterLink></li>
-                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/popular">Populares</RouterLink></li>
-                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/no-ar">No ar</RouterLink></li>
-                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/finalizados">Finalizados</RouterLink></li>
+                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/campaigns">{{ t('footer.explore') }}</RouterLink></li>
+                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/popular">{{ t('footer.popular') }}</RouterLink></li>
+                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/no-ar">{{ t('footer.live') }}</RouterLink></li>
+                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/finalizados">{{ t('footer.finished') }}</RouterLink></li>
                             </ul>
                         </div>
                     </div>
 
                     <div class="col-12 col-md-3">
-                        <h6 class="fw-semibold">Assine nossa news</h6>
+                        <h6 class="fw-semibold">{{ t('footer.subscribeTitle') }}</h6>
                         <form class="mt-3" @submit.prevent="subscribeNewsletter">
                             <div class="input-group">
                                 <input
                                     v-model="newsletterEmail"
                                     type="email"
                                     class="form-control"
-                                    placeholder="Digite seu email"
-                                    aria-label="Digite seu email"
+                                    :placeholder="t('footer.emailPlaceholder')"
+                                    :aria-label="t('footer.emailPlaceholder')"
                                     autocomplete="email"
                                 />
-                                <button class="btn btn-primary" type="submit" aria-label="Assinar">
+                                <button class="btn btn-primary" type="submit" :aria-label="t('footer.subscribeAria')">
                                     <i class="bi bi-arrow-right"></i>
                                 </button>
                             </div>
-                            <div class="form-text text-secondary mt-2">Você pode cancelar a qualquer momento.</div>
+                            <div class="form-text text-secondary mt-2">{{ t('footer.cancelAnytime') }}</div>
                         </form>
                     </div>
                 </div>
 
                 <div class="border-top border-secondary mt-4 pt-4 d-flex flex-column flex-md-row justify-content-between gap-2">
-                    <div class="text-secondary small">Origo — plataforma de crowdfunding para projetos criativos.</div>
-                    <div class="text-secondary small">&copy; {{ year }} Origo. Todos os direitos reservados.</div>
+                    <div class="text-secondary small">{{ t('footer.tagline') }}</div>
+                    <div class="text-secondary small">&copy; {{ year }} Origo. {{ t('footer.rights') }}</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="text-secondary small">{{ t('footer.language') }}</div>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Selecionar idioma">
+                            <button
+                                v-for="opt in localeOptions"
+                                :key="opt.value"
+                                type="button"
+                                class="btn"
+                                :class="currentLocale === opt.value ? 'btn-light text-dark' : 'btn-outline-light'"
+                                @click="switchLocale(opt.value)"
+                            >
+                                {{ localeLabel(opt.value) }}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </footer>
@@ -253,8 +268,10 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { apiGet, apiPost } from './api';
 import { categories } from './categories';
+import { normalizeLocaleForApp } from './i18n';
 
 const router = useRouter();
 const route = useRoute();
@@ -263,6 +280,8 @@ const user = ref(null);
 const loading = ref(true);
 const flashSuccess = ref('');
 const flashError = ref('');
+
+const { t, locale } = useI18n({ useScope: 'global' });
 
 const year = computed(() => new Date().getFullYear());
 
@@ -273,6 +292,14 @@ const logoUrl = '/img/logo.svg';
 const searchQuery = ref('');
 
 const newsletterEmail = ref('');
+
+const localeOptions = [
+    { value: 'pt_BR' },
+    { value: 'en' },
+    { value: 'es' },
+];
+
+const currentLocale = ref('pt_BR');
 
 // `categories` imported from ./categories
 
@@ -298,9 +325,9 @@ async function fetchMe() {
 async function logout() {
     try {
         await apiPost('/api/logout', {});
-        setFlashSuccess('Você saiu da sua conta.');
+        setFlashSuccess(t('flash.loggedOut'));
     } catch {
-        setFlashError('Erro ao sair.');
+        setFlashError(t('flash.logoutError'));
     } finally {
         await fetchMe();
         router.push('/');
@@ -315,15 +342,32 @@ function onSearchSubmit() {
 function subscribeNewsletter() {
     const email = String(newsletterEmail.value || '').trim();
     if (!email) {
-        setFlashError('Digite um email para assinar.');
+        setFlashError(t('newsletter.missingEmail'));
         return;
     }
 
     newsletterEmail.value = '';
-    setFlashSuccess('Obrigado! Você foi inscrito na newsletter.');
+    setFlashSuccess(t('newsletter.subscribed'));
+}
+
+function localeLabel(localeValue) {
+    const normalized = normalizeLocaleForApp(localeValue);
+    if (normalized === 'pt_BR') return t('footer.langPortuguese');
+    if (normalized === 'en') return t('footer.langEnglish');
+    if (normalized === 'es') return t('footer.langSpanish');
+    return normalized;
+}
+
+function switchLocale(locale) {
+    const next = normalizeLocaleForApp(locale);
+    const url = new URL(window.location.href);
+    url.searchParams.set('lang', next);
+    window.location.href = url.toString();
 }
 
 onMounted(async () => {
+    currentLocale.value = normalizeLocaleForApp(document.documentElement.lang);
+    locale.value = currentLocale.value;
     await fetchMe();
     loading.value = false;
 });

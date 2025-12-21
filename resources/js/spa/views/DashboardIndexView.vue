@@ -3,18 +3,18 @@
         <div class="py-3">
             <div class="d-flex justify-content-between align-items-end">
                 <div>
-                    <div class="text-uppercase text-muted small">Criador</div>
-                    <h1 class="h3 fw-normal mb-0">Minhas campanhas</h1>
+                    <div class="text-uppercase text-muted small">{{ t('dashboard.sectionLabel') }}</div>
+                    <h1 class="h3 fw-normal mb-0">{{ t('dashboard.title') }}</h1>
                 </div>
                 <RouterLink to="/me/creator/setup" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Nova campanha
+                    <i class="bi bi-plus-circle"></i> {{ t('dashboard.newCampaign') }}
                 </RouterLink>
             </div>
         </div>
 
-        <div v-if="!user" class="text-muted">Você precisa estar logado.</div>
+        <div v-if="!user" class="text-muted">{{ t('errors.loginRequired') }}</div>
 
-        <div v-else-if="loading" class="text-muted">Carregando…</div>
+        <div v-else-if="loading" class="text-muted">{{ t('common.loading') }}</div>
 
         <template v-else>
             <div v-for="c in campaigns" :key="c.id" class="card mb-3">
@@ -30,33 +30,33 @@
 
                             <div class="d-flex gap-4 text-sm">
                                 <span>
-                                    <strong>{{ formatMoney(c.pledged_amount) }}</strong> de {{ formatMoney(c.goal_amount) }}
+                                    <strong>{{ formatMoney(c.pledged_amount) }}</strong> {{ t('common.ofGoal', { goal: formatMoney(c.goal_amount) }) }}
                                 </span>
-                                <span>{{ c.pledges_count ?? 0 }} apoios</span>
-                                <span>{{ daysRemaining(c) }} dias restantes</span>
+                                <span>{{ t('dashboard.pledgesCount', { count: c.pledges_count ?? 0 }) }}</span>
+                                <span>{{ t('common.daysRemaining', { days: daysRemaining(c) }) }}</span>
                             </div>
                         </div>
 
                         <div class="col-md-4 text-md-end mt-3 mt-md-0">
                             <span :class="`badge ${statusBadge(c.status)} mb-2`">
-                                {{ capitalize(c.status) }}
+                                {{ statusLabel(c.status) }}
                             </span>
 
                             <div class="btn-group d-block">
                                 <template v-if="c.status === 'draft'">
                                     <RouterLink :to="`/me/campaigns/${c.id}/edit`" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i> Editar
+                                        <i class="bi bi-pencil"></i> {{ t('common.edit') }}
                                     </RouterLink>
                                     <button type="button" class="btn btn-sm btn-success" @click="publish(c.id)">
-                                        <i class="bi bi-rocket-takeoff"></i> Publicar
+                                        <i class="bi bi-rocket-takeoff"></i> {{ t('common.publish') }}
                                     </button>
                                 </template>
                                 <template v-else>
                                     <RouterLink :to="`/campaigns/${c.slug}`" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye"></i> Ver
+                                        <i class="bi bi-eye"></i> {{ t('common.view') }}
                                     </RouterLink>
                                     <RouterLink :to="`/dashboard/campaigns/${c.id}`" class="btn btn-sm btn-primary">
-                                        <i class="bi bi-bar-chart"></i> Estatísticas
+                                        <i class="bi bi-bar-chart"></i> {{ t('dashboard.stats') }}
                                     </RouterLink>
                                 </template>
                             </div>
@@ -67,9 +67,9 @@
 
             <div v-if="campaigns.length === 0" class="text-center py-5">
                 <i class="bi bi-inbox display-1 text-muted"></i>
-                <p class="text-muted mt-3">Você ainda não criou nenhuma campanha.</p>
+                <p class="text-muted mt-3">{{ t('dashboard.empty') }}</p>
                 <RouterLink to="/me/creator/setup" class="btn btn-primary">
-                    Criar Minha Primeira Campanha
+                    {{ t('dashboard.createFirst') }}
                 </RouterLink>
             </div>
         </template>
@@ -78,6 +78,7 @@
 
 <script setup>
 import { onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { apiGet, apiPost } from '../api';
 
 const props = defineProps({
@@ -86,6 +87,8 @@ const props = defineProps({
 
 const loading = ref(true);
 const campaigns = ref([]);
+
+const { t, locale } = useI18n({ useScope: 'global' });
 
 const emit = defineEmits(['flash-success', 'flash-error']);
 
@@ -109,8 +112,9 @@ function limit(text, max) {
 }
 
 function formatMoney(cents) {
-    const value = (Number(cents || 0) / 100).toFixed(2);
-    return `R$ ${value}`;
+    const value = Number(cents || 0) / 100;
+    const intlLocale = String(locale.value || 'pt_BR').replace('_', '-');
+    return new Intl.NumberFormat(intlLocale, { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 function progress(c) {
@@ -134,18 +138,20 @@ function statusBadge(status) {
     return 'bg-primary';
 }
 
-function capitalize(text) {
-    const value = String(text || '');
-    return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+function statusLabel(status) {
+    if (status === 'draft') return t('campaign.status.draft');
+    if (status === 'active') return t('campaign.status.active');
+    if (status === 'closed') return t('campaign.status.closed');
+    return String(status || '');
 }
 
 async function publish(id) {
     try {
         await apiPost(`/api/me/campaigns/${id}/publish`, {});
-        emit('flash-success', 'Campanha publicada com sucesso!');
+        emit('flash-success', t('dashboard.publishSuccess'));
         await load();
     } catch (e) {
-        emit('flash-error', e?.response?.data?.message ?? 'Erro ao publicar.');
+        emit('flash-error', e?.response?.data?.message ?? t('dashboard.publishError'));
     }
 }
 

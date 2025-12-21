@@ -11,16 +11,16 @@
                 <div class="col-12 col-sm-10 col-md-6 col-lg-4">
                     <div class="card shadow-sm">
                         <div class="card-body p-4">
-                            <h1 class="h3 fw-normal mb-3">Entrar</h1>
+                            <h1 class="h3 fw-normal mb-3">{{ t('auth.login.title') }}</h1>
 
                             <button type="button" class="btn btn-outline-secondary w-100 py-2" @click="onGoogleSignIn">
                                 <span class="me-2" aria-hidden="true">G</span>
-                                Entrar com Google
+                                {{ t('auth.login.withGoogle') }}
                             </button>
 
                             <div class="d-flex align-items-center my-4">
                                 <hr class="flex-grow-1" />
-                                <span class="mx-3 text-muted small">ou</span>
+                                <span class="mx-3 text-muted small">{{ t('common.or') }}</span>
                                 <hr class="flex-grow-1" />
                             </div>
 
@@ -30,7 +30,7 @@
                                         v-model="email"
                                         type="email"
                                         class="form-control"
-                                        placeholder="Email"
+                                        :placeholder="t('auth.common.email')"
                                         autocomplete="email"
                                         required
                                     />
@@ -41,23 +41,23 @@
                                         v-model="password"
                                         type="password"
                                         class="form-control"
-                                        placeholder="Password"
+                                        :placeholder="t('auth.common.password')"
                                         autocomplete="current-password"
                                         required
                                     />
                                 </div>
 
                                 <div class="mb-3">
-                                    <a href="#" class="small link-primary" @click.prevent>Forgot your password?</a>
+                                    <a href="#" class="small link-primary" @click.prevent>{{ t('auth.login.forgotPassword') }}</a>
                                 </div>
 
                                 <button type="submit" class="btn btn-success w-100 py-2" :disabled="submitting">
-                                    {{ submitting ? 'Entrando…' : 'Entrar' }}
+                                    {{ submitting ? t('auth.login.submitting') : t('auth.login.submit') }}
                                 </button>
 
                                 <div class="form-check mt-3">
                                     <input id="remember" v-model="remember" class="form-check-input" type="checkbox" />
-                                    <label class="form-check-label" for="remember">Remember me</label>
+                                    <label class="form-check-label" for="remember">{{ t('auth.login.rememberMe') }}</label>
                                 </div>
 
                                 <div v-if="error" class="alert alert-danger mt-3 mb-0" role="alert">
@@ -68,16 +68,16 @@
                         </div>
 
                         <div class="border-top p-3 text-center">
-                            <span class="text-muted">Novo por aqui?</span>
-                            <RouterLink to="/register" class="link-primary">Cadastre-se</RouterLink>
+                            <span class="text-muted">{{ t('auth.login.newHere') }}</span>
+                            <RouterLink to="/register" class="link-primary">{{ t('auth.login.signUp') }}</RouterLink>
                         </div>
 
                         <div class="border-top p-3 text-center text-muted small">
-                            This site is protected by reCAPTCHA and the Google
-                            <a href="#" class="link-primary" @click.prevent>Privacy Policy</a>
-                            and
-                            <a href="#" class="link-primary" @click.prevent>Terms of Service</a>
-                            apply.
+                            {{ t('auth.recaptcha.prefix') }}
+                            <a href="#" class="link-primary" @click.prevent>{{ t('auth.recaptcha.privacy') }}</a>
+                            {{ t('auth.recaptcha.and') }}
+                            <a href="#" class="link-primary" @click.prevent>{{ t('auth.recaptcha.terms') }}</a>
+                            {{ t('auth.recaptcha.suffix') }}
                         </div>
                     </div>
                 </div>
@@ -89,6 +89,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { apiPost } from '../api';
 
 const emit = defineEmits(['auth-updated']);
@@ -103,9 +104,11 @@ const remember = ref(false);
 const error = ref('');
 const submitting = ref(false);
 
+const { t } = useI18n({ useScope: 'global' });
+
 onMounted(() => {
     if (route.query?.oauth === 'google_not_configured') {
-        error.value = 'Login com Google não está configurado. Configure GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET no .env.';
+        error.value = t('auth.googleNotConfigured');
     }
 });
 
@@ -126,7 +129,7 @@ async function submit() {
         emit('auth-updated');
         router.push('/dashboard');
     } catch (e) {
-        error.value = e?.response?.data?.message ?? 'Erro ao entrar.';
+        error.value = e?.response?.data?.message ?? t('auth.login.error');
     } finally {
         submitting.value = false;
     }

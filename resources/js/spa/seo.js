@@ -1,3 +1,5 @@
+import { i18n, normalizeLocaleForApp } from './i18n';
+
 function ensureMeta(selector, createAttrs) {
     let el = document.head.querySelector(selector);
     if (el) return el;
@@ -65,6 +67,29 @@ function getDefaults() {
     return window.__SEO__ || {};
 }
 
+function currentAppLocale() {
+    const htmlLang = document?.documentElement?.getAttribute('lang') || '';
+    const globalLocale = i18n?.global?.locale?.value || i18n?.global?.locale || '';
+    return normalizeLocaleForApp(htmlLang || globalLocale || 'pt_BR');
+}
+
+function ogLocaleFromAppLocale(appLocale) {
+    const normalized = normalizeLocaleForApp(appLocale);
+    if (normalized === 'pt_BR') return 'pt_BR';
+    if (normalized === 'en') return 'en_US';
+    if (normalized === 'es') return 'es_ES';
+    return normalized;
+}
+
+function tMaybe(key) {
+    if (!key) return '';
+    try {
+        return String(i18n.global.t(String(key)));
+    } catch {
+        return String(key);
+    }
+}
+
 export function absoluteUrl(pathOrUrl) {
     const value = String(pathOrUrl ?? '').trim();
     if (!value) return '';
@@ -86,9 +111,13 @@ export function applyRouteSeo(route) {
     const defaults = getDefaults();
 
     const siteName = defaults.site_name || 'Catarse';
-    const pageTitle = route?.meta?.title || '';
 
-    const descriptionFromMeta = route?.meta?.description || route?.meta?.lead || '';
+    const pageTitle = route?.meta?.titleKey ? tMaybe(route.meta.titleKey) : (route?.meta?.title || '');
+
+    const descriptionFromKey = route?.meta?.descriptionKey ? tMaybe(route.meta.descriptionKey) : '';
+    const leadFromKey = route?.meta?.leadKey ? tMaybe(route.meta.leadKey) : '';
+
+    const descriptionFromMeta = descriptionFromKey || route?.meta?.description || leadFromKey || route?.meta?.lead || '';
     const description = truncate(descriptionFromMeta || defaults.description || '', 160);
 
     const canonical = window.location.origin + window.location.pathname;
@@ -108,7 +137,7 @@ export function applyRouteSeo(route) {
 
     setCanonical(canonical);
 
-    setMetaByProperty('og:locale', 'pt_BR');
+    setMetaByProperty('og:locale', ogLocaleFromAppLocale(currentAppLocale()));
     setMetaByProperty('og:site_name', siteName);
     setMetaByProperty('og:type', ogType);
     setMetaByProperty('og:title', fullTitle);
@@ -151,6 +180,7 @@ export function applyCampaignSeo(campaign) {
     setMetaByName('robots', 'index, follow');
     setCanonical(canonical);
 
+    setMetaByProperty('og:locale', ogLocaleFromAppLocale(currentAppLocale()));
     setMetaByProperty('og:type', 'article');
     setMetaByProperty('og:title', fullTitle);
     setMetaByProperty('og:description', description);

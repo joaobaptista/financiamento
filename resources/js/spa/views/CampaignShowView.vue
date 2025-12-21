@@ -1,16 +1,16 @@
 <template>
     <div>
-        <div v-if="loading" class="container py-4 text-muted">Carregando…</div>
+        <div v-if="loading" class="container py-4 text-muted">{{ t('common.loading') }}</div>
 
         <div v-else-if="campaign">
             <!-- Hero (padrão Catarse) -->
             <div class="bg-light border-bottom">
                 <div class="container py-4 py-md-5">
-                    <div class="text-uppercase text-muted small">Campanha</div>
+                    <div class="text-uppercase text-muted small">{{ t('campaignShow.sectionLabel') }}</div>
                     <h1 class="display-6 mb-2">{{ campaign.title }}</h1>
                     <div class="text-muted d-flex flex-wrap align-items-center gap-2">
                         <div>
-                            Por <strong>{{ campaign.user?.name ?? '—' }}</strong>
+                            {{ t('campaignShow.by') }} <strong>{{ campaign.user?.name ?? '—' }}</strong>
                         </div>
 
                         <template
@@ -24,20 +24,20 @@
                                     :disabled="supportingBusy"
                                     @click="togglePageFollow"
                                 >
-                                    {{ supportingBusy ? '…' : isFollowingPage ? 'Deixar de seguir' : 'Seguir página' }}
+                                    {{ supportingBusy ? t('common.ellipsis') : isFollowingPage ? t('campaignShow.unfollowPage') : t('campaignShow.followPage') }}
                                 </button>
                                 <span v-if="pageFollowersCount != null" class="small text-muted">
-                                    {{ pageFollowersCount }} seguidores
+                                    {{ t('campaignShow.followersCount', { count: pageFollowersCount }) }}
                                 </span>
                             </template>
                             <template v-else>
-                                <RouterLink to="/login" class="btn btn-sm btn-outline-primary">Entrar para seguir</RouterLink>
+                                <RouterLink to="/login" class="btn btn-sm btn-outline-primary">{{ t('campaignShow.loginToFollow') }}</RouterLink>
                             </template>
                         </template>
 
                         <span class="mx-2">•</span>
-                        <span v-if="isCampaignOpen">{{ daysRemaining }} dias restantes</span>
-                        <span v-else>Campanha finalizada</span>
+                        <span v-if="isCampaignOpen">{{ t('common.daysRemaining', { days: daysRemaining }) }}</span>
+                        <span v-else>{{ t('campaignShow.finished') }}</span>
                     </div>
                 </div>
             </div>
@@ -74,7 +74,7 @@
 
                         <div class="card mb-3">
                             <div class="card-body">
-                                <h2 class="h5 fw-normal mb-3">Sobre o projeto</h2>
+                                <h2 class="h5 fw-normal mb-3">{{ t('campaignShow.aboutTitle') }}</h2>
                                 <div
                                     v-if="storyHtml"
                                     class="campaign-story text-muted"
@@ -89,8 +89,8 @@
                         <div v-if="(campaign.rewards || []).length" class="card" id="recompensas">
                             <div class="card-body">
                                 <div class="d-flex align-items-center justify-content-between gap-3">
-                                    <h2 class="h5 fw-normal mb-0">Recompensas</h2>
-                                    <span class="text-muted small">Escolha uma recompensa para aumentar sua contribuição.</span>
+                                    <h2 class="h5 fw-normal mb-0">{{ t('campaignShow.rewardsTitle') }}</h2>
+                                    <span class="text-muted small">{{ t('campaignShow.rewardsSubtitle') }}</span>
                                 </div>
 
                                 <div class="mt-3">
@@ -98,16 +98,16 @@
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-start gap-3">
                                                 <div>
-                                                    <div class="text-uppercase text-muted small">Apoio livre</div>
-                                                    <div class="fw-semibold">Contribua com qualquer valor</div>
-                                                    <div class="text-muted small">Ajude o projeto sem selecionar recompensa.</div>
+                                                    <div class="text-uppercase text-muted small">{{ t('campaignShow.freeSupport.label') }}</div>
+                                                    <div class="fw-semibold">{{ t('campaignShow.freeSupport.title') }}</div>
+                                                    <div class="text-muted small">{{ t('campaignShow.freeSupport.subtitle') }}</div>
                                                 </div>
                                                 <button
                                                     type="button"
                                                     class="btn btn-outline-primary"
                                                     @click="selectNoReward()"
                                                 >
-                                                    Selecionar
+                                                    {{ t('common.select') }}
                                                 </button>
                                             </div>
                                         </div>
@@ -121,8 +121,8 @@
                                                     <div class="fw-semibold">{{ r.title }}</div>
                                                     <div v-if="r.description" class="text-muted small mt-1">{{ r.description }}</div>
                                                     <div v-if="r.quantity" class="text-muted small mt-2">
-                                                        <span v-if="isRewardAvailable(r)">{{ r.remaining }}/{{ r.quantity }} disponíveis</span>
-                                                        <span v-else class="text-danger">Esgotada</span>
+                                                        <span v-if="isRewardAvailable(r)">{{ t('campaignShow.rewardAvailability', { remaining: r.remaining, quantity: r.quantity }) }}</span>
+                                                        <span v-else class="text-danger">{{ t('campaignShow.soldOut') }}</span>
                                                     </div>
                                                 </div>
 
@@ -133,7 +133,7 @@
                                                     :disabled="!isRewardAvailable(r)"
                                                     @click="selectReward(r)"
                                                 >
-                                                    {{ isRewardAvailable(r) ? 'Selecionar' : 'Indisponível' }}
+                                                    {{ isRewardAvailable(r) ? t('common.select') : t('campaignShow.unavailable') }}
                                                 </button>
                                             </div>
                                         </div>
@@ -148,13 +148,13 @@
                         <div ref="supportBox" class="card sticky-top" style="top: 16px">
                             <div class="card-body">
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <div class="text-uppercase text-muted small">Apoiar</div>
+                                    <div class="text-uppercase text-muted small">{{ t('campaignShow.supportTitle') }}</div>
                                     <a
                                         v-if="(campaign.rewards || []).length"
                                         class="small text-decoration-none"
                                         href="#recompensas"
                                     >
-                                        ver recompensas
+                                        {{ t('campaignShow.seeRewards') }}
                                     </a>
                                 </div>
 
@@ -165,22 +165,22 @@
                                     <div class="d-flex justify-content-between mt-2">
                                         <div>
                                             <div class="h4 text-success mb-0">{{ formatMoney(campaign.pledged_amount) }}</div>
-                                            <div class="text-muted small">de {{ formatMoney(campaign.goal_amount) }}</div>
+                                            <div class="text-muted small">{{ t('common.ofGoal', { goal: formatMoney(campaign.goal_amount) }) }}</div>
                                         </div>
                                         <div class="text-end">
                                             <div class="h4 mb-0">{{ Math.round(progress) }}%</div>
-                                            <div class="text-muted small">atingido</div>
+                                            <div class="text-muted small">{{ t('campaignShow.reached') }}</div>
                                         </div>
                                     </div>
 
                                     <div class="row g-2 mt-2 text-center">
                                         <div class="col-6">
                                             <div class="fw-semibold">{{ campaign.supporters_count ?? 0 }}</div>
-                                            <div class="text-muted small">apoiadores</div>
+                                            <div class="text-muted small">{{ t('campaignShow.supporters') }}</div>
                                         </div>
                                         <div class="col-6">
                                             <div class="fw-semibold">{{ daysRemaining }}</div>
-                                            <div class="text-muted small">dias</div>
+                                            <div class="text-muted small">{{ t('campaignShow.days') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -189,12 +189,12 @@
 
                                 <template v-if="user">
                                     <div v-if="!isCampaignOpen" class="alert alert-secondary mb-3" role="alert">
-                                        Esta campanha não está aceitando apoios no momento.
+                                        {{ t('campaignShow.supportClosed') }}
                                     </div>
 
                                     <form @submit.prevent="submit">
                                         <div class="mb-2">
-                                            <label class="form-label">Valor do apoio</label>
+                                            <label class="form-label">{{ t('campaignShow.amountLabel') }}</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">R$</span>
                                                 <input
@@ -208,14 +208,14 @@
                                                 />
                                             </div>
                                             <div v-if="selectedReward" class="form-text">
-                                                Mínimo para esta recompensa: <strong>{{ formatMoney(selectedReward.min_amount) }}</strong>
+                                                {{ t('campaignShow.minForReward', { min: formatMoney(selectedReward.min_amount) }) }}
                                             </div>
                                         </div>
 
                                         <div v-if="(campaign.rewards || []).length" class="mb-3">
-                                            <label class="form-label">Recompensa</label>
+                                            <label class="form-label">{{ t('campaignShow.rewardLabel') }}</label>
                                             <select v-model="rewardId" class="form-select" :disabled="submitting || !isCampaignOpen">
-                                                <option :value="null">Sem recompensa</option>
+                                                <option :value="null">{{ t('campaignShow.noReward') }}</option>
                                                 <option
                                                     v-for="r in sortedRewards"
                                                     :key="r.id"
@@ -223,7 +223,7 @@
                                                     :disabled="!isRewardAvailable(r)"
                                                 >
                                                     {{ r.title }} — {{ formatMoney(r.min_amount) }}
-                                                    <template v-if="!isRewardAvailable(r)"> (Esgotada)</template>
+                                                    <template v-if="!isRewardAvailable(r)"> ({{ t('campaignShow.soldOut') }})</template>
                                                 </option>
                                             </select>
                                         </div>
@@ -234,7 +234,7 @@
                                             :disabled="submitting || !isCampaignOpen"
                                         >
                                             <i class="bi bi-heart-fill"></i>
-                                            {{ submitting ? 'Processando…' : 'Apoiar agora' }}
+                                            {{ submitting ? t('campaignShow.processing') : t('campaignShow.supportNow') }}
                                         </button>
 
                                         <div v-if="message" class="text-muted small mt-2">{{ message }}</div>
@@ -242,9 +242,9 @@
                                 </template>
 
                                 <template v-else>
-                                    <p class="text-muted mb-3">Faça login para apoiar este projeto.</p>
-                                    <RouterLink to="/login" class="btn btn-primary w-100">Entrar</RouterLink>
-                                    <RouterLink to="/register" class="btn btn-outline-primary w-100 mt-2">Cadastrar</RouterLink>
+                                    <p class="text-muted mb-3">{{ t('campaignShow.loginToSupport') }}</p>
+                                    <RouterLink to="/login" class="btn btn-primary w-100">{{ t('navbar.login') }}</RouterLink>
+                                    <RouterLink to="/register" class="btn btn-outline-primary w-100 mt-2">{{ t('auth.register.submit') }}</RouterLink>
                                 </template>
                             </div>
                         </div>
@@ -253,12 +253,13 @@
             </div>
         </div>
 
-        <div v-else class="container py-4 text-muted">Campanha não encontrada.</div>
+        <div v-else class="container py-4 text-muted">{{ t('campaignShow.notFound') }}</div>
     </div>
 </template>
 
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { apiDelete, apiGet, apiPost } from '../api';
 import { absoluteUrl, applyCampaignSeo } from '../seo';
 import DOMPurify from 'dompurify';
@@ -281,9 +282,12 @@ const supportingBusy = ref(false);
 const isFollowingPage = ref(false);
 const pageFollowersCount = ref(null);
 
+const { t, locale } = useI18n({ useScope: 'global' });
+
 function formatMoney(cents) {
-    const value = (Number(cents || 0) / 100).toFixed(2);
-    return `R$ ${value}`;
+    const value = Number(cents || 0) / 100;
+    const intlLocale = String(locale.value || 'pt_BR').replace('_', '-');
+    return new Intl.NumberFormat(intlLocale, { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 function isRewardAvailable(r) {
@@ -424,7 +428,7 @@ async function submit() {
         if (selectedReward.value) {
             const min = Number(selectedReward.value.min_amount || 0) / 100;
             if (Number(amount.value) < min) {
-                message.value = `O valor mínimo para esta recompensa é ${formatMoney(selectedReward.value.min_amount)}.`;
+                message.value = t('campaignShow.minRewardError', { min: formatMoney(selectedReward.value.min_amount) });
                 submitting.value = false;
                 return;
             }
@@ -435,10 +439,10 @@ async function submit() {
             amount: amount.value,
             reward_id: rewardId.value,
         });
-        message.value = 'Apoio realizado com sucesso!';
+        message.value = t('campaignShow.supportSuccess');
         await fetchCampaign();
     } catch (e) {
-        message.value = e?.response?.data?.message ?? 'Erro ao apoiar.';
+        message.value = e?.response?.data?.message ?? t('campaignShow.supportError');
     } finally {
         submitting.value = false;
     }

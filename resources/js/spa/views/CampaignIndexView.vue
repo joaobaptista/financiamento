@@ -1,16 +1,20 @@
 <template>
     <div class="container">
         <div class="py-3">
-            <div class="text-uppercase text-muted small">Descobrir</div>
-            <h1 class="h3 fw-normal mb-0">Explorar campanhas</h1>
+            <div class="text-uppercase text-muted small">{{ t('campaignsIndex.discoverLabel') }}</div>
+            <h1 class="h3 fw-normal mb-0">{{ t('campaignsIndex.title') }}</h1>
 
             <div v-if="activeFilterLabel" class="text-muted small mt-1">
-                Filtro: <strong>{{ activeFilterLabel }}</strong>
-                <RouterLink class="ms-2" :to="{ path: '/campaigns' }">limpar</RouterLink>
+                {{ t('campaignsIndex.filterPrefix') }} <strong>{{ activeFilterLabel }}</strong>
+                <RouterLink class="ms-2" :to="{ path: '/campaigns' }">{{ t('campaignsIndex.clearFilter') }}</RouterLink>
             </div>
         </div>
 
-        <div v-if="loading" class="text-center text-muted py-5">Carregando campanhas…</div>
+        <div v-if="loading" class="text-center text-muted py-5">{{ t('campaignsIndex.loading') }}</div>
+
+        <div v-else-if="loadError" class="alert alert-danger" role="alert">
+            {{ loadError }}
+        </div>
 
         <div v-else>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
@@ -55,7 +59,7 @@
                                 <RouterLink
                                     :to="`/campaigns/${c.slug}`"
                                     class="stretched-link"
-                                    aria-label="Ver campanha"
+                                    :aria-label="t('common.viewCampaign')"
                                 ></RouterLink>
                             </div>
                         </div>
@@ -65,7 +69,7 @@
 
             <div v-if="filteredCampaigns.length === 0" class="text-center py-5">
                 <i class="bi bi-inbox display-1 text-muted"></i>
-                <p class="text-muted mt-3">Nenhuma campanha encontrada.</p>
+                <p class="text-muted mt-3">{{ t('campaignsIndex.empty') }}</p>
             </div>
         </div>
     </div>
@@ -74,6 +78,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { apiGet } from '../api';
 import { absoluteUrl } from '../seo';
 
@@ -81,13 +86,16 @@ const route = useRoute();
 
 const loading = ref(true);
 const campaigns = ref([]);
+const loadError = ref('');
+
+const { t, locale } = useI18n({ useScope: 'global' });
 
 const queryQ = computed(() => String(route.query.q || '').trim());
 const queryCategory = computed(() => String(route.query.category || '').trim());
 
 const activeFilterLabel = computed(() => {
-    if (queryQ.value) return `Busca: ${queryQ.value}`;
-    if (queryCategory.value) return `Categoria: ${queryCategory.value}`;
+    if (queryQ.value) return t('campaignsIndex.filters.search', { q: queryQ.value });
+    if (queryCategory.value) return t('campaignsIndex.filters.category', { category: queryCategory.value });
     return '';
 });
 
@@ -107,8 +115,9 @@ const filteredCampaigns = computed(() => {
 });
 
 function formatMoney(cents) {
-    const value = (Number(cents || 0) / 100).toFixed(2);
-    return `R$ ${value}`;
+    const value = Number(cents || 0) / 100;
+    const intlLocale = String(locale.value || 'pt_BR').replace('_', '-');
+    return new Intl.NumberFormat(intlLocale, { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 function limit(text, max) {
@@ -133,8 +142,18 @@ function daysRemaining(c) {
 }
 
 onMounted(async () => {
-    const data = await apiGet('/api/campaigns');
-    campaigns.value = data.data ?? [];
-    loading.value = false;
+    loadError.value = '';
+    loading.value = true;
+
+    try {
+        const data = await apiGet('/api/campaigns');
+        campaigns.value = data.data ?? [];
+    } catch (error) {
+        console.error('Failed to load /api/campaigns', error);
+        campaigns.value = [];
+        loadError.value = t('errors.loadFailed');
+    } finally {
+        loading.value = false;
+    }
 });
 </script>
