@@ -124,16 +124,126 @@
         </main>
 
         <!-- Footer -->
-        <footer v-if="!isAuthRoute" class="py-4">
+        <footer v-if="!isAuthRoute" class="bg-dark text-light pt-5 pb-4 mt-5">
             <div class="container">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5>Catarse</h5>
-                        <p class="text-muted">Plataforma de crowdfunding para projetos criativos.</p>
+                <div class="row g-4">
+                    <div class="col-6 col-md-3">
+                        <h6 class="fw-semibold">Bem-vindo</h6>
+                        <ul class="list-unstyled mt-3 mb-0">
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/about">Quem Somos</RouterLink></li>
+                            <li class="mb-2">
+                                <RouterLink class="link-light text-decoration-none" to="/how-it-works">Como funciona</RouterLink>
+                            </li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/blog">Blog</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/team">Nosso time</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/press">Imprensa</RouterLink></li>
+                            <li class="mb-2">
+                                <RouterLink class="link-light text-decoration-none" to="/retrospectiva-2020">Retrospectiva 2020</RouterLink>
+                            </li>
+                        </ul>
+
+                        <div class="mt-4">
+                            <h6 class="fw-semibold">Redes Sociais</h6>
+                            <ul class="list-unstyled mt-3 mb-0">
+                                <li class="mb-2">
+                                    <a class="link-light text-decoration-none" href="https://facebook.com" target="_blank" rel="noopener">
+                                        <i class="bi bi-facebook me-2"></i>Facebook
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a class="link-light text-decoration-none" href="https://twitter.com" target="_blank" rel="noopener">
+                                        <i class="bi bi-twitter-x me-2"></i>Twitter
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a class="link-light text-decoration-none" href="https://instagram.com" target="_blank" rel="noopener">
+                                        <i class="bi bi-instagram me-2"></i>Instagram
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a class="link-light text-decoration-none" href="https://github.com" target="_blank" rel="noopener">
+                                        <i class="bi bi-github me-2"></i>Github
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                    <div class="col-md-6 text-md-end">
-                        <p class="text-muted mb-0">&copy; {{ year }} Catarse. Todos os direitos reservados.</p>
+
+                    <div class="col-6 col-md-3">
+                        <h6 class="fw-semibold">Ajuda</h6>
+                        <ul class="list-unstyled mt-3 mb-0">
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/support">Central de Suporte</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/contact">Contato</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/updates">Atualizações</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/fees">Nossa Taxa</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/security">Responsabilidades e Segurança</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/terms">Termos de uso</RouterLink></li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/privacy">Política de privacidade</RouterLink></li>
+                        </ul>
                     </div>
+
+                    <div class="col-6 col-md-3">
+                        <h6 class="fw-semibold">Faça uma campanha</h6>
+                        <ul class="list-unstyled mt-3 mb-0">
+                            <li class="mb-2">
+                                <RouterLink class="link-light text-decoration-none" to="/me/campaigns/create">Comece seu projeto</RouterLink>
+                            </li>
+                            <li class="mb-2">
+                                <RouterLink class="link-light text-decoration-none" :to="{ path: '/campaigns', query: { category: 'musica' } }">
+                                    Música no Origo
+                                </RouterLink>
+                            </li>
+                            <li class="mb-2">
+                                <RouterLink
+                                    class="link-light text-decoration-none"
+                                    :to="{ path: '/campaigns', query: { category: 'publicacao' } }"
+                                >
+                                    Publicações Independentes
+                                </RouterLink>
+                            </li>
+                            <li class="mb-2">
+                                <RouterLink class="link-light text-decoration-none" :to="{ path: '/campaigns', query: { category: 'jornalismo' } }">
+                                    Jornalismo
+                                </RouterLink>
+                            </li>
+                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/assinaturas">Assinaturas</RouterLink></li>
+                        </ul>
+
+                        <div class="mt-4">
+                            <h6 class="fw-semibold">Apoie projetos no Origo</h6>
+                            <ul class="list-unstyled mt-3 mb-0">
+                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/campaigns">Explore projetos</RouterLink></li>
+                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/popular">Populares</RouterLink></li>
+                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/no-ar">No ar</RouterLink></li>
+                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/finalizados">Finalizados</RouterLink></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                        <h6 class="fw-semibold">Assine nossa news</h6>
+                        <form class="mt-3" @submit.prevent="subscribeNewsletter">
+                            <div class="input-group">
+                                <input
+                                    v-model="newsletterEmail"
+                                    type="email"
+                                    class="form-control"
+                                    placeholder="Digite seu email"
+                                    aria-label="Digite seu email"
+                                    autocomplete="email"
+                                />
+                                <button class="btn btn-primary" type="submit" aria-label="Assinar">
+                                    <i class="bi bi-arrow-right"></i>
+                                </button>
+                            </div>
+                            <div class="form-text text-secondary mt-2">Você pode cancelar a qualquer momento.</div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="border-top border-secondary mt-4 pt-4 d-flex flex-column flex-md-row justify-content-between gap-2">
+                    <div class="text-secondary small">Origo — plataforma de crowdfunding para projetos criativos.</div>
+                    <div class="text-secondary small">&copy; {{ year }} Origo. Todos os direitos reservados.</div>
                 </div>
             </div>
         </footer>
@@ -160,6 +270,8 @@ const isAuthRoute = computed(() => route.name === 'login' || route.name === 'reg
 const logoUrl = '/img/logo.svg';
 
 const searchQuery = ref('');
+
+const newsletterEmail = ref('');
 
 const categories = [
     { key: 'arte', label: 'Arte' },
@@ -213,6 +325,17 @@ async function logout() {
 function onSearchSubmit() {
     const q = String(searchQuery.value || '').trim();
     router.push({ path: '/campaigns', query: q ? { q } : {} });
+}
+
+function subscribeNewsletter() {
+    const email = String(newsletterEmail.value || '').trim();
+    if (!email) {
+        setFlashError('Digite um email para assinar.');
+        return;
+    }
+
+    newsletterEmail.value = '';
+    setFlashSuccess('Obrigado! Você foi inscrito na newsletter.');
 }
 
 onMounted(async () => {

@@ -56,8 +56,7 @@
             height: 8px;
         }
 
-        footer {
-            background-color: #f8f9fa;
+        .site-footer {
             margin-top: 4rem;
         }
     </style>
@@ -149,15 +148,105 @@
     </main>
 
     <!-- Footer -->
-    <footer class="py-4">
+    <footer class="site-footer bg-dark text-light pt-5 pb-4">
         <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>Origo</h5>
-                        <p class="text-muted">Plataforma de crowdfunding para projetos criativos.</p>
-                <div class="col-md-6 text-md-end">
-                    <p class="text-muted mb-0">&copy; {{ date('Y') }} Origo. Todos os direitos reservados.</p>
-                        <p class="text-muted mb-0">&copy; {{ date('Y') }} Origo. Todos os direitos reservados.</p>
+            <div class="row g-4">
+                <div class="col-6 col-md-3">
+                    <h6 class="fw-semibold">Bem-vindo</h6>
+                    <ul class="list-unstyled mt-3 mb-0">
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/about">Quem Somos</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/how-it-works">Como funciona</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/blog">Blog</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/team">Nosso time</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/press">Imprensa</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/retrospectiva-2020">Retrospectiva 2020</a></li>
+                    </ul>
+
+                    <div class="mt-4">
+                        <h6 class="fw-semibold">Redes Sociais</h6>
+                        <ul class="list-unstyled mt-3 mb-0">
+                            <li class="mb-2">
+                                <a class="link-light text-decoration-none" href="https://facebook.com" target="_blank" rel="noopener">
+                                    <i class="bi bi-facebook me-2"></i>Facebook
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <a class="link-light text-decoration-none" href="https://twitter.com" target="_blank" rel="noopener">
+                                    <i class="bi bi-twitter-x me-2"></i>Twitter
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <a class="link-light text-decoration-none" href="https://instagram.com" target="_blank" rel="noopener">
+                                    <i class="bi bi-instagram me-2"></i>Instagram
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <a class="link-light text-decoration-none" href="https://github.com" target="_blank" rel="noopener">
+                                    <i class="bi bi-github me-2"></i>Github
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <h6 class="fw-semibold">Ajuda</h6>
+                    <ul class="list-unstyled mt-3 mb-0">
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/support">Central de Suporte</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/contact">Contato</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/updates">Atualizações</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/fees">Nossa Taxa</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/security">Responsabilidades e Segurança</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/terms">Termos de uso</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/privacy">Política de privacidade</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <h6 class="fw-semibold">Faça uma campanha</h6>
+                    <ul class="list-unstyled mt-3 mb-0">
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/me/campaigns/create">Comece seu projeto</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/campaigns?category=musica">Música no Origo</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/campaigns?category=publicacao">Publicações Independentes</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/campaigns?category=jornalismo">Jornalismo</a></li>
+                        <li class="mb-2"><a class="link-light text-decoration-none" href="/assinaturas">Assinaturas</a></li>
+                    </ul>
+
+                    <div class="mt-4">
+                        <h6 class="fw-semibold">Apoie projetos no Origo</h6>
+                        <ul class="list-unstyled mt-3 mb-0">
+                            <li class="mb-2"><a class="link-light text-decoration-none" href="/campaigns">Explore projetos</a></li>
+                            <li class="mb-2"><a class="link-light text-decoration-none" href="/popular">Populares</a></li>
+                            <li class="mb-2"><a class="link-light text-decoration-none" href="/no-ar">No ar</a></li>
+                            <li class="mb-2"><a class="link-light text-decoration-none" href="/finalizados">Finalizados</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <h6 class="fw-semibold">Assine nossa news</h6>
+                    <form class="mt-3" onsubmit="return false;">
+                        <div class="input-group">
+                            <input
+                                type="email"
+                                class="form-control"
+                                placeholder="Digite seu email"
+                                aria-label="Digite seu email"
+                                autocomplete="email"
+                            />
+                            <button class="btn btn-primary" type="submit" aria-label="Assinar">
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div class="form-text text-secondary mt-2">Você pode cancelar a qualquer momento.</div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="border-top border-secondary mt-4 pt-4 d-flex flex-column flex-md-row justify-content-between gap-2">
+                <div class="text-secondary small">Origo — plataforma de crowdfunding para projetos criativos.</div>
+                <div class="text-secondary small">&copy; {{ date('Y') }} Origo. Todos os direitos reservados.</div>
+            </div>
         </div>
     </footer>
 
