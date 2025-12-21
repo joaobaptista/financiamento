@@ -40,12 +40,36 @@ class MockCampaignsSeeder extends Seeder
             ]
         );
 
+        $bookMarkdown = <<<MD
+Categoria: publicacao
+
+## Um livro feito por quem ama fantasia
+
+Este é um projeto de **exemplo** para desenvolvimento local, mas com um texto que simula uma campanha real.
+
+### O que você vai receber
+
+- Edição caprichada (diagramada e revisada)
+- Ilustrações coloridas
+- Recompensas digitais e físicas
+
+### Por que apoiar?
+
+Sua contribuição ajuda a cobrir:
+
+1. Edição e revisão
+2. Ilustração
+3. Impressão e envios
+
+[Saiba mais sobre o projeto](https://example.com)
+MD;
+
         $campaignBook = Campaign::updateOrCreate(
             ['slug' => 'campanha-exemplo-livro'],
             [
                 'user_id' => $creator->id,
                 'title' => 'Livro de Contos Fantásticos (Exemplo)',
-                'description' => 'Campanha de exemplo para desenvolvimento local. Um livro com contos de fantasia, edição de luxo e ilustrações coloridas. Categoria: publicacao.',
+                'description' => $bookMarkdown,
                 'goal_amount' => 5000000,
                 'pledged_amount' => 0,
                 'starts_at' => now()->subDays(7),
@@ -170,7 +194,21 @@ class MockCampaignsSeeder extends Seeder
             [
                 'slug' => 'campanha-exemplo-tecnologia',
                 'title' => 'Gadget Sustentável (Exemplo)',
-                'description' => 'Campanha de exemplo. Um gadget sustentável pensado para reduzir desperdício no dia a dia.',
+                'description' => <<<MD
+Categoria: tecnologia
+
+## Um gadget para reduzir desperdício
+
+Campanha de exemplo com **Markdown** para testar a página.
+
+### Destaques
+
+- Design simples
+- Materiais recicláveis
+- Produção local
+
+> Apoie e ajude a tirar do papel.
+MD,
                 'category_key' => 'tecnologia',
                 'goal_amount' => 8000000,
                 'starts_at' => now()->subDays(1),
