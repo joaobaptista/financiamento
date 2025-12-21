@@ -4,6 +4,8 @@ namespace App\Actions\Campaign;
 
 use App\Domain\Campaign\Campaign;
 use App\Enums\CampaignStatus;
+use App\Notifications\NewCampaignPublished;
+use Illuminate\Support\Facades\Notification;
 
 class PublishCampaign
 {
@@ -31,6 +33,21 @@ class PublishCampaign
             $campaign->starts_at = now();
         }
 
-        return $campaign->save();
+        $saved = $campaign->save();
+
+        if ($saved) {
+            $campaign->loadMissing('user');
+            $creator = $campaign->user;
+
+            if ($creator) {
+                $creator->supporters()
+                    ->select('users.*')
+                    ->chunkById(200, function ($supporters) use ($campaign) {
+                        Notification::send($supporters, new NewCampaignPublished($campaign));
+                    });
+            }
+        }
+
+        return $saved;
     }
 }

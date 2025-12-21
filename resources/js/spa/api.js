@@ -12,3 +12,8 @@ export async function apiPut(url, payload) {
     const response = await window.axios.put(url, payload);
     return response.data;
 }
+
+export async function apiDelete(url) {
+    const response = await window.axios.delete(url);
+    return response.data;
+}

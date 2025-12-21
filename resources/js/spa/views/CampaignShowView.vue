@@ -8,8 +8,31 @@
                 <div class="container py-4 py-md-5">
                     <div class="text-uppercase text-muted small">Campanha</div>
                     <h1 class="display-6 mb-2">{{ campaign.title }}</h1>
-                    <div class="text-muted">
-                        Por <strong>{{ campaign.user?.name ?? '—' }}</strong>
+                    <div class="text-muted d-flex flex-wrap align-items-center gap-2">
+                        <div>
+                            Por <strong>{{ campaign.user?.name ?? '—' }}</strong>
+                        </div>
+
+                        <template v-if="campaign.user?.id && (!user || user.id !== campaign.user.id)">
+                            <template v-if="user">
+                                <button
+                                    type="button"
+                                    class="btn btn-sm"
+                                    :class="isSupportingCreator ? 'btn-outline-secondary' : 'btn-outline-primary'"
+                                    :disabled="supportingBusy"
+                                    @click="toggleCreatorSupport"
+                                >
+                                    {{ supportingBusy ? '…' : isSupportingCreator ? 'Deixar de apoiar' : 'Apoiar criador' }}
+                                </button>
+                                <span v-if="creatorSupportersCount != null" class="small text-muted">
+                                    {{ creatorSupportersCount }} apoiadores
+                                </span>
+                            </template>
+                            <template v-else>
+                                <RouterLink to="/login" class="btn btn-sm btn-outline-primary">Entrar para apoiar</RouterLink>
+                            </template>
+                        </template>
+
                         <span class="mx-2">•</span>
                         <span v-if="isCampaignOpen">{{ daysRemaining }} dias restantes</span>
                         <span v-else>Campanha finalizada</span>
@@ -234,7 +257,7 @@
 
 <script setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
-import { apiGet, apiPost } from '../api';
+import { apiDelete, apiGet, apiPost } from '../api';
 import { absoluteUrl, applyCampaignSeo } from '../seo';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
@@ -251,6 +274,10 @@ const rewardId = ref(null);
 const submitting = ref(false);
 const message = ref('');
 const supportBox = ref(null);
+
+const supportingBusy = ref(false);
+const isSupportingCreator = ref(false);
+const creatorSupportersCount = ref(null);
 
 function formatMoney(cents) {
     const value = (Number(cents || 0) / 100).toFixed(2);
@@ -352,7 +379,39 @@ async function fetchCampaign() {
     } else if (!amount.value) {
         amount.value = '25.00';
     }
+
+    await fetchCreatorSupport();
     loading.value = false;
+}
+
+async function fetchCreatorSupport() {
+    const creatorId = campaign.value?.user?.id;
+    if (!creatorId) return;
+
+    try {
+        const data = await apiGet(`/api/creators/${creatorId}/support`);
+        isSupportingCreator.value = !!data?.is_supporting;
+        creatorSupportersCount.value = Number(data?.supporters_count ?? 0);
+    } catch {
+        // Ignore (e.g. creator deleted)
+    }
+}
+
+async function toggleCreatorSupport() {
+    const creatorId = campaign.value?.user?.id;
+    if (!creatorId) return;
+    if (!props.user) return;
+
+    supportingBusy.value = true;
+    try {
+        const data = isSupportingCreator.value
+            ? await apiDelete(`/api/creators/${creatorId}/support`)
+            : await apiPost(`/api/creators/${creatorId}/support`, {});
+        isSupportingCreator.value = !!data?.is_supporting;
+        creatorSupportersCount.value = Number(data?.supporters_count ?? creatorSupportersCount.value ?? 0);
+    } finally {
+        supportingBusy.value = false;
+    }
 }
 
 async function submit() {

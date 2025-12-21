@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CampaignController;
+use App\Http\Controllers\Api\CreatorSupportController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PublicCampaignController;
 use App\Http\Controllers\Api\PledgeController;
 use Illuminate\Support\Facades\Route;
@@ -30,8 +32,19 @@ Route::middleware(['web'])->group(function () {
     Route::get('/campaigns', [PublicCampaignController::class, 'index']);
     Route::get('/campaigns/{slug}', [PublicCampaignController::class, 'show']);
 
+    // Support a creator ("seguir" / "apoiar")
+    Route::get('/creators/{creator}/support', [CreatorSupportController::class, 'show']);
+
     // Creator/dashboard
     Route::middleware('auth')->group(function () {
+        // In-app notifications
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+
+        Route::post('/creators/{creator}/support', [CreatorSupportController::class, 'store']);
+        Route::delete('/creators/{creator}/support', [CreatorSupportController::class, 'destroy']);
+
         Route::get('/dashboard/campaigns', [DashboardController::class, 'index']);
         Route::get('/dashboard/campaigns/{id}', [DashboardController::class, 'show']);
 
