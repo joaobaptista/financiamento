@@ -7,6 +7,7 @@ import DashboardIndexView from './views/DashboardIndexView.vue';
 import DashboardShowView from './views/DashboardShowView.vue';
 import CampaignCreateView from './views/CampaignCreateView.vue';
 import CampaignEditView from './views/CampaignEditView.vue';
+import CreatorSetupCategoryView from './views/CreatorSetupCategoryView.vue';
 import StaticPageView from './views/StaticPageView.vue';
 
 export const routes = [
@@ -277,6 +278,17 @@ export const routes = [
         meta: {
             title: 'Dashboard da campanha',
             description: 'Acompanhe apoios e métricas da sua campanha.',
+            robots: 'noindex, nofollow',
+        },
+    },
+
+    {
+        path: '/me/creator/setup',
+        name: 'me.creator.setup',
+        component: CreatorSetupCategoryView,
+        meta: {
+            title: 'Configurar perfil de criador',
+            description: 'Configure sua categoria como criador antes de criar campanhas.',
             robots: 'noindex, nofollow',
         },
     },

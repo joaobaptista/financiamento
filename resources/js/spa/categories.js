@@ -1,0 +1,17 @@
+export const categories = [
+    { key: 'arte', label: 'Arte' },
+    { key: 'quadrinhos', label: 'Quadrinhos' },
+    { key: 'artesanato', label: 'Artesanato' },
+    { key: 'danca', label: 'Dança' },
+    { key: 'design', label: 'Design' },
+    { key: 'moda', label: 'Moda' },
+    { key: 'filme', label: 'Filme' },
+    { key: 'comida', label: 'Comida' },
+    { key: 'jogos', label: 'Jogos' },
+    { key: 'jornalismo', label: 'Jornalismo' },
+    { key: 'musica', label: 'Música' },
+    { key: 'fotografia', label: 'Fotografia' },
+    { key: 'publicacao', label: 'Publicação' },
+    { key: 'tecnologia', label: 'Tecnologia' },
+    { key: 'teatro', label: 'Teatro' },
+];

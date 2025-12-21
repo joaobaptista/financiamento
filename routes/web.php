@@ -14,6 +14,8 @@ Route::middleware(['auth'])->group(function () {
 	Route::view('/dashboard', 'spa')->name('dashboard.index');
 	Route::view('/dashboard/campaigns/{id}', 'spa')->name('dashboard.show');
 
+	Route::view('/me/creator/setup', 'spa')->name('creator.setup');
+
 	Route::view('/me/campaigns/create', 'spa')->name('campaigns.create');
 	Route::view('/me/campaigns/{id}/edit', 'spa')->name('campaigns.edit');
 

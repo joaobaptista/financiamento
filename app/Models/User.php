@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -57,6 +58,11 @@ class User extends Authenticatable
     public function pledges()
     {
         return $this->hasMany(\App\Domain\Pledge\Pledge::class);
+    }
+
+    public function creatorProfile(): HasOne
+    {
+        return $this->hasOne(CreatorProfile::class);
     }
 
     public function supportedCreators(): BelongsToMany

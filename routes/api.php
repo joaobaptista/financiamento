@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CampaignController;
+use App\Http\Controllers\Api\CreatorProfileController;
 use App\Http\Controllers\Api\CreatorSupportController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\NotificationController;
@@ -37,6 +38,10 @@ Route::middleware(['web'])->group(function () {
 
     // Creator/dashboard
     Route::middleware('auth')->group(function () {
+        // Creator onboarding/profile
+        Route::get('/me/creator-profile', [CreatorProfileController::class, 'show']);
+        Route::post('/me/creator-profile', [CreatorProfileController::class, 'store']);
+
         // In-app notifications
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);

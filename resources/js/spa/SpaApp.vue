@@ -38,7 +38,7 @@
                     <ul class="navbar-nav ms-lg-auto align-items-lg-center">
                         <template v-if="user">
                             <li class="nav-item">
-                                <RouterLink class="nav-link" to="/me/campaigns/create">Para criadores</RouterLink>
+                                <RouterLink class="nav-link" to="/me/creator/setup">Para criadores</RouterLink>
                             </li>
                             <li class="nav-item dropdown">
                                 <a
@@ -69,7 +69,7 @@
 
                         <template v-else>
                             <li class="nav-item">
-                                <RouterLink class="nav-link" to="/me/campaigns/create">Para criadores</RouterLink>
+                                <RouterLink class="nav-link" to="/me/creator/setup">Para criadores</RouterLink>
                             </li>
                             <li class="nav-item">
                                 <RouterLink class="nav-link" to="/login">Entrar</RouterLink>
@@ -186,7 +186,7 @@
                         <h6 class="fw-semibold">Faça uma campanha</h6>
                         <ul class="list-unstyled mt-3 mb-0">
                             <li class="mb-2">
-                                <RouterLink class="link-light text-decoration-none" to="/me/campaigns/create">Comece seu projeto</RouterLink>
+                                <RouterLink class="link-light text-decoration-none" to="/me/creator/setup">Comece seu projeto</RouterLink>
                             </li>
                             <li class="mb-2">
                                 <RouterLink class="link-light text-decoration-none" :to="{ path: '/campaigns', query: { category: 'musica' } }">
@@ -254,6 +254,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { apiGet, apiPost } from './api';
+import { categories } from './categories';
 
 const router = useRouter();
 const route = useRoute();
@@ -273,23 +274,7 @@ const searchQuery = ref('');
 
 const newsletterEmail = ref('');
 
-const categories = [
-    { key: 'arte', label: 'Arte' },
-    { key: 'quadrinhos', label: 'Quadrinhos' },
-    { key: 'artesanato', label: 'Artesanato' },
-    { key: 'danca', label: 'Dança' },
-    { key: 'design', label: 'Design' },
-    { key: 'moda', label: 'Moda' },
-    { key: 'filme', label: 'Filme' },
-    { key: 'comida', label: 'Comida' },
-    { key: 'jogos', label: 'Jogos' },
-    { key: 'jornalismo', label: 'Jornalismo' },
-    { key: 'musica', label: 'Música' },
-    { key: 'fotografia', label: 'Fotografia' },
-    { key: 'publicacao', label: 'Publicação' },
-    { key: 'tecnologia', label: 'Tecnologia' },
-    { key: 'teatro', label: 'Teatro' },
-];
+// `categories` imported from ./categories
 
 function setFlashSuccess(message) {
     flashSuccess.value = message || '';

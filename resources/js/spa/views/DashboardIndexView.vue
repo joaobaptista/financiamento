@@ -6,7 +6,7 @@
                     <div class="text-uppercase text-muted small">Criador</div>
                     <h1 class="h3 fw-normal mb-0">Minhas campanhas</h1>
                 </div>
-                <RouterLink to="/me/campaigns/create" class="btn btn-primary">
+                <RouterLink to="/me/creator/setup" class="btn btn-primary">
                     <i class="bi bi-plus-circle"></i> Nova campanha
                 </RouterLink>
             </div>
@@ -68,7 +68,7 @@
             <div v-if="campaigns.length === 0" class="text-center py-5">
                 <i class="bi bi-inbox display-1 text-muted"></i>
                 <p class="text-muted mt-3">Você ainda não criou nenhuma campanha.</p>
-                <RouterLink to="/me/campaigns/create" class="btn btn-primary">
+                <RouterLink to="/me/creator/setup" class="btn btn-primary">
                     Criar Minha Primeira Campanha
                 </RouterLink>
             </div>
