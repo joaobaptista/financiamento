@@ -108,7 +108,7 @@
         </div>
 
         <!-- Main Content -->
-        <main :class="isAuthRoute ? 'py-0' : 'py-4'">
+        <main :class="isAuthRoute ? 'py-0' : 'pt-2 pb-4'">
             <div v-if="loading" class="container text-muted">{{ t('common.loading') }}</div>
             <RouterView
                 v-else

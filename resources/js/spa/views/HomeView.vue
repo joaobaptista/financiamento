@@ -1,7 +1,7 @@
 <template>
     <div class="container">
-        <div class="text-center py-4 py-md-5">
-            <h1 class="display-5 fw-normal mb-0">{{ t('home.heroTitle') }}</h1>
+        <div class="text-center py-3 py-md-4">
+            <h1 class="display-6 fw-normal mb-0">{{ t('home.heroTitle') }}</h1>
         </div>
 
         <div v-if="loading" class="text-center text-muted py-5">{{ t('common.loading') }}</div>
