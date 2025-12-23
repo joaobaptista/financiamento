@@ -110,7 +110,7 @@ export function absoluteUrl(pathOrUrl) {
 export function applyRouteSeo(route) {
     const defaults = getDefaults();
 
-    const siteName = defaults.site_name || 'Catarse';
+    const siteName = defaults.site_name || 'Origo';
 
     const pageTitle = route?.meta?.titleKey ? tMaybe(route.meta.titleKey) : (route?.meta?.title || '');
 
@@ -163,7 +163,7 @@ export function applyRouteSeo(route) {
 
 export function applyCampaignSeo(campaign) {
     const defaults = getDefaults();
-    const siteName = defaults.site_name || 'Catarse';
+    const siteName = defaults.site_name || 'Origo';
 
     const title = campaign?.title || 'Campanha';
     const description = truncate(campaign?.description || defaults.description || '', 160);

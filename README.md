@@ -11,6 +11,7 @@ Uma plataforma moderna de crowdfunding construída com **Laravel 12**, **Postgre
 ## 📋 Índice
 
 - [Funcionalidades](#-funcionalidades)
+- [Documentação](#-documentação)
 - [Requisitos](#-requisitos)
 - [Instalação](#-instalação)
 - [Configuração](#-configuração)
@@ -24,6 +25,13 @@ Uma plataforma moderna de crowdfunding construída com **Laravel 12**, **Postgre
 - [Contribuindo](#-contribuindo)
 
 ---
+
+## 📚 Documentação
+
+- Arquitetura: `docs/architecture.md`
+- Backend: `docs/backend.md`
+- Frontend: `docs/frontend.md`
+- Banco de dados: `docs/database.md`
 
 ## ✨ Funcionalidades
 

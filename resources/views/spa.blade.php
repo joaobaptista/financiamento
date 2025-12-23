@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     @php
-        $seoSiteName = (string) config('seo.site_name', config('app.name', 'Catarse'));
+        $seoSiteName = (string) config('seo.site_name', config('app.name', 'Origo'));
         $seoDescription = (string) config('seo.description', 'Plataforma de crowdfunding.');
         $seoKeywords = (string) config('seo.keywords', 'crowdfunding');
         $seoAuthor = (string) config('seo.author', $seoSiteName);

@@ -3,7 +3,7 @@
         <div v-if="loading" class="container py-4 text-muted">{{ t('common.loading') }}</div>
 
         <div v-else-if="campaign">
-            <!-- Hero (padrão Catarse) -->
+            <!-- Hero (padrão Origo) -->
             <div class="bg-light border-bottom">
                 <div class="container py-4 py-md-5">
                     <div class="text-uppercase text-muted small">{{ t('campaignShow.sectionLabel') }}</div>
