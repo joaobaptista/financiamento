@@ -398,7 +398,7 @@ const messages = {
         navbar: {
             searchPlaceholder: 'Buscar projetos, criadores e categorias',
             searchAria: 'Buscar',
-            forCreators: 'Para criadores',
+            register: 'Cadastrar',
             login: 'Entrar',
             dashboard: 'Meu Dashboard',
             profile: 'Perfil',
@@ -828,7 +828,7 @@ const messages = {
         navbar: {
             searchPlaceholder: 'Search projects, creators and categories',
             searchAria: 'Search',
-            forCreators: 'For creators',
+            register: 'Sign up',
             login: 'Sign in',
             dashboard: 'My Dashboard',
             profile: 'Profile',
@@ -1258,7 +1258,7 @@ const messages = {
         navbar: {
             searchPlaceholder: 'Buscar proyectos, creadores y categorías',
             searchAria: 'Buscar',
-            forCreators: 'Para creadores',
+            register: 'Registrarse',
             login: 'Iniciar sesión',
             dashboard: 'Mi Panel',
             profile: 'Perfil',

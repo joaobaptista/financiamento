@@ -37,9 +37,6 @@
 
                     <ul class="navbar-nav ms-lg-auto align-items-lg-center">
                         <template v-if="user">
-                            <li class="nav-item">
-                                <RouterLink class="nav-link" to="/me/creator/setup">{{ t('navbar.forCreators') }}</RouterLink>
-                            </li>
                             <li class="nav-item dropdown">
                                 <a
                                     class="nav-link dropdown-toggle"
@@ -69,7 +66,7 @@
 
                         <template v-else>
                             <li class="nav-item">
-                                <RouterLink class="nav-link" to="/me/creator/setup">{{ t('navbar.forCreators') }}</RouterLink>
+                                <RouterLink class="nav-link" to="/register">{{ t('navbar.register') }}</RouterLink>
                             </li>
                             <li class="nav-item">
                                 <RouterLink class="nav-link" to="/login">{{ t('navbar.login') }}</RouterLink>
