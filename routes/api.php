@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PublicCampaignController;
 use App\Http\Controllers\Api\PledgeController;
+use App\Http\Controllers\Api\SupporterProfileController;
+use App\Http\Controllers\Api\CepController;
 use App\Http\Controllers\Webhooks\MercadoPagoWebhookController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +48,13 @@ Route::middleware(['web'])->group(function () {
 
     // Creator/dashboard
     Route::middleware('auth')->group(function () {
+        // Supporter profile (address + phone)
+        Route::get('/me/supporter-profile', [SupporterProfileController::class, 'show']);
+        Route::post('/me/supporter-profile', [SupporterProfileController::class, 'update']);
+
+        // CEP lookup (ViaCEP)
+        Route::get('/cep/{cep}', [CepController::class, 'show'])->middleware(['throttle:30,1']);
+
         // Creator onboarding/profile
         Route::get('/me/creator-profile', [CreatorProfileController::class, 'show']);
         Route::post('/me/creator-profile', [CreatorProfileController::class, 'store']);

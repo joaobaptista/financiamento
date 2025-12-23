@@ -193,6 +193,127 @@
                                     </div>
 
                                     <form @submit.prevent="submit">
+                                        <div v-if="!supporterProfileReady" class="alert alert-warning mb-3" role="alert">
+                                            {{ t('campaignShow.supporterProfileRequired') }}
+                                        </div>
+
+                                        <div v-if="!supporterProfileReady" class="border rounded p-3 mb-3">
+                                            <div class="fw-semibold mb-2">{{ t('campaignShow.supporterProfileTitle') }}</div>
+
+                                            <div class="row g-2">
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.postalCodeLabel') }}</label>
+                                                    <div class="input-group">
+                                                        <input
+                                                            v-model="supporterPostalCode"
+                                                            type="text"
+                                                            class="form-control"
+                                                            inputmode="numeric"
+                                                            autocomplete="postal-code"
+                                                            :disabled="submitting || !isCampaignOpen || supporterProfileSaving"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-outline-secondary"
+                                                            :disabled="submitting || !isCampaignOpen || supporterProfileSaving || !supporterPostalCode"
+                                                            @click="lookupCep"
+                                                        >
+                                                            {{ t('campaignShow.lookupCep') }}
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.addressStreetLabel') }}</label>
+                                                    <input
+                                                        v-model="supporterAddressStreet"
+                                                        type="text"
+                                                        class="form-control"
+                                                        autocomplete="address-line1"
+                                                        :disabled="submitting || !isCampaignOpen || supporterProfileSaving"
+                                                    />
+                                                </div>
+
+                                                <div class="col-6">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.addressNumberLabel') }}</label>
+                                                    <input
+                                                        v-model="supporterAddressNumber"
+                                                        type="text"
+                                                        class="form-control"
+                                                        :disabled="submitting || !isCampaignOpen || supporterProfileSaving"
+                                                    />
+                                                </div>
+
+                                                <div class="col-6">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.addressComplementLabel') }}</label>
+                                                    <input
+                                                        v-model="supporterAddressComplement"
+                                                        type="text"
+                                                        class="form-control"
+                                                        :disabled="submitting || !isCampaignOpen || supporterProfileSaving"
+                                                    />
+                                                </div>
+
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.addressNeighborhoodLabel') }}</label>
+                                                    <input
+                                                        v-model="supporterAddressNeighborhood"
+                                                        type="text"
+                                                        class="form-control"
+                                                        :disabled="submitting || !isCampaignOpen || supporterProfileSaving"
+                                                    />
+                                                </div>
+
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.addressCityLabel') }}</label>
+                                                    <input
+                                                        v-model="supporterAddressCity"
+                                                        type="text"
+                                                        class="form-control"
+                                                        :disabled="submitting || !isCampaignOpen || supporterProfileSaving"
+                                                    />
+                                                </div>
+
+                                                <div class="col-12 col-md-2">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.addressStateLabel') }}</label>
+                                                    <input
+                                                        v-model="supporterAddressState"
+                                                        type="text"
+                                                        class="form-control"
+                                                        maxlength="2"
+                                                        :disabled="submitting || !isCampaignOpen || supporterProfileSaving"
+                                                    />
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.phoneLabel') }}</label>
+                                                    <input
+                                                        v-model="supporterPhone"
+                                                        type="text"
+                                                        class="form-control"
+                                                        inputmode="tel"
+                                                        autocomplete="tel"
+                                                        :disabled="submitting || !isCampaignOpen || supporterProfileSaving"
+                                                    />
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-outline-primary w-100"
+                                                        :disabled="submitting || !isCampaignOpen || supporterProfileSaving"
+                                                        @click="saveSupporterProfile"
+                                                    >
+                                                        {{ supporterProfileSaving ? t('common.ellipsis') : t('campaignShow.saveSupporterProfile') }}
+                                                    </button>
+
+                                                    <div v-if="supporterProfileMessage" class="text-muted small mt-2">
+                                                        {{ supporterProfileMessage }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div class="mb-2">
                                             <label class="form-label">{{ t('campaignShow.amountLabel') }}</label>
                                             <div class="input-group">
@@ -222,7 +343,7 @@
                                                     type="radio"
                                                     name="payment_method"
                                                     value="pix"
-                                                    :disabled="submitting || !isCampaignOpen"
+                                                    :disabled="submitting || !isCampaignOpen || !supporterProfileReady"
                                                 />
                                                 <label class="form-check-label" for="pay-pix">{{ t('campaignShow.paymentPix') }}</label>
                                             </div>
@@ -234,7 +355,7 @@
                                                     type="radio"
                                                     name="payment_method"
                                                     value="card"
-                                                    :disabled="submitting || !isCampaignOpen"
+                                                    :disabled="submitting || !isCampaignOpen || !supporterProfileReady"
                                                 />
                                                 <label class="form-check-label" for="pay-card">{{ t('campaignShow.paymentCard') }}</label>
                                             </div>
@@ -345,7 +466,7 @@
                                         <button
                                             type="submit"
                                             class="btn btn-success w-100"
-                                            :disabled="submitting || !isCampaignOpen"
+                                            :disabled="submitting || !isCampaignOpen || !supporterProfileReady"
                                         >
                                             <i class="bi bi-heart-fill"></i>
                                             {{ submitting ? t('campaignShow.processing') : t('campaignShow.supportNow') }}
@@ -404,6 +525,18 @@ const cardName = ref('');
 const cardExpiry = ref('');
 const cardCvv = ref('');
 const cardInstallments = ref(1);
+
+const supporterProfileReady = ref(false);
+const supporterProfileSaving = ref(false);
+const supporterProfileMessage = ref('');
+const supporterPostalCode = ref('');
+const supporterAddressStreet = ref('');
+const supporterAddressNumber = ref('');
+const supporterAddressComplement = ref('');
+const supporterAddressNeighborhood = ref('');
+const supporterAddressCity = ref('');
+const supporterAddressState = ref('');
+const supporterPhone = ref('');
 
 const supportingBusy = ref(false);
 const isFollowingPage = ref(false);
@@ -519,11 +652,89 @@ async function fetchCampaign() {
         }
 
         await fetchPageFollow();
+        await fetchSupporterProfile();
     } catch (e) {
         campaign.value = null;
         message.value = e?.response?.data?.message ?? '';
     } finally {
         loading.value = false;
+    }
+}
+
+function isSupporterProfileComplete() {
+    return (
+        String(supporterPostalCode.value || '').trim() !== '' &&
+        String(supporterAddressStreet.value || '').trim() !== '' &&
+        String(supporterAddressNumber.value || '').trim() !== '' &&
+        String(supporterAddressNeighborhood.value || '').trim() !== '' &&
+        String(supporterAddressCity.value || '').trim() !== '' &&
+        String(supporterAddressState.value || '').trim().length === 2 &&
+        String(supporterPhone.value || '').trim() !== ''
+    );
+}
+
+async function fetchSupporterProfile() {
+    supporterProfileMessage.value = '';
+    try {
+        const data = await apiGet('/api/me/supporter-profile');
+        supporterPostalCode.value = String(data?.postal_code ?? '');
+        supporterAddressStreet.value = String(data?.address_street ?? '');
+        supporterAddressNumber.value = String(data?.address_number ?? '');
+        supporterAddressComplement.value = String(data?.address_complement ?? '');
+        supporterAddressNeighborhood.value = String(data?.address_neighborhood ?? '');
+        supporterAddressCity.value = String(data?.address_city ?? '');
+        supporterAddressState.value = String(data?.address_state ?? '');
+        supporterPhone.value = String(data?.phone ?? '');
+    } catch {
+        // If endpoint isn't available for some reason, do not block the UI.
+        supporterProfileReady.value = true;
+        return;
+    }
+
+    supporterProfileReady.value = isSupporterProfileComplete();
+}
+
+async function lookupCep() {
+    supporterProfileMessage.value = '';
+    const cep = String(supporterPostalCode.value || '').trim();
+    if (!cep) return;
+
+    try {
+        const data = await apiGet(`/api/cep/${encodeURIComponent(cep)}`);
+        if (data?.postal_code) supporterPostalCode.value = String(data.postal_code);
+        if (data?.address_street) supporterAddressStreet.value = String(data.address_street);
+        if (data?.address_neighborhood) supporterAddressNeighborhood.value = String(data.address_neighborhood);
+        if (data?.address_city) supporterAddressCity.value = String(data.address_city);
+        if (data?.address_state) supporterAddressState.value = String(data.address_state);
+    } catch (e) {
+        supporterProfileMessage.value = e?.response?.data?.message ?? '';
+    }
+}
+
+async function saveSupporterProfile() {
+    supporterProfileMessage.value = '';
+    supporterProfileSaving.value = true;
+
+    try {
+        await apiPost('/api/me/supporter-profile', {
+            postal_code: String(supporterPostalCode.value || '').trim(),
+            address_street: String(supporterAddressStreet.value || '').trim(),
+            address_number: String(supporterAddressNumber.value || '').trim(),
+            address_complement: String(supporterAddressComplement.value || '').trim(),
+            address_neighborhood: String(supporterAddressNeighborhood.value || '').trim(),
+            address_city: String(supporterAddressCity.value || '').trim(),
+            address_state: String(supporterAddressState.value || '').trim().toUpperCase(),
+            phone: String(supporterPhone.value || '').trim(),
+        });
+
+        supporterProfileReady.value = isSupporterProfileComplete();
+        if (supporterProfileReady.value) {
+            supporterProfileMessage.value = t('campaignShow.supporterProfileSaved');
+        }
+    } catch (e) {
+        supporterProfileMessage.value = e?.response?.data?.message ?? '';
+    } finally {
+        supporterProfileSaving.value = false;
     }
 }
 
