@@ -193,14 +193,44 @@
                                     </div>
 
                                     <form @submit.prevent="submit">
-                                        <div v-if="!supporterProfileReady" class="alert alert-warning mb-3" role="alert">
-                                            {{ t('campaignShow.supporterProfileRequired') }}
-                                        </div>
+                                        <div class="border rounded p-3 mb-3">
+                                            <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                                                <div class="fw-semibold">{{ t('campaignShow.supporterProfileTitle') }}</div>
+                                                <button
+                                                    v-if="supporterProfileReady && !supporterProfileEditing"
+                                                    type="button"
+                                                    class="btn btn-sm btn-outline-secondary"
+                                                    :disabled="submitting || !isCampaignOpen || supporterProfileSaving"
+                                                    @click="supporterProfileEditing = true"
+                                                >
+                                                    {{ t('common.edit') }}
+                                                </button>
+                                            </div>
 
-                                        <div v-if="!supporterProfileReady" class="border rounded p-3 mb-3">
-                                            <div class="fw-semibold mb-2">{{ t('campaignShow.supporterProfileTitle') }}</div>
+                                            <div v-if="!supporterProfileReady" class="alert alert-warning mb-3" role="alert">
+                                                {{ t('campaignShow.supporterProfileRequired') }}
+                                            </div>
 
-                                            <div class="row g-2">
+                                            <div v-if="supporterProfileReady && !supporterProfileEditing" class="small text-muted">
+                                                <div><span class="fw-semibold">{{ t('campaignShow.postalCodeLabel') }}:</span> {{ supporterPostalCode }}</div>
+                                                <div>
+                                                    <span class="fw-semibold">{{ t('campaignShow.addressStreetLabel') }}:</span>
+                                                    {{ supporterAddressStreet }}, {{ supporterAddressNumber }}
+                                                    <template v-if="supporterAddressComplement"> — {{ supporterAddressComplement }}</template>
+                                                </div>
+                                                <div>
+                                                    <span class="fw-semibold">{{ t('campaignShow.addressNeighborhoodLabel') }}:</span>
+                                                    {{ supporterAddressNeighborhood }}
+                                                </div>
+                                                <div>
+                                                    <span class="fw-semibold">{{ t('campaignShow.addressCityLabel') }}:</span>
+                                                    {{ supporterAddressCity }}
+                                                    <template v-if="supporterAddressState">/{{ supporterAddressState }}</template>
+                                                </div>
+                                                <div><span class="fw-semibold">{{ t('campaignShow.phoneLabel') }}:</span> {{ supporterPhone }}</div>
+                                            </div>
+
+                                            <div v-else class="row g-2">
                                                 <div class="col-12 col-md-6">
                                                     <label class="form-label mb-1">{{ t('campaignShow.postalCodeLabel') }}</label>
                                                     <div class="input-group">
@@ -343,7 +373,7 @@
                                                     type="radio"
                                                     name="payment_method"
                                                     value="pix"
-                                                    :disabled="submitting || !isCampaignOpen || !supporterProfileReady"
+                                                    :disabled="submitting || !isCampaignOpen || supporterProfileSaving || !supporterProfileReady || supporterProfileEditing"
                                                 />
                                                 <label class="form-check-label" for="pay-pix">{{ t('campaignShow.paymentPix') }}</label>
                                             </div>
@@ -355,7 +385,7 @@
                                                     type="radio"
                                                     name="payment_method"
                                                     value="card"
-                                                    :disabled="submitting || !isCampaignOpen || !supporterProfileReady"
+                                                    :disabled="submitting || !isCampaignOpen || supporterProfileSaving || !supporterProfileReady || supporterProfileEditing"
                                                 />
                                                 <label class="form-check-label" for="pay-card">{{ t('campaignShow.paymentCard') }}</label>
                                             </div>
@@ -466,7 +496,7 @@
                                         <button
                                             type="submit"
                                             class="btn btn-success w-100"
-                                            :disabled="submitting || !isCampaignOpen || !supporterProfileReady"
+                                            :disabled="submitting || !isCampaignOpen || supporterProfileSaving || !supporterProfileReady || supporterProfileEditing"
                                         >
                                             <i class="bi bi-heart-fill"></i>
                                             {{ submitting ? t('campaignShow.processing') : t('campaignShow.supportNow') }}
@@ -527,6 +557,7 @@ const cardCvv = ref('');
 const cardInstallments = ref(1);
 
 const supporterProfileReady = ref(false);
+const supporterProfileEditing = ref(true);
 const supporterProfileSaving = ref(false);
 const supporterProfileMessage = ref('');
 const supporterPostalCode = ref('');
@@ -652,7 +683,12 @@ async function fetchCampaign() {
         }
 
         await fetchPageFollow();
-        await fetchSupporterProfile();
+        if (props.user) {
+            await fetchSupporterProfile();
+        } else {
+            supporterProfileReady.value = true;
+            supporterProfileEditing.value = false;
+        }
     } catch (e) {
         campaign.value = null;
         message.value = e?.response?.data?.message ?? '';
@@ -685,13 +721,16 @@ async function fetchSupporterProfile() {
         supporterAddressCity.value = String(data?.address_city ?? '');
         supporterAddressState.value = String(data?.address_state ?? '');
         supporterPhone.value = String(data?.phone ?? '');
-    } catch {
-        // If endpoint isn't available for some reason, do not block the UI.
-        supporterProfileReady.value = true;
+    } catch (e) {
+        supporterProfileReady.value = false;
+        supporterProfileEditing.value = true;
+        supporterProfileMessage.value = e?.response?.data?.message ?? t('errors.loadFailed');
         return;
     }
 
-    supporterProfileReady.value = isSupporterProfileComplete();
+    const complete = isSupporterProfileComplete();
+    supporterProfileReady.value = complete;
+    supporterProfileEditing.value = !complete;
 }
 
 async function lookupCep() {
@@ -728,9 +767,8 @@ async function saveSupporterProfile() {
         });
 
         supporterProfileReady.value = isSupporterProfileComplete();
-        if (supporterProfileReady.value) {
-            supporterProfileMessage.value = t('campaignShow.supporterProfileSaved');
-        }
+        supporterProfileEditing.value = !supporterProfileReady.value;
+        if (supporterProfileReady.value) supporterProfileMessage.value = t('campaignShow.supporterProfileSaved');
     } catch (e) {
         supporterProfileMessage.value = e?.response?.data?.message ?? '';
     } finally {
