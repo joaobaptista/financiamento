@@ -85,7 +85,7 @@
                             <div class="input-group">
                                 <input v-model="postalCode" type="text" class="form-control" :disabled="saving" />
                                 <button type="button" class="btn btn-outline-secondary" :disabled="saving || !postalCode" @click="lookupCep">
-                                    {{ t('campaignShow.lookupCep') }}
+                                    {{ saving ? t('common.ellipsis') : t('campaignShow.lookupCep') }}
                                 </button>
                             </div>
                         </div>
@@ -234,16 +234,22 @@ async function lookupCep() {
         if (data?.address_neighborhood) addressNeighborhood.value = String(data.address_neighborhood);
         if (data?.address_city) addressCity.value = String(data.address_city);
         if (data?.address_state) addressState.value = String(data.address_state);
+
+        // Auto-save the updated address fields after a successful CEP lookup.
+        await saveProfile({ includePhoto: false, silent: true });
     } catch (e) {
         message.value = e?.response?.data?.message ?? t('errors.loadFailed');
     }
 }
 
-async function saveProfile() {
+async function saveProfile(options = {}) {
     if (!props.user) return;
 
+    const includePhoto = options.includePhoto !== false;
+    const silent = options.silent === true;
+
     saving.value = true;
-    message.value = '';
+    if (!silent) message.value = '';
 
     try {
         const fd = new FormData();
@@ -257,15 +263,15 @@ async function saveProfile() {
         if (addressCity.value) fd.set('address_city', String(addressCity.value || '').trim());
         if (addressState.value) fd.set('address_state', String(addressState.value || '').trim());
         if (phone.value) fd.set('phone', String(phone.value || '').trim());
-        if (selectedPhoto.value) fd.set('profile_photo', selectedPhoto.value);
+        if (includePhoto && selectedPhoto.value) fd.set('profile_photo', selectedPhoto.value);
 
         const res = await apiPost('/api/me/profile', fd);
 
         emit('auth-updated');
-        message.value = t('profile.saved');
+        if (!silent) message.value = t('profile.saved');
 
         if (res?.user) hydrateFromUser(res.user);
-        selectedPhoto.value = null;
+        if (includePhoto) selectedPhoto.value = null;
     } catch (e) {
         message.value = e?.response?.data?.message ?? t('errors.saveFailed');
         emit('flash-error', message.value);
