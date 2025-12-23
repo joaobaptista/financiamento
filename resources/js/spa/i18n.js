@@ -273,6 +273,24 @@ const messages = {
             },
         },
 
+        profile: {
+            sectionLabel: 'Conta',
+            title: 'Meu perfil',
+            photoTitle: 'Foto de perfil',
+            photoHelp: 'Faça upload de uma imagem para usar no topo e no seu perfil.',
+            basicTitle: 'Dados básicos',
+            contactTitle: 'Endereço e telefone',
+            nameLabel: 'Nome',
+            emailLabel: 'Email',
+            passwordTitle: 'Senha',
+            currentPasswordLabel: 'Senha atual',
+            newPasswordLabel: 'Nova senha',
+            newPasswordConfirmLabel: 'Confirmar nova senha',
+            updatePassword: 'Atualizar senha',
+            saved: 'Perfil salvo!',
+            passwordSaved: 'Senha atualizada!',
+        },
+
         categories: {
             arte: 'Arte',
             quadrinhos: 'Quadrinhos',
@@ -311,6 +329,10 @@ const messages = {
             register: {
                 title: 'Criar conta',
                 description: 'Crie sua conta para apoiar campanhas e criar projetos.',
+            },
+            profile: {
+                title: 'Meu perfil',
+                description: 'Edite seus dados, senha e foto de perfil.',
             },
             dashboard: {
                 title: 'Dashboard',

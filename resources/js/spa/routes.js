@@ -9,6 +9,7 @@ import CampaignCreateView from './views/CampaignCreateView.vue';
 import CampaignEditView from './views/CampaignEditView.vue';
 import CreatorSetupCategoryView from './views/CreatorSetupCategoryView.vue';
 import StaticPageView from './views/StaticPageView.vue';
+import ProfileView from './views/ProfileView.vue';
 
 export const routes = [
     {
@@ -250,6 +251,17 @@ export const routes = [
         meta: {
             titleKey: 'routes.register.title',
             descriptionKey: 'routes.register.description',
+            robots: 'noindex, nofollow',
+        },
+    },
+
+    {
+        path: '/profile',
+        name: 'profile',
+        component: ProfileView,
+        meta: {
+            titleKey: 'routes.profile.title',
+            descriptionKey: 'routes.profile.description',
             robots: 'noindex, nofollow',
         },
     },

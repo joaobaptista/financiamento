@@ -45,6 +45,13 @@
                                     data-bs-toggle="dropdown"
                                     aria-expanded="false"
                                 >
+                                    <img
+                                        v-if="user.profile_photo_url"
+                                        :src="user.profile_photo_url"
+                                        alt=""
+                                        class="rounded-circle border me-2"
+                                        style="width: 24px; height: 24px; object-fit: cover"
+                                    />
                                     {{ user.name }}
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">

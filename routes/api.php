@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CreatorPageFollowController;
 use App\Http\Controllers\Api\CreatorProfileController;
 use App\Http\Controllers\Api\CreatorSupportController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\MeProfileController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PublicCampaignController;
 use App\Http\Controllers\Api\PledgeController;
@@ -48,6 +49,11 @@ Route::middleware(['web'])->group(function () {
 
     // Creator/dashboard
     Route::middleware('auth')->group(function () {
+        // Me profile (name/email/avatar/address/phone)
+        Route::get('/me/profile', [MeProfileController::class, 'show']);
+        Route::post('/me/profile', [MeProfileController::class, 'update']);
+        Route::post('/me/password', [MeProfileController::class, 'updatePassword']);
+
         // Supporter profile (address + phone)
         Route::get('/me/supporter-profile', [SupporterProfileController::class, 'show']);
         Route::post('/me/supporter-profile', [SupporterProfileController::class, 'update']);

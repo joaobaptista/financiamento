@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -25,6 +26,7 @@ class User extends Authenticatable
         'email',
         'password',
         'google_id',
+        'profile_photo_path',
         'postal_code',
         'address_street',
         'address_number',
@@ -33,6 +35,15 @@ class User extends Authenticatable
         'address_city',
         'address_state',
         'phone',
+    ];
+
+    /**
+     * Appended attributes for JSON serialization.
+     *
+     * @var list<string>
+     */
+    protected $appends = [
+        'profile_photo_url',
     ];
 
     /**
@@ -56,6 +67,14 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getProfilePhotoUrlAttribute(): ?string
+    {
+        $path = (string) ($this->profile_photo_path ?? '');
+        if ($path === '') return null;
+
+        return Storage::disk('public')->url($path);
     }
 
     // Relationships
