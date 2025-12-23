@@ -17,6 +17,7 @@ use App\Models\CreatorPage;
 use App\Services\Images\CampaignCoverImageService;
 use App\Services\Money\Money;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class CampaignController
 {
@@ -154,5 +155,27 @@ class CampaignController
                 'message' => $e->getMessage(),
             ], 422);
         }
+    }
+
+    public function destroy(int $id)
+    {
+        $campaign = Campaign::query()
+            ->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        if (!in_array($campaign->status, [CampaignStatus::Draft, CampaignStatus::Active], true)) {
+            return response()->json([
+                'message' => 'Apenas campanhas em rascunho ou ativas podem ser excluídas.',
+            ], 422);
+        }
+
+        Storage::disk('public')->deleteDirectory('campaign-covers/' . $campaign->id);
+
+        $campaign->delete();
+
+        return response()->json([
+            'ok' => true,
+        ]);
     }
 }

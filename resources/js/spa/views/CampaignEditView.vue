@@ -99,6 +99,9 @@
                             <i class="bi bi-save"></i> {{ submitting ? t('common.saving') : t('common.save') }}
                         </button>
                         <RouterLink to="/dashboard" class="btn btn-outline-secondary">{{ t('common.cancel') }}</RouterLink>
+                        <button type="button" class="btn btn-outline-danger ms-auto" :disabled="submitting" @click="destroyCampaign">
+                            <i class="bi bi-trash"></i> {{ t('common.delete') }}
+                        </button>
                     </div>
 
                     <div v-if="error" class="alert alert-danger mt-3" role="alert">{{ error }}</div>
@@ -126,7 +129,7 @@
 import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { apiGet, apiPost, apiPut } from '../api';
+import { apiDelete, apiGet, apiPost, apiPut } from '../api';
 
 const props = defineProps({
     id: { type: [String, Number], required: true },
@@ -170,7 +173,8 @@ function addReward() {
 
 async function load() {
     loading.value = true;
-    const campaign = await apiGet(`/api/me/campaigns/${props.id}`);
+    const payload = await apiGet(`/api/me/campaigns/${props.id}`);
+    const campaign = payload?.data ?? payload;
 
     form.value = {
         title: campaign.title,
@@ -192,7 +196,6 @@ async function load() {
 async function submit() {
     error.value = '';
     submitting.value = true;
-
     try {
         if (coverFile.value) {
             const fd = new FormData();
@@ -228,6 +231,21 @@ async function submit() {
             await apiPut(`/api/me/campaigns/${props.id}`, payload);
         }
 
+        router.push('/dashboard');
+    } catch (e) {
+        error.value = e?.response?.data?.message ?? t('campaignEdit.error');
+    } finally {
+        submitting.value = false;
+    }
+}
+
+async function destroyCampaign() {
+    error.value = '';
+    if (!confirm(t('campaignEdit.deleteConfirm'))) return;
+
+    submitting.value = true;
+    try {
+        await apiDelete(`/api/me/campaigns/${props.id}`);
         router.push('/dashboard');
     } catch (e) {
         error.value = e?.response?.data?.message ?? t('campaignEdit.error');

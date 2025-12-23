@@ -6,7 +6,7 @@
                     <div class="text-uppercase text-muted small">{{ t('dashboard.sectionLabel') }}</div>
                     <h1 class="h3 fw-normal mb-0">{{ t('dashboard.title') }}</h1>
                 </div>
-                <RouterLink to="/me/creator/setup" class="btn btn-primary">
+                <RouterLink to="/me/campaigns/create" class="btn btn-primary">
                     <i class="bi bi-plus-circle"></i> {{ t('dashboard.newCampaign') }}
                 </RouterLink>
             </div>
@@ -50,6 +50,9 @@
                                     <button type="button" class="btn btn-sm btn-success" @click="publish(c.id)">
                                         <i class="bi bi-rocket-takeoff"></i> {{ t('common.publish') }}
                                     </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" @click="destroyCampaign(c)">
+                                        <i class="bi bi-trash"></i> {{ t('common.delete') }}
+                                    </button>
                                 </template>
                                 <template v-else>
                                     <RouterLink :to="`/campaigns/${c.slug}`" class="btn btn-sm btn-outline-primary">
@@ -58,6 +61,12 @@
                                     <RouterLink :to="`/dashboard/campaigns/${c.id}`" class="btn btn-sm btn-primary">
                                         <i class="bi bi-bar-chart"></i> {{ t('dashboard.stats') }}
                                     </RouterLink>
+                                    <RouterLink :to="`/me/campaigns/${c.id}/edit`" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i> {{ t('common.edit') }}
+                                    </RouterLink>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" @click="destroyCampaign(c)">
+                                        <i class="bi bi-trash"></i> {{ t('common.delete') }}
+                                    </button>
                                 </template>
                             </div>
                         </div>
@@ -68,7 +77,7 @@
             <div v-if="campaigns.length === 0" class="text-center py-5">
                 <i class="bi bi-inbox display-1 text-muted"></i>
                 <p class="text-muted mt-3">{{ t('dashboard.empty') }}</p>
-                <RouterLink to="/me/creator/setup" class="btn btn-primary">
+                <RouterLink to="/me/campaigns/create" class="btn btn-primary">
                     {{ t('dashboard.createFirst') }}
                 </RouterLink>
             </div>
@@ -79,7 +88,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { apiGet, apiPost } from '../api';
+import { apiDelete, apiGet, apiPost } from '../api';
 
 const props = defineProps({
     user: { type: Object, default: null },
@@ -143,6 +152,19 @@ function statusLabel(status) {
     if (status === 'active') return t('campaign.status.active');
     if (status === 'closed') return t('campaign.status.closed');
     return String(status || '');
+}
+
+async function destroyCampaign(campaign) {
+    if (!campaign?.id) return;
+    if (!confirm(t('dashboard.deleteConfirm'))) return;
+
+    try {
+        await apiDelete(`/api/me/campaigns/${campaign.id}`);
+        emit('flash-success', t('dashboard.deleteSuccess'));
+        await load();
+    } catch (e) {
+        emit('flash-error', e?.response?.data?.message ?? t('dashboard.deleteError'));
+    }
 }
 
 async function publish(id) {

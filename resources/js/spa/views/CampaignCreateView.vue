@@ -192,7 +192,8 @@ async function submit() {
             created = await apiPost('/api/me/campaigns', payload);
         }
 
-        router.push(`/dashboard/campaigns/${created.id}`);
+        const createdCampaign = created?.data ?? created;
+        router.push(`/dashboard/campaigns/${createdCampaign.id}`);
     } catch (e) {
         error.value = e?.response?.data?.message ?? t('campaignCreate.error');
     } finally {

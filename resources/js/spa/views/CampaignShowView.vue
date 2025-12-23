@@ -373,21 +373,31 @@ async function selectNoReward() {
 
 async function fetchCampaign() {
     loading.value = true;
-    campaign.value = await apiGet(`/api/campaigns/${props.slug}`);
-    progress.value = calcProgress(campaign.value);
-    daysRemaining.value = calcDaysRemaining(campaign.value);
+    message.value = '';
 
-    applyCampaignSeo(campaign.value);
+    try {
+        const data = await apiGet(`/api/campaigns/${props.slug}`);
+        campaign.value = data?.data ?? data;
 
-    // Escolha inicial de valor: se houver recompensa selecionada, usa mínimo; senão, um valor sugerido.
-    if (selectedReward.value) {
-        amount.value = centsToAmountInput(selectedReward.value.min_amount);
-    } else if (!amount.value) {
-        amount.value = '25.00';
+        progress.value = calcProgress(campaign.value);
+        daysRemaining.value = calcDaysRemaining(campaign.value);
+
+        applyCampaignSeo(campaign.value);
+
+        // Escolha inicial de valor: se houver recompensa selecionada, usa mínimo; senão, um valor sugerido.
+        if (selectedReward.value) {
+            amount.value = centsToAmountInput(selectedReward.value.min_amount);
+        } else if (!amount.value) {
+            amount.value = '25.00';
+        }
+
+        await fetchPageFollow();
+    } catch (e) {
+        campaign.value = null;
+        message.value = e?.response?.data?.message ?? '';
+    } finally {
+        loading.value = false;
     }
-
-    await fetchPageFollow();
-    loading.value = false;
 }
 
 async function fetchPageFollow() {

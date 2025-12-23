@@ -31,7 +31,7 @@ class CampaignCoverImageService
             $disk->putFileAs($baseDir, $file, $baseName . '.' . $ext);
 
             $campaign->forceFill([
-                'cover_image_path' => $originalRelativePath,
+                'cover_image_path' => $this->toPublicUrlPath($originalRelativePath),
                 'cover_image_webp_path' => null,
             ])->save();
 
@@ -43,13 +43,19 @@ class CampaignCoverImageService
         $finalWebpPath = null;
         if ($webpBytes !== null) {
             $disk->put($webpRelativePath, $webpBytes);
-            $finalWebpPath = $webpRelativePath;
+            $finalWebpPath = $this->toPublicUrlPath($webpRelativePath);
         }
 
         $campaign->forceFill([
-            'cover_image_path' => $jpgRelativePath,
+            'cover_image_path' => $this->toPublicUrlPath($jpgRelativePath),
             'cover_image_webp_path' => $finalWebpPath,
         ])->save();
+    }
+
+    private function toPublicUrlPath(string $publicDiskRelativePath): string
+    {
+        $relative = ltrim(trim($publicDiskRelativePath), '/');
+        return '/storage/' . $relative;
     }
 
     private function deleteOldFiles(Campaign $campaign): void

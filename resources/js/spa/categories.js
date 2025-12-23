@@ -1,17 +1,13 @@
 export const categories = [
     { key: 'arte', labelKey: 'categories.arte' },
     { key: 'quadrinhos', labelKey: 'categories.quadrinhos' },
-    { key: 'artesanato', labelKey: 'categories.artesanato' },
-    { key: 'danca', labelKey: 'categories.danca' },
     { key: 'design', labelKey: 'categories.design' },
     { key: 'moda', labelKey: 'categories.moda' },
     { key: 'filme', labelKey: 'categories.filme' },
-    { key: 'comida', labelKey: 'categories.comida' },
     { key: 'jogos', labelKey: 'categories.jogos' },
     { key: 'jornalismo', labelKey: 'categories.jornalismo' },
     { key: 'musica', labelKey: 'categories.musica' },
     { key: 'fotografia', labelKey: 'categories.fotografia' },
     { key: 'publicacao', labelKey: 'categories.publicacao' },
     { key: 'tecnologia', labelKey: 'categories.tecnologia' },
-    { key: 'teatro', labelKey: 'categories.teatro' },
 ];

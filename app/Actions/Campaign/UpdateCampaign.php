@@ -16,8 +16,8 @@ class UpdateCampaign
             ->where('user_id', $data->userId)
             ->firstOrFail();
 
-        if ($campaign->status !== CampaignStatus::Draft) {
-            throw new \RuntimeException('Apenas campanhas em rascunho podem ser editadas.');
+        if (!in_array($campaign->status, [CampaignStatus::Draft, CampaignStatus::Active], true)) {
+            throw new \RuntimeException('Apenas campanhas em rascunho ou ativas podem ser editadas.');
         }
 
         $campaign->update([

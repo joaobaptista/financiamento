@@ -61,6 +61,15 @@
                     <i class="bi bi-rocket-takeoff"></i>
                     {{ publishing ? t('common.publishing') : t('common.publish') }}
                 </button>
+
+                <button
+                    type="button"
+                    class="btn btn-outline-danger ms-2"
+                    :disabled="publishing"
+                    @click="destroyCampaign"
+                >
+                    <i class="bi bi-trash"></i> {{ t('common.delete') }}
+                </button>
             </div>
 
             <div class="card">
@@ -100,7 +109,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { apiGet, apiPost } from '../api';
+import { apiDelete, apiGet, apiPost } from '../api';
 
 const props = defineProps({
     id: { type: [String, Number], required: true },
@@ -128,7 +137,12 @@ function formatDateTime(iso) {
 
 async function load() {
     loading.value = true;
-    data.value = await apiGet(`/api/dashboard/campaigns/${props.id}`);
+    const payload = await apiGet(`/api/dashboard/campaigns/${props.id}`);
+    data.value = {
+        ...payload,
+        campaign: payload?.campaign?.data ?? payload?.campaign,
+        pledges: payload?.pledges?.data ?? payload?.pledges,
+    };
     loading.value = false;
 }
 
@@ -144,6 +158,19 @@ async function publish() {
         message.value = e?.response?.data?.message ?? t('dashboard.publishError');
     } finally {
         publishing.value = false;
+    }
+}
+
+async function destroyCampaign() {
+    message.value = '';
+    if (!confirm(t('dashboard.deleteConfirm'))) return;
+
+    try {
+        await apiDelete(`/api/me/campaigns/${props.id}`);
+        message.value = t('dashboard.deleteSuccess');
+        await load();
+    } catch (e) {
+        message.value = e?.response?.data?.message ?? t('dashboard.deleteError');
     }
 }
 

@@ -63,6 +63,7 @@ Route::middleware(['web'])->group(function () {
         Route::get('/me/campaigns/{id}', [CampaignController::class, 'show']);
         Route::post('/me/campaigns', [CampaignController::class, 'store']);
         Route::put('/me/campaigns/{id}', [CampaignController::class, 'update']);
+        Route::delete('/me/campaigns/{id}', [CampaignController::class, 'destroy']);
         Route::post('/me/campaigns/{id}/publish', [CampaignController::class, 'publish']);
 
         Route::post('/pledges', [PledgeController::class, 'store'])->middleware('throttle:10,1');
