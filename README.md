@@ -1,4 +1,4 @@
-# 🚀 Catarse Laravel - Plataforma de Crowdfunding
+# 🚀 Origo - Plataforma de Crowdfunding
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
@@ -99,8 +99,8 @@ psql --version
 ### 1. Clone o repositório
 
 ```bash
-git clone <URL_DO_REPOSITORIO>
-cd catarse-laravel
+git clone <URL_DO_REPOSITORIO_PRIVADO>
+cd origo
 ```
 
 ### 2. Instale as dependências do PHP
@@ -138,7 +138,7 @@ php artisan key:generate
 Edite o arquivo `.env` e configure as credenciais do PostgreSQL:
 
 ```env
-APP_NAME="Catarse"
+APP_NAME="Origo"
 APP_ENV=local
 APP_DEBUG=true
 APP_URL=http://localhost:8000
@@ -146,7 +146,7 @@ APP_URL=http://localhost:8000
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=5432
-DB_DATABASE=catarse_db
+DB_DATABASE=origo_db
 DB_USERNAME=seu_usuario
 DB_PASSWORD=sua_senha
 ```
@@ -162,7 +162,7 @@ psql -U postgres
 Dentro do console do PostgreSQL:
 
 ```sql
-CREATE DATABASE catarse_db;
+CREATE DATABASE origo_db;
 \q
 ```
 
@@ -367,7 +367,7 @@ Edite `resources/js/app.js` para adicionar lógica JavaScript customizada.
 ## 📁 Estrutura do Projeto
 
 ```
-catarse-laravel/
+origo/
 ├── app/                    # Código da aplicação
 │   ├── Actions/           # Ações de negócio
 │   ├── Domain/            # Lógica de domínio
@@ -538,7 +538,7 @@ O projeto usa **Laravel Pint** para formatação de código:
 
 ## 📄 Licença
 
-Este projeto é open-source sob a licença [MIT](https://opensource.org/licenses/MIT).
+Este projeto é proprietário e não é distribuído como open source.
 
 ---
 
@@ -563,4 +563,4 @@ Desenvolvido como MVP de plataforma de crowdfunding com Laravel 12.
 
 ---
 
-**Dúvidas?** Abra uma issue no repositório! 🚀
+**Dúvidas?** Fale com o time responsável.

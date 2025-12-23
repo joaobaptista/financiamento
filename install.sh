@@ -14,8 +14,8 @@ set -e
 # ------------------------------------------------------------------------------
 DOMAIN="origocrowd.com.br"
 PROJECT_DIR="/var/www/$DOMAIN"
-DB_NAME="catarse_db"
-DB_USER="catarse_user"
+DB_NAME="origo_db"
+DB_USER="origo_user"
 
 PHP_TARGET_VERSION="8.4"   # versão desejada/documentada
 PHP_FALLBACK_VERSION="8.3" # versão estável real no Ubuntu 24.10

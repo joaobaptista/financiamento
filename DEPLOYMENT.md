@@ -1,6 +1,6 @@
-# 🚀 Guia de Deploy - Catarse Laravel
+# 🚀 Guia de Deploy - Origo
 
-Este guia fornece instruções para fazer deploy da aplicação Catarse Laravel em diferentes ambientes de produção.
+Este guia fornece instruções para fazer deploy da aplicação Origo em diferentes ambientes de produção.
 
 ---
 
@@ -58,7 +58,7 @@ npm run build
 ### 2. Configurar .env para Produção
 
 ```env
-APP_NAME="Catarse"
+APP_NAME="Origo"
 APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://seudominio.com
@@ -66,8 +66,8 @@ APP_URL=https://seudominio.com
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=5432
-DB_DATABASE=catarse_production
-DB_USERNAME=catarse_user
+DB_DATABASE=origo_production
+DB_USERNAME=origo_user
 DB_PASSWORD=senha_segura_aqui
 
 CACHE_STORE=redis
@@ -148,9 +148,9 @@ sudo mv composer.phar /usr/local/bin/composer
 sudo -u postgres psql
 
 # Criar banco e usuário
-CREATE DATABASE catarse_production;
-CREATE USER catarse_user WITH PASSWORD 'senha_segura_aqui';
-GRANT ALL PRIVILEGES ON DATABASE catarse_production TO catarse_user;
+CREATE DATABASE origo_production;
+CREATE USER origo_user WITH PASSWORD 'senha_segura_aqui';
+GRANT ALL PRIVILEGES ON DATABASE origo_production TO origo_user;
 \q
 ```
 
@@ -158,14 +158,14 @@ GRANT ALL PRIVILEGES ON DATABASE catarse_production TO catarse_user;
 
 ```bash
 # Criar diretório
-sudo mkdir -p /var/www/catarse
-cd /var/www/catarse
+sudo mkdir -p /var/www/origo
+cd /var/www/origo
 
 # Clonar repositório
-sudo git clone https://github.com/SEU_REPO/catarse-laravel.git .
+sudo git clone <URL_DO_REPOSITORIO_PRIVADO> .
 
 # Definir permissões
-sudo chown -R $USER:www-data /var/www/catarse
+sudo chown -R $USER:www-data /var/www/origo
 
 # Instalar dependências
 composer install --optimize-autoloader --no-dev
@@ -195,7 +195,7 @@ sudo chmod -R 775 storage bootstrap/cache
 ### Passo 4: Configurar Nginx
 
 ```bash
-sudo nano /etc/nginx/sites-available/catarse
+sudo nano /etc/nginx/sites-available/origo
 ```
 
 ```nginx
@@ -203,7 +203,7 @@ server {
     listen 80;
     listen [::]:80;
     server_name seudominio.com www.seudominio.com;
-    root /var/www/catarse/public;
+    root /var/www/origo/public;
 
     add_header X-Frame-Options "SAMEORIGIN";
     add_header X-Content-Type-Options "nosniff";
@@ -235,7 +235,7 @@ server {
 
 ```bash
 # Ativar site
-sudo ln -s /etc/nginx/sites-available/catarse /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/origo /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl restart nginx
 ```
@@ -255,12 +255,12 @@ sudo certbot --nginx -d seudominio.com -d www.seudominio.com
 ### Passo 6: Configurar Queue Worker
 
 ```bash
-sudo nano /etc/systemd/system/catarse-worker.service
+sudo nano /etc/systemd/system/origo-worker.service
 ```
 
 ```ini
 [Unit]
-Description=Catarse Queue Worker
+Description=Origo Queue Worker
 After=network.target
 
 [Service]
@@ -269,7 +269,7 @@ User=www-data
 Group=www-data
 Restart=always
 RestartSec=3
-ExecStart=/usr/bin/php /var/www/catarse/artisan queue:work --sleep=3 --tries=3 --max-time=3600
+ExecStart=/usr/bin/php /var/www/origo/artisan queue:work --sleep=3 --tries=3 --max-time=3600
 
 [Install]
 WantedBy=multi-user.target
@@ -277,9 +277,9 @@ WantedBy=multi-user.target
 
 ```bash
 # Ativar e iniciar
-sudo systemctl enable catarse-worker
-sudo systemctl start catarse-worker
-sudo systemctl status catarse-worker
+sudo systemctl enable origo-worker
+sudo systemctl start origo-worker
+sudo systemctl status origo-worker
 ```
 
 ### Passo 7: Configurar Cron para Scheduler
@@ -290,7 +290,7 @@ sudo crontab -e -u www-data
 
 Adicionar:
 ```
-* * * * * cd /var/www/catarse && php artisan schedule:run >> /dev/null 2>&1
+* * * * * cd /var/www/origo && php artisan schedule:run >> /dev/null 2>&1
 ```
 
 ---
@@ -407,17 +407,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: catarse-app
+    container_name: origo-app
     restart: unless-stopped
     working_dir: /var/www
     volumes:
       - ./:/var/www
     networks:
-      - catarse
+      - origo
 
   nginx:
     image: nginx:alpine
-    container_name: catarse-nginx
+    container_name: origo-nginx
     restart: unless-stopped
     ports:
       - "80:80"
@@ -426,30 +426,30 @@ services:
       - ./:/var/www
       - ./docker/nginx:/etc/nginx/conf.d
     networks:
-      - catarse
+      - origo
 
   postgres:
     image: postgres:14
-    container_name: catarse-postgres
+    container_name: origo-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: catarse
-      POSTGRES_USER: catarse
+      POSTGRES_DB: origo
+      POSTGRES_USER: origo
       POSTGRES_PASSWORD: secret
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-      - catarse
+      - origo
 
   redis:
     image: redis:alpine
-    container_name: catarse-redis
+    container_name: origo-redis
     restart: unless-stopped
     networks:
-      - catarse
+      - origo
 
 networks:
-  catarse:
+  origo:
     driver: bridge
 
 volumes:
@@ -486,11 +486,11 @@ SESSION_DRIVER=redis
 
 ```bash
 # Rotação de logs
-sudo nano /etc/logrotate.d/catarse
+sudo nano /etc/logrotate.d/origo
 ```
 
 ```
-/var/www/catarse/storage/logs/*.log {
+/var/www/origo/storage/logs/*.log {
     daily
     missingok
     rotate 14
@@ -536,21 +536,21 @@ php artisan pail
 
 ```bash
 # Script de backup
-sudo nano /usr/local/bin/backup-catarse.sh
+sudo nano /usr/local/bin/backup-origo.sh
 ```
 
 ```bash
 #!/bin/bash
-BACKUP_DIR="/var/backups/catarse"
+BACKUP_DIR="/var/backups/origo"
 DATE=$(date +%Y%m%d_%H%M%S)
 
 mkdir -p $BACKUP_DIR
 
 # Backup PostgreSQL
-pg_dump -U catarse_user catarse_production > $BACKUP_DIR/db_$DATE.sql
+pg_dump -U origo_user origo_production > $BACKUP_DIR/db_$DATE.sql
 
 # Backup arquivos
-tar -czf $BACKUP_DIR/files_$DATE.tar.gz /var/www/catarse/storage/app
+tar -czf $BACKUP_DIR/files_$DATE.tar.gz /var/www/origo/storage/app
 
 # Manter apenas últimos 7 dias
 find $BACKUP_DIR -type f -mtime +7 -delete
@@ -558,14 +558,14 @@ find $BACKUP_DIR -type f -mtime +7 -delete
 
 ```bash
 # Tornar executável
-sudo chmod +x /usr/local/bin/backup-catarse.sh
+sudo chmod +x /usr/local/bin/backup-origo.sh
 
 # Agendar no cron (diariamente às 2h)
 sudo crontab -e
 ```
 
 ```
-0 2 * * * /usr/local/bin/backup-catarse.sh
+0 2 * * * /usr/local/bin/backup-origo.sh
 ```
 
 ---
@@ -596,13 +596,13 @@ sudo chmod -R 775 storage bootstrap/cache
 
 ```bash
 # Verificar status
-sudo systemctl status catarse-worker
+sudo systemctl status origo-worker
 
 # Reiniciar
-sudo systemctl restart catarse-worker
+sudo systemctl restart origo-worker
 
 # Ver logs
-journalctl -u catarse-worker -f
+journalctl -u origo-worker -f
 ```
 
 ### Migrations falham

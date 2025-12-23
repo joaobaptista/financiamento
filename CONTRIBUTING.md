@@ -1,6 +1,6 @@
-# 🤝 Guia de Contribuição - Catarse Laravel
+# 🤝 Guia de Contribuição - Origo
 
-Obrigado por considerar contribuir com o projeto Catarse Laravel! Este documento fornece diretrizes para ajudá-lo a contribuir de forma efetiva.
+Este documento descreve diretrizes de contribuição **interna** para o projeto Origo.
 
 ---
 
@@ -86,16 +86,11 @@ Siga as instruções no [README.md](README.md) para configurar o ambiente local.
 
 ## 🔄 Workflow de Desenvolvimento
 
-### 1. Fork e Clone
+### 1. Clone
 
 ```bash
-# Fork o repositório no GitHub
-# Clone seu fork
-git clone https://github.com/SEU_USUARIO/catarse-laravel.git
-cd catarse-laravel
-
-# Adicione o repositório original como upstream
-git remote add upstream https://github.com/ORIGINAL/catarse-laravel.git
+git clone <URL_DO_REPOSITORIO_PRIVADO>
+cd origo
 ```
 
 ### 2. Crie uma Branch
@@ -103,7 +98,7 @@ git remote add upstream https://github.com/ORIGINAL/catarse-laravel.git
 ```bash
 # Atualize sua main
 git checkout main
-git pull upstream main
+git pull origin main
 
 # Crie uma branch para sua feature/fix
 git checkout -b feature/nome-da-feature

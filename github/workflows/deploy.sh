@@ -5,8 +5,8 @@
 # ==========================
 DOMAIN="origocrowd.com.br"
 PROJECT_DIR="/var/www/$DOMAIN"
-DB_NAME="catarse_db"
-DB_USER="catarse_user"
+DB_NAME="origo_db"
+DB_USER="origo_user"
 PHP_VERSION="8.4"
 
 echo "🚀 Iniciando deploy do projeto $DOMAIN"
