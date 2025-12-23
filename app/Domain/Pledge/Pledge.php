@@ -17,8 +17,10 @@ class Pledge extends Model
         'reward_id',
         'amount',
         'status',
+        'payment_method',
         'provider',
         'provider_payment_id',
+        'provider_payload',
         'paid_at',
     ];
 
@@ -26,6 +28,7 @@ class Pledge extends Model
         'amount' => 'integer',
         'paid_at' => 'datetime',
         'status' => PledgeStatus::class,
+        'provider_payload' => 'array',
     ];
 
     // Relationships

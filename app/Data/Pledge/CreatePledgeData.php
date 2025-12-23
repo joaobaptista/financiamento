@@ -9,6 +9,7 @@ final readonly class CreatePledgeData
         public int $userId,
         public int $amount,
         public ?int $rewardId,
+        public string $paymentMethod,
     ) {
     }
 }

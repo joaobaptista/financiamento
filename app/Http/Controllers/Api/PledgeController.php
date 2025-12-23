@@ -6,6 +6,8 @@ use App\Actions\Pledge\ConfirmPayment;
 use App\Actions\Pledge\CreatePledge;
 use App\Contracts\Payments\PaymentService;
 use App\Data\Pledge\CreatePledgeData;
+use App\Domain\Pledge\Pledge;
+use App\Enums\PledgeStatus;
 use App\Http\Requests\StorePledgeRequest;
 use App\Services\Money\Money;
 
@@ -21,6 +23,7 @@ class PledgeController
         $validated = $request->validated();
 
         $amount = Money::toCents($validated['amount']);
+        $paymentMethod = (string) $validated['payment_method'];
 
         try {
             $data = new CreatePledgeData(
@@ -28,13 +31,15 @@ class PledgeController
                 userId: auth()->id(),
                 amount: $amount,
                 rewardId: $validated['reward_id'] ?? null,
+                paymentMethod: $paymentMethod,
             );
 
             $pledge = $createPledge->execute($data);
 
-            $paymentResult = $paymentService->processPayment($amount, [
+            $paymentResult = $paymentService->processPayment($amount, $paymentMethod, [
                 'campaign_id' => (int) $validated['campaign_id'],
                 'user_id' => auth()->id(),
+                'pledge_id' => $pledge->id,
             ]);
 
             if (! $paymentResult->success) {
@@ -44,15 +49,59 @@ class PledgeController
                 ], 422);
             }
 
-            $confirmPayment->execute($pledge, $paymentResult->paymentId);
+            // Persist provider payment id / payload for tracking
+            $pledge->provider_payment_id = $paymentResult->paymentId;
+            if (is_array($paymentResult->nextAction)) {
+                $pledge->provider_payload = $paymentResult->nextAction;
+            }
+            $pledge->save();
+
+            // Card (mock) confirms immediately; Pix stays pending until confirmation.
+            if ($paymentResult->status === PledgeStatus::Paid->value) {
+                $confirmPayment->execute($pledge, $paymentResult->paymentId);
+                $pledge->refresh();
+            }
 
             return response()->json([
                 'ok' => true,
+                'pledge_id' => $pledge->id,
+                'status' => $pledge->status->value,
+                'payment' => [
+                    'method' => $paymentResult->paymentMethod,
+                    'status' => $paymentResult->status,
+                    'payment_id' => $paymentResult->paymentId,
+                    'next_action' => $paymentResult->nextAction,
+                ],
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),
             ], 422);
         }
+    }
+
+    public function confirm(int $id, ConfirmPayment $confirmPayment)
+    {
+        $userId = (int) auth()->id();
+
+        /** @var Pledge $pledge */
+        $pledge = Pledge::query()
+            ->whereKey($id)
+            ->where('user_id', $userId)
+            ->firstOrFail();
+
+        // Only pending pledges can be confirmed
+        if ($pledge->status === PledgeStatus::Canceled || $pledge->status === PledgeStatus::Refunded) {
+            return response()->json([
+                'message' => 'Este apoio não pode ser confirmado.',
+            ], 422);
+        }
+
+        $confirmPayment->execute($pledge, $pledge->provider_payment_id);
+
+        return response()->json([
+            'ok' => true,
+            'status' => PledgeStatus::Paid->value,
+        ]);
     }
 }

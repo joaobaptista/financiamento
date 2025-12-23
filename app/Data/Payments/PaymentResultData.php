@@ -9,6 +9,9 @@ final readonly class PaymentResultData
         public ?string $paymentId,
         public int $amount,
         public string $status,
+        public ?string $paymentMethod = null,
+        /** @var array<string, mixed>|null */
+        public ?array $nextAction = null,
         public ?string $message = null,
         /** @var array<string, mixed> */
         public array $raw = [],

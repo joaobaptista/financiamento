@@ -48,6 +48,7 @@ class CreatePledge
             'reward_id' => $data->rewardId,
             'amount' => $data->amount,
             'status' => PledgeStatus::Pending,
+            'payment_method' => $data->paymentMethod,
             'provider' => 'mock',
         ]);
 

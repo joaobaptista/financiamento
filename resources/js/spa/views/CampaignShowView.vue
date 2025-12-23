@@ -212,6 +212,120 @@
                                             </div>
                                         </div>
 
+                                        <div class="mb-3">
+                                            <label class="form-label">{{ t('campaignShow.paymentMethodLabel') }}</label>
+                                            <div class="form-check">
+                                                <input
+                                                    id="pay-pix"
+                                                    v-model="paymentMethod"
+                                                    class="form-check-input"
+                                                    type="radio"
+                                                    name="payment_method"
+                                                    value="pix"
+                                                    :disabled="submitting || !isCampaignOpen"
+                                                />
+                                                <label class="form-check-label" for="pay-pix">{{ t('campaignShow.paymentPix') }}</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input
+                                                    id="pay-card"
+                                                    v-model="paymentMethod"
+                                                    class="form-check-input"
+                                                    type="radio"
+                                                    name="payment_method"
+                                                    value="card"
+                                                    :disabled="submitting || !isCampaignOpen"
+                                                />
+                                                <label class="form-check-label" for="pay-card">{{ t('campaignShow.paymentCard') }}</label>
+                                            </div>
+                                        </div>
+
+                                        <div v-if="pixNextAction?.copy_paste" class="alert alert-info mb-3" role="alert">
+                                            <div class="small">{{ t('campaignShow.pixInstructions') }}</div>
+                                            <div class="mt-2">
+                                                <div v-if="pixQrCodeDataUrl" class="mb-2">
+                                                    <div class="form-text">{{ t('campaignShow.pixQrCodeLabel') }}</div>
+                                                    <img
+                                                        :src="pixQrCodeDataUrl"
+                                                        alt="Pix QR Code"
+                                                        class="d-block border rounded"
+                                                        style="max-width: 220px"
+                                                    />
+                                                </div>
+
+                                                <div class="form-text">{{ t('campaignShow.pixCopyPasteLabel') }}</div>
+                                                <textarea
+                                                    class="form-control font-monospace"
+                                                    rows="3"
+                                                    readonly
+                                                    :value="pixNextAction.copy_paste"
+                                                ></textarea>
+
+                                                <div class="d-flex gap-2 mt-2">
+                                                    <button type="button" class="btn btn-outline-primary btn-sm" @click="copyPixCode">
+                                                        {{ t('campaignShow.pixCopy') }}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-primary btn-sm"
+                                                        :disabled="confirmingPix"
+                                                        @click="confirmPix"
+                                                    >
+                                                        {{ confirmingPix ? t('common.ellipsis') : t('campaignShow.pixConfirm') }}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div v-if="paymentMethod === 'card'" class="alert alert-light border mb-3" role="alert">
+                                            <div class="small mb-2">{{ t('campaignShow.cardMockInfo') }}</div>
+                                            <div class="row g-2">
+                                                <div class="col-12">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.cardNumberLabel') }}</label>
+                                                    <input
+                                                        v-model="cardNumber"
+                                                        type="text"
+                                                        class="form-control"
+                                                        autocomplete="cc-number"
+                                                        inputmode="numeric"
+                                                        :disabled="submitting || !isCampaignOpen"
+                                                    />
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.cardNameLabel') }}</label>
+                                                    <input
+                                                        v-model="cardName"
+                                                        type="text"
+                                                        class="form-control"
+                                                        autocomplete="cc-name"
+                                                        :disabled="submitting || !isCampaignOpen"
+                                                    />
+                                                </div>
+                                                <div class="col-6">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.cardExpiryLabel') }}</label>
+                                                    <input
+                                                        v-model="cardExpiry"
+                                                        type="text"
+                                                        class="form-control"
+                                                        autocomplete="cc-exp"
+                                                        placeholder="MM/AA"
+                                                        :disabled="submitting || !isCampaignOpen"
+                                                    />
+                                                </div>
+                                                <div class="col-6">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.cardCvvLabel') }}</label>
+                                                    <input
+                                                        v-model="cardCvv"
+                                                        type="password"
+                                                        class="form-control"
+                                                        autocomplete="cc-csc"
+                                                        inputmode="numeric"
+                                                        :disabled="submitting || !isCampaignOpen"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div v-if="(campaign.rewards || []).length" class="mb-3">
                                             <label class="form-label">{{ t('campaignShow.rewardLabel') }}</label>
                                             <select v-model="rewardId" class="form-select" :disabled="submitting || !isCampaignOpen">
@@ -264,6 +378,7 @@ import { apiDelete, apiGet, apiPost } from '../api';
 import { absoluteUrl, applyCampaignSeo } from '../seo';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
+import QRCode from 'qrcode';
 
 const props = defineProps({
     slug: { type: String, required: true },
@@ -277,6 +392,17 @@ const rewardId = ref(null);
 const submitting = ref(false);
 const message = ref('');
 const supportBox = ref(null);
+
+const paymentMethod = ref('pix');
+const pixNextAction = ref(null);
+const pixQrCodeDataUrl = ref('');
+const lastPledgeId = ref(null);
+const confirmingPix = ref(false);
+
+const cardNumber = ref('');
+const cardName = ref('');
+const cardExpiry = ref('');
+const cardCvv = ref('');
 
 const supportingBusy = ref(false);
 const isFollowingPage = ref(false);
@@ -434,6 +560,10 @@ async function submit() {
     message.value = '';
     submitting.value = true;
 
+    pixNextAction.value = null;
+    pixQrCodeDataUrl.value = '';
+    lastPledgeId.value = null;
+
     try {
         if (selectedReward.value) {
             const min = Number(selectedReward.value.min_amount || 0) / 100;
@@ -444,11 +574,25 @@ async function submit() {
             }
         }
 
-        await apiPost('/api/pledges', {
+        const result = await apiPost('/api/pledges', {
             campaign_id: campaign.value.id,
             amount: amount.value,
             reward_id: rewardId.value,
+            payment_method: paymentMethod.value,
+            card_number: paymentMethod.value === 'card' ? cardNumber.value : undefined,
+            card_name: paymentMethod.value === 'card' ? cardName.value : undefined,
+            card_expiry: paymentMethod.value === 'card' ? cardExpiry.value : undefined,
+            card_cvv: paymentMethod.value === 'card' ? cardCvv.value : undefined,
         });
+
+        const nextAction = result?.payment?.next_action;
+        if (result?.payment?.method === 'pix' && nextAction?.type === 'pix') {
+            pixNextAction.value = nextAction;
+            lastPledgeId.value = result?.pledge_id ?? null;
+            message.value = '';
+            return;
+        }
+
         message.value = t('campaignShow.supportSuccess');
         await fetchCampaign();
     } catch (e) {
@@ -457,6 +601,69 @@ async function submit() {
         submitting.value = false;
     }
 }
+
+async function generatePixQrCode() {
+    const code = pixNextAction.value?.copy_paste;
+    if (!code) {
+        pixQrCodeDataUrl.value = '';
+        return;
+    }
+
+    try {
+        pixQrCodeDataUrl.value = await QRCode.toDataURL(String(code), {
+            width: 220,
+            margin: 1,
+        });
+    } catch {
+        pixQrCodeDataUrl.value = '';
+    }
+}
+
+async function copyPixCode() {
+    const code = pixNextAction.value?.copy_paste;
+    if (!code) return;
+    try {
+        await navigator.clipboard.writeText(String(code));
+    } catch {
+        // ignore
+    }
+}
+
+async function confirmPix() {
+    const id = lastPledgeId.value;
+    if (!id) return;
+
+    confirmingPix.value = true;
+    try {
+        await apiPost(`/api/pledges/${id}/confirm`, {});
+        pixNextAction.value = null;
+        lastPledgeId.value = null;
+        message.value = t('campaignShow.pixConfirmed');
+        await fetchCampaign();
+    } catch (e) {
+        message.value = e?.response?.data?.message ?? t('campaignShow.supportError');
+    } finally {
+        confirmingPix.value = false;
+    }
+}
+
+watch(
+    () => pixNextAction.value?.copy_paste,
+    () => {
+        generatePixQrCode();
+    }
+);
+
+watch(
+    () => paymentMethod.value,
+    (method) => {
+        if (method !== 'pix') {
+            pixNextAction.value = null;
+            pixQrCodeDataUrl.value = '';
+            lastPledgeId.value = null;
+        }
+    }
+);
 
 onMounted(fetchCampaign);
 watch(() => props.slug, fetchCampaign);

@@ -17,6 +17,7 @@ class StorePledgeRequest extends FormRequest
             'campaign_id' => 'required|exists:campaigns,id',
             'amount' => 'required|numeric|min:1',
             'reward_id' => 'nullable|exists:rewards,id',
+            'payment_method' => 'required|in:pix,card',
         ];
     }
 }
