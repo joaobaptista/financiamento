@@ -1,0 +1,21 @@
+name: Deploy Origocrowd
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy na VPS Hostinger
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 72.62.104.121
+          username: deploy
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/origocrowd.com.br
+            ./deploy.sh
