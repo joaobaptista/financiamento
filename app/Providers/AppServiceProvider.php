@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Contracts\Payments\PaymentService;
 use App\Domain\Campaign\Campaign;
 use App\Services\Payments\MockPaymentService;
+use App\Services\Payments\MercadoPagoPaymentService;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
@@ -16,7 +17,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(PaymentService::class, MockPaymentService::class);
+        $this->app->bind(PaymentService::class, function () {
+            $driver = (string) config('payments.driver', 'mock');
+
+            return match ($driver) {
+                'mercadopago' => new MercadoPagoPaymentService(),
+                default => new MockPaymentService(),
+            };
+        });
     }
 
     /**

@@ -85,6 +85,13 @@ MAIL_USERNAME=seu_username
 MAIL_PASSWORD=sua_senha
 MAIL_FROM_ADDRESS="noreply@seudominio.com"
 MAIL_FROM_NAME="${APP_NAME}"
+
+# Payments
+PAYMENTS_DRIVER=mock
+
+# Mercado Pago (se usar em produção)
+MERCADOPAGO_ACCESS_TOKEN=
+MERCADOPAGO_WEBHOOK_URL=${APP_URL}/api/webhooks/mercadopago
 ```
 
 ### 3. Segurança

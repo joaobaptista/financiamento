@@ -403,6 +403,7 @@ const cardNumber = ref('');
 const cardName = ref('');
 const cardExpiry = ref('');
 const cardCvv = ref('');
+const cardInstallments = ref(1);
 
 const supportingBusy = ref(false);
 const isFollowingPage = ref(false);
@@ -574,15 +575,16 @@ async function submit() {
             }
         }
 
+        const cardToken = paymentMethod.value === 'card' ? createMockCardToken() : undefined;
+
         const result = await apiPost('/api/pledges', {
             campaign_id: campaign.value.id,
             amount: amount.value,
             reward_id: rewardId.value,
             payment_method: paymentMethod.value,
-            card_number: paymentMethod.value === 'card' ? cardNumber.value : undefined,
-            card_name: paymentMethod.value === 'card' ? cardName.value : undefined,
-            card_expiry: paymentMethod.value === 'card' ? cardExpiry.value : undefined,
-            card_cvv: paymentMethod.value === 'card' ? cardCvv.value : undefined,
+            // Card: send only a token (mock for now). Never send raw card data to the backend.
+            card_token: cardToken,
+            installments: paymentMethod.value === 'card' ? Number(cardInstallments.value || 1) : undefined,
         });
 
         const nextAction = result?.payment?.next_action;
@@ -600,6 +602,19 @@ async function submit() {
     } finally {
         submitting.value = false;
     }
+}
+
+function createMockCardToken() {
+    // Mock tokenization until Mercado Pago account/SDK is configured.
+    // The token must NOT contain PAN/CVV or any reversible card data.
+    try {
+        if (globalThis.crypto?.randomUUID) {
+            return `mock_card_${globalThis.crypto.randomUUID()}`;
+        }
+    } catch {
+        // ignore
+    }
+    return `mock_card_${Math.random().toString(16).slice(2)}${Date.now().toString(16)}`;
 }
 
 async function generatePixQrCode() {

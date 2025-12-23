@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PublicCampaignController;
 use App\Http\Controllers\Api\PledgeController;
+use App\Http\Controllers\Webhooks\MercadoPagoWebhookController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +21,9 @@ use Illuminate\Support\Facades\Route;
 | We wrap routes with the `web` middleware so Laravel sessions/CSRF work.
 |
 */
+
+// Webhooks must NOT use the `web` middleware (no CSRF/session cookies).
+Route::post('/webhooks/mercadopago', MercadoPagoWebhookController::class)->middleware(['throttle:60,1']);
 
 Route::middleware(['web'])->group(function () {
     // Auth (session-based)

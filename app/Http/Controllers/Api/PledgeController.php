@@ -40,6 +40,11 @@ class PledgeController
                 'campaign_id' => (int) $validated['campaign_id'],
                 'user_id' => auth()->id(),
                 'pledge_id' => $pledge->id,
+                'payer_email' => (string) (auth()->user()?->email ?? ''),
+                'description' => 'Apoio campanha #' . (int) $validated['campaign_id'],
+                'idempotency_key' => 'pledge_' . $pledge->id,
+                'card_token' => $validated['card_token'] ?? null,
+                'installments' => $validated['installments'] ?? null,
             ]);
 
             if (! $paymentResult->success) {

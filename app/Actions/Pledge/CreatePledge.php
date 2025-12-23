@@ -49,7 +49,7 @@ class CreatePledge
             'amount' => $data->amount,
             'status' => PledgeStatus::Pending,
             'payment_method' => $data->paymentMethod,
-            'provider' => 'mock',
+            'provider' => (string) config('payments.driver', 'mock'),
         ]);
 
         $pledge->save();

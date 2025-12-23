@@ -18,6 +18,7 @@ Uma plataforma moderna de crowdfunding construída com **Laravel 12**, **Postgre
 - [Desenvolvimento Backend](#-desenvolvimento-backend)
 - [Desenvolvimento Frontend](#-desenvolvimento-frontend)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Pagamentos (Mercado Pago)](#-pagamentos-mercado-pago)
 - [Testes](#-testes)
 - [Troubleshooting](#-troubleshooting)
 - [Contribuindo](#-contribuindo)
@@ -49,6 +50,9 @@ Uma plataforma moderna de crowdfunding construída com **Laravel 12**, **Postgre
 - Pagamento simulado (mock para MVP)
 - Confirmação automática de pagamento
 - Rastreamento de apoiadores por campanha
+
+### 💳 Pagamentos (Mercado Pago)
+- Guia de integração (PIX + webhook + env vars): `docs/payments/mercadopago.md`
 
 ### 📊 Dashboard do Criador
 - Visão geral de todas as campanhas criadas
