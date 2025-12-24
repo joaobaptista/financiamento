@@ -121,7 +121,7 @@ const messages = {
         campaignShow: {
             sectionLabel: 'Campanha',
             by: 'Por',
-            followPage: 'Seguir página',
+            followPage: 'Seguir criador',
             unfollowPage: 'Deixar de seguir',
             followersCount: '{count} seguidores',
             loginToFollow: 'Entrar para seguir',
@@ -603,7 +603,7 @@ const messages = {
         campaignShow: {
             sectionLabel: 'Campaign',
             by: 'By',
-            followPage: 'Follow page',
+            followPage: 'Follow creator',
             unfollowPage: 'Unfollow',
             followersCount: '{count} followers',
             loginToFollow: 'Sign in to follow',
@@ -1047,7 +1047,7 @@ const messages = {
         campaignShow: {
             sectionLabel: 'Campaña',
             by: 'Por',
-            followPage: 'Seguir página',
+            followPage: 'Seguir creador',
             unfollowPage: 'Dejar de seguir',
             followersCount: '{count} seguidores',
             loginToFollow: 'Inicia sesión para seguir',

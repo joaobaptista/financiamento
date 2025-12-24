@@ -10,7 +10,7 @@
                     <h1 class="display-6 mb-2">{{ campaign.title }}</h1>
                     <div class="text-muted d-flex flex-wrap align-items-center gap-2">
                         <div>
-                            {{ t('campaignShow.by') }} <strong>{{ campaign.user?.name ?? '—' }}</strong>
+                            {{ t('campaignShow.by') }} <strong>{{ campaign.creator_page?.name ?? campaign.user?.name ?? '—' }}</strong>
                         </div>
 
                         <template
