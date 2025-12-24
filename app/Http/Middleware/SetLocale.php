@@ -67,34 +67,6 @@ class SetLocale
             }
         }
 
-        // 3) Accept-Language
-        $accept = (string) $request->header('Accept-Language', '');
-        if ($accept !== '') {
-            foreach (explode(',', $accept) as $part) {
-                $candidate = trim(explode(';', $part)[0] ?? '');
-                if ($candidate === '') {
-                    continue;
-                }
-
-                $candidate = $this->normalizeLocale($candidate);
-
-                if (in_array($candidate, $supported, true)) {
-                    return $candidate;
-                }
-
-                // Map generic languages to a supported locale.
-                if ($candidate === 'pt' && in_array('pt_BR', $supported, true)) {
-                    return 'pt_BR';
-                }
-                if ($candidate === 'en' && in_array('en', $supported, true)) {
-                    return 'en';
-                }
-                if ($candidate === 'es' && in_array('es', $supported, true)) {
-                    return 'es';
-                }
-            }
-        }
-
         return null;
     }
 
