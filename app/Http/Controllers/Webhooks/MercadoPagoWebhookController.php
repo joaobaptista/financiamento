@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Webhooks;
 use App\Actions\Pledge\ConfirmPayment;
 use App\Domain\Pledge\Pledge;
 use App\Enums\PledgeStatus;
+use App\Notifications\PledgePaymentConfirmed;
+use App\Notifications\PledgePaymentFailed;
+use App\Notifications\PledgePaymentRefunded;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -63,17 +66,39 @@ class MercadoPagoWebhookController
             $pledge->save();
 
             if ($mpStatus === 'approved') {
+                $wasPaid = $pledge->status === PledgeStatus::Paid;
                 $confirmPayment->execute($pledge, $paymentId);
+
+                $pledge->refresh();
+                $pledge->loadMissing(['user']);
+                if (!$wasPaid && $pledge->status === PledgeStatus::Paid && $pledge->user) {
+                    $pledge->user->notify(new PledgePaymentConfirmed($pledge));
+                }
                 return response()->json(['ok' => true]);
             }
 
             if (in_array($mpStatus, ['cancelled', 'rejected'], true)) {
+                $wasCanceled = $pledge->status === PledgeStatus::Canceled;
                 $pledge->markAsCanceled();
+
+                $pledge->refresh();
+                $pledge->loadMissing(['user']);
+                if (!$wasCanceled && $pledge->status === PledgeStatus::Canceled && $pledge->user) {
+                    $reason = $mpStatus === 'rejected' ? 'Pagamento rejeitado' : 'Pagamento cancelado';
+                    $pledge->user->notify(new PledgePaymentFailed($pledge, $reason));
+                }
                 return response()->json(['ok' => true]);
             }
 
             if (in_array($mpStatus, ['refunded', 'charged_back'], true)) {
+                $wasRefunded = $pledge->status === PledgeStatus::Refunded;
                 $pledge->markAsRefunded();
+
+                $pledge->refresh();
+                $pledge->loadMissing(['user']);
+                if (!$wasRefunded && $pledge->status === PledgeStatus::Refunded && $pledge->user) {
+                    $pledge->user->notify(new PledgePaymentRefunded($pledge));
+                }
                 return response()->json(['ok' => true]);
             }
 

@@ -21,12 +21,14 @@ class Pledge extends Model
         'provider',
         'provider_payment_id',
         'provider_payload',
+        'checkout_incomplete_reminded_at',
         'paid_at',
     ];
 
     protected $casts = [
         'amount' => 'integer',
         'paid_at' => 'datetime',
+        'checkout_incomplete_reminded_at' => 'datetime',
         'status' => PledgeStatus::class,
         'provider_payload' => 'array',
     ];

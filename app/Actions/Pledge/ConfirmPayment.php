@@ -5,7 +5,9 @@ namespace App\Actions\Pledge;
 use App\Domain\Campaign\Campaign;
 use App\Domain\Campaign\Reward;
 use App\Domain\Pledge\Pledge;
+use App\Enums\CampaignStatus;
 use App\Enums\PledgeStatus;
+use App\Notifications\CampaignGoalReached;
 use Illuminate\Support\Facades\DB;
 
 class ConfirmPayment
@@ -43,9 +45,33 @@ class ConfirmPayment
 
             $lockedPledge->markAsPaid($paymentId);
 
-            Campaign::query()
+            /** @var Campaign $campaign */
+            $campaign = Campaign::query()
                 ->whereKey($lockedPledge->campaign_id)
-                ->increment('pledged_amount', (int) $lockedPledge->amount);
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $wasBelowGoal = (int) $campaign->pledged_amount < (int) $campaign->goal_amount;
+            $campaign->pledged_amount = (int) $campaign->pledged_amount + (int) $lockedPledge->amount;
+            $campaign->save();
+
+            $crossedGoal = $wasBelowGoal && (int) $campaign->pledged_amount >= (int) $campaign->goal_amount;
+            $shouldNotifyGoalReached =
+                $crossedGoal &&
+                $campaign->status === CampaignStatus::Active &&
+                $campaign->goal_reached_notified_at === null;
+
+            if ($shouldNotifyGoalReached) {
+                $campaign->goal_reached_notified_at = now();
+                $campaign->save();
+
+                DB::afterCommit(function () use ($campaign): void {
+                    $campaign->loadMissing('user');
+                    if ($campaign->user) {
+                        $campaign->user->notify(new CampaignGoalReached($campaign));
+                    }
+                });
+            }
 
             return true;
         });

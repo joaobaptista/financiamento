@@ -22,8 +22,11 @@ class Campaign extends Model
         'description',
         'goal_amount',
         'pledged_amount',
+        'goal_reached_notified_at',
         'starts_at',
         'ends_at',
+        'ending_soon_notified_at',
+        'finished_notified_at',
         'status',
         'cover_image_path',
         'cover_image_webp_path',
@@ -32,8 +35,11 @@ class Campaign extends Model
     protected $casts = [
         'goal_amount' => 'integer',
         'pledged_amount' => 'integer',
+        'goal_reached_notified_at' => 'datetime',
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
+        'ending_soon_notified_at' => 'datetime',
+        'finished_notified_at' => 'datetime',
         'status' => CampaignStatus::class,
     ];
 

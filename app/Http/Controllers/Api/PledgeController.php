@@ -9,6 +9,8 @@ use App\Data\Pledge\CreatePledgeData;
 use App\Domain\Pledge\Pledge;
 use App\Enums\PledgeStatus;
 use App\Http\Requests\StorePledgeRequest;
+use App\Notifications\PledgePaymentConfirmed;
+use App\Notifications\PledgePixGenerated;
 use App\Services\Money\Money;
 
 class PledgeController
@@ -63,8 +65,15 @@ class PledgeController
 
             // Card (mock) confirms immediately; Pix stays pending until confirmation.
             if ($paymentResult->status === PledgeStatus::Paid->value) {
+                $wasPaid = $pledge->status === PledgeStatus::Paid;
                 $confirmPayment->execute($pledge, $paymentResult->paymentId);
                 $pledge->refresh();
+
+                if (!$wasPaid && $pledge->status === PledgeStatus::Paid && auth()->user()) {
+                    auth()->user()->notify(new PledgePaymentConfirmed($pledge));
+                }
+            } elseif ($paymentResult->paymentMethod === 'pix' && is_array($paymentResult->nextAction) && auth()->user()) {
+                auth()->user()->notify(new PledgePixGenerated($pledge, $paymentResult->nextAction));
             }
 
             return response()->json([

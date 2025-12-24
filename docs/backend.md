@@ -72,6 +72,10 @@ Definidas em `routes/api.php` sob middleware `web`:
 
 ## Pagamentos
 
+## Mensagens (e-mails)
+
+- Guia de envio de mensagens transacionais (Notifications + jobs + scheduler): `docs/messaging.md`
+
 ### Contrato
 - `app/Contracts/Payments/PaymentService.php`
 

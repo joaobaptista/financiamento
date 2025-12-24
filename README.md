@@ -32,6 +32,7 @@ Uma plataforma moderna de crowdfunding construída com **Laravel 12**, **Postgre
 - Backend: `docs/backend.md`
 - Frontend: `docs/frontend.md`
 - Banco de dados: `docs/database.md`
+- Mensagens (e-mails): `docs/messaging.md`
 
 ## ✨ Funcionalidades
 
