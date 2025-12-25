@@ -15,6 +15,27 @@ use App\Services\Money\Money;
 
 class PledgeController
 {
+    public function show(int $id)
+    {
+        $userId = (int) auth()->id();
+
+        /** @var Pledge $pledge */
+        $pledge = Pledge::query()
+            ->whereKey($id)
+            ->where('user_id', $userId)
+            ->firstOrFail();
+
+        return response()->json([
+            'ok' => true,
+            'pledge_id' => $pledge->id,
+            'status' => $pledge->status->value,
+            'payment' => [
+                'method' => $pledge->payment_method,
+                'provider_payment_id' => $pledge->provider_payment_id,
+            ],
+        ]);
+    }
+
     public function store(
         StorePledgeRequest $request,
         PaymentService $paymentService,
@@ -47,13 +68,23 @@ class PledgeController
                 'idempotency_key' => 'pledge_' . $pledge->id,
                 'card_token' => $validated['card_token'] ?? null,
                 'installments' => $validated['installments'] ?? null,
+                'payment_method_id' => $validated['payment_method_id'] ?? null,
+                'payer_identification_type' => $validated['payer_identification_type'] ?? null,
+                'payer_identification_number' => $validated['payer_identification_number'] ?? null,
             ]);
 
             if (! $paymentResult->success) {
                 $pledge->markAsCanceled();
-                return response()->json([
+
+                $response = [
                     'message' => 'Erro ao processar pagamento. Tente novamente.',
-                ], 422);
+                ];
+
+                if ((bool) config('app.debug') && is_array($paymentResult->raw)) {
+                    $response['provider'] = $paymentResult->raw;
+                }
+
+                return response()->json($response, 422);
             }
 
             // Persist provider payment id / payload for tracking
@@ -96,6 +127,12 @@ class PledgeController
 
     public function confirm(int $id, ConfirmPayment $confirmPayment)
     {
+        if ((string) config('payments.driver', 'mock') === 'mercadopago') {
+            return response()->json([
+                'message' => 'No Mercado Pago, a confirmação é automática. Aguarde ou atualize a página.',
+            ], 422);
+        }
+
         $userId = (int) auth()->id();
 
         /** @var Pledge $pledge */

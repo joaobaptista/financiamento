@@ -392,7 +392,9 @@
                                         </div>
 
                                         <div v-if="pixNextAction?.copy_paste" class="alert alert-info mb-3" role="alert">
-                                            <div class="small">{{ t('campaignShow.pixInstructions') }}</div>
+                                            <div class="small">
+                                                {{ pixNextAction.confirmable === false ? t('campaignShow.pixWaitingConfirmation') : t('campaignShow.pixInstructions') }}
+                                            </div>
                                             <div class="mt-2">
                                                 <div v-if="pixQrCodeDataUrl" class="mb-2">
                                                     <div class="form-text">{{ t('campaignShow.pixQrCodeLabel') }}</div>
@@ -417,6 +419,7 @@
                                                         {{ t('campaignShow.pixCopy') }}
                                                     </button>
                                                     <button
+                                                        v-if="pixNextAction.confirmable !== false"
                                                         type="button"
                                                         class="btn btn-primary btn-sm"
                                                         :disabled="confirmingPix"
@@ -424,12 +427,15 @@
                                                     >
                                                         {{ confirmingPix ? t('common.ellipsis') : t('campaignShow.pixConfirm') }}
                                                     </button>
+                                                    <span v-else class="small text-muted align-self-center">
+                                                        {{ pollingPix ? t('campaignShow.pixPolling') : '' }}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div v-if="paymentMethod === 'card'" class="alert alert-light border mb-3" role="alert">
-                                            <div class="small mb-2">{{ t('campaignShow.cardMockInfo') }}</div>
+                                            <div class="small mb-2">{{ t('campaignShow.cardInfo') }}</div>
                                             <div class="row g-2">
                                                 <div class="col-12">
                                                     <label class="form-label mb-1">{{ t('campaignShow.cardNumberLabel') }}</label>
@@ -449,6 +455,18 @@
                                                         type="text"
                                                         class="form-control"
                                                         autocomplete="cc-name"
+                                                        :disabled="submitting || !isCampaignOpen"
+                                                    />
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.cardCpfLabel') }}</label>
+                                                    <input
+                                                        v-model="cardCpf"
+                                                        type="text"
+                                                        class="form-control"
+                                                        inputmode="numeric"
+                                                        autocomplete="off"
+                                                        placeholder="000.000.000-00"
                                                         :disabled="submitting || !isCampaignOpen"
                                                     />
                                                 </div>
@@ -523,7 +541,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { apiDelete, apiGet, apiPost } from '../api';
 import { absoluteUrl, applyCampaignSeo } from '../seo';
@@ -549,12 +567,129 @@ const pixNextAction = ref(null);
 const pixQrCodeDataUrl = ref('');
 const lastPledgeId = ref(null);
 const confirmingPix = ref(false);
+const pollingPix = ref(false);
+let pixPollIntervalId = null;
 
 const cardNumber = ref('');
 const cardName = ref('');
+const cardCpf = ref('');
 const cardExpiry = ref('');
 const cardCvv = ref('');
 const cardInstallments = ref(1);
+
+let mercadoPagoInstance = null;
+let mercadoPagoSdkPromise = null;
+
+function getMercadoPagoPublicKey() {
+    return String(import.meta.env?.VITE_MERCADOPAGO_PUBLIC_KEY || '').trim();
+}
+
+function loadMercadoPagoSdk() {
+    if (mercadoPagoSdkPromise) return mercadoPagoSdkPromise;
+
+    mercadoPagoSdkPromise = new Promise((resolve, reject) => {
+        if (typeof window !== 'undefined' && window.MercadoPago) {
+            resolve(window.MercadoPago);
+            return;
+        }
+
+        const existing = document.querySelector('script[data-mp-sdk="v2"]');
+        if (existing) {
+            existing.addEventListener('load', () => resolve(window.MercadoPago));
+            existing.addEventListener('error', reject);
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://sdk.mercadopago.com/js/v2';
+        script.async = true;
+        script.defer = true;
+        script.dataset.mpSdk = 'v2';
+        script.onload = () => resolve(window.MercadoPago);
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+
+    return mercadoPagoSdkPromise;
+}
+
+async function getMercadoPago() {
+    const publicKey = getMercadoPagoPublicKey();
+    if (!publicKey) {
+        throw new Error('Mercado Pago não configurado.');
+    }
+
+    if (mercadoPagoInstance) return mercadoPagoInstance;
+
+    const MercadoPago = await loadMercadoPagoSdk();
+    mercadoPagoInstance = new MercadoPago(publicKey, { locale: 'pt-BR' });
+    return mercadoPagoInstance;
+}
+
+function onlyDigits(value) {
+    return String(value || '').replace(/\D+/g, '');
+}
+
+function parseExpiry(value) {
+    const raw = String(value || '').trim();
+    const match = raw.match(/^(\d{1,2})\s*\/\s*(\d{2,4})$/);
+    if (!match) return null;
+    const month = Number(match[1]);
+    const yearRaw = match[2];
+    if (!month || month < 1 || month > 12) return null;
+    let year = Number(yearRaw);
+    if (yearRaw.length === 2) year += 2000;
+    if (!year || year < 2000) return null;
+    return { month, year };
+}
+
+async function createMercadoPagoCardToken() {
+    const mp = await getMercadoPago();
+    const number = onlyDigits(cardNumber.value);
+    const cvv = onlyDigits(cardCvv.value);
+    const cpf = onlyDigits(cardCpf.value);
+    const expiry = parseExpiry(cardExpiry.value);
+
+    if (!number || !cvv || !expiry || !String(cardName.value || '').trim()) {
+        throw new Error('Dados do cartão incompletos.');
+    }
+
+    if (cpf.length !== 11) {
+        throw new Error('CPF inválido.');
+    }
+
+    const tokenResult = await mp.createCardToken({
+        cardNumber: number,
+        cardholderName: String(cardName.value || '').trim(),
+        cardExpirationMonth: String(expiry.month).padStart(2, '0'),
+        cardExpirationYear: String(expiry.year),
+        securityCode: cvv,
+        identificationType: 'CPF',
+        identificationNumber: cpf,
+    });
+
+    const token = tokenResult?.id || tokenResult?.token || null;
+    if (!token) {
+        throw new Error('Não foi possível tokenizar o cartão.');
+    }
+
+    let paymentMethodId = null;
+    try {
+        const bin = number.slice(0, 6);
+        if (bin.length === 6 && typeof mp.getPaymentMethods === 'function') {
+            const methods = await mp.getPaymentMethods({ bin });
+            paymentMethodId = methods?.results?.[0]?.id || methods?.[0]?.id || null;
+        }
+    } catch {
+        // ignore
+    }
+
+    return {
+        token,
+        paymentMethodId,
+        identification: { type: 'CPF', number: cpf },
+    };
+}
 
 const supporterProfileReady = ref(false);
 const supporterProfileEditing = ref(true);
@@ -824,7 +959,24 @@ async function submit() {
             }
         }
 
-        const cardToken = paymentMethod.value === 'card' ? createMockCardToken() : undefined;
+        let cardToken = undefined;
+        let paymentMethodId = undefined;
+        let payerIdentificationType = undefined;
+        let payerIdentificationNumber = undefined;
+
+        if (paymentMethod.value === 'card') {
+            try {
+                const cardData = await createMercadoPagoCardToken();
+                cardToken = cardData.token;
+                paymentMethodId = cardData.paymentMethodId || undefined;
+                payerIdentificationType = cardData.identification.type;
+                payerIdentificationNumber = cardData.identification.number;
+            } catch (e) {
+                message.value = e?.message || t('campaignShow.supportError');
+                submitting.value = false;
+                return;
+            }
+        }
 
         const result = await apiPost('/api/pledges', {
             campaign_id: campaign.value.id,
@@ -834,6 +986,9 @@ async function submit() {
             // Card: send only a token (mock for now). Never send raw card data to the backend.
             card_token: cardToken,
             installments: paymentMethod.value === 'card' ? Number(cardInstallments.value || 1) : undefined,
+            payment_method_id: paymentMethodId,
+            payer_identification_type: payerIdentificationType,
+            payer_identification_number: payerIdentificationNumber,
         });
 
         const nextAction = result?.payment?.next_action;
@@ -851,19 +1006,6 @@ async function submit() {
     } finally {
         submitting.value = false;
     }
-}
-
-function createMockCardToken() {
-    // Mock tokenization until Mercado Pago account/SDK is configured.
-    // The token must NOT contain PAN/CVV or any reversible card data.
-    try {
-        if (globalThis.crypto?.randomUUID) {
-            return `mock_card_${globalThis.crypto.randomUUID()}`;
-        }
-    } catch {
-        // ignore
-    }
-    return `mock_card_${Math.random().toString(16).slice(2)}${Date.now().toString(16)}`;
 }
 
 async function generatePixQrCode() {
@@ -911,12 +1053,76 @@ async function confirmPix() {
     }
 }
 
+function stopPixPolling() {
+    if (pixPollIntervalId) {
+        clearInterval(pixPollIntervalId);
+        pixPollIntervalId = null;
+    }
+    pollingPix.value = false;
+}
+
+async function pollPixStatusOnce() {
+    const id = lastPledgeId.value;
+    if (!id) return;
+
+    try {
+        const data = await apiGet(`/api/pledges/${id}`);
+        const status = String(data?.status || '').toLowerCase();
+
+        if (status === 'paid') {
+            stopPixPolling();
+            pixNextAction.value = null;
+            lastPledgeId.value = null;
+            message.value = t('campaignShow.pixConfirmed');
+            await fetchCampaign();
+            return;
+        }
+
+        if (status === 'canceled' || status === 'refunded') {
+            stopPixPolling();
+            pixNextAction.value = null;
+            lastPledgeId.value = null;
+            message.value = t('campaignShow.supportError');
+        }
+    } catch {
+        // ignore transient errors
+    }
+}
+
+function startPixPolling() {
+    if (pixPollIntervalId) return;
+    if (pixNextAction.value?.confirmable !== false) return;
+    if (!lastPledgeId.value) return;
+
+    pollingPix.value = true;
+    pollPixStatusOnce();
+    pixPollIntervalId = setInterval(() => {
+        pollPixStatusOnce();
+    }, 5000);
+}
+
 watch(
     () => pixNextAction.value?.copy_paste,
     () => {
         generatePixQrCode();
     }
 );
+
+watch(
+    () => [lastPledgeId.value, pixNextAction.value?.confirmable],
+    () => {
+        if (pixNextAction.value?.confirmable === false && lastPledgeId.value) {
+            startPixPolling();
+        } else {
+            stopPixPolling();
+        }
+    },
+    { immediate: true }
+);
+
+onBeforeUnmount(() => {
+    stopPixPolling();
+});
 
 watch(
     () => paymentMethod.value,

@@ -12,6 +12,9 @@ return [
     // Used when creating payments.
     'currency' => env('MERCADOPAGO_CURRENCY', 'BRL'),
 
+    // When using test credentials, Mercado Pago can require a test payer email (e.g. *@testuser.com).
+    'test_payer_email' => env('MERCADOPAGO_TEST_PAYER_EMAIL', 'test_user_123@testuser.com'),
+
     // Webhook URL Mercado Pago will call (configure in MP panel).
     'webhook_url' => env('MERCADOPAGO_WEBHOOK_URL', rtrim((string) env('APP_URL', ''), '/') . '/api/webhooks/mercadopago'),
 ];

@@ -38,6 +38,10 @@ PAYMENTS_DRIVER=mercadopago
 # Mercado Pago (server-side)
 MERCADOPAGO_ACCESS_TOKEN=SEU_ACCESS_TOKEN
 
+# Mercado Pago (frontend)
+# Public Key pode ficar no frontend (é pública), mas ainda assim evite commitar valores reais.
+VITE_MERCADOPAGO_PUBLIC_KEY=SUA_PUBLIC_KEY
+
 # Opcional
 MERCADOPAGO_BASE_URL=https://api.mercadopago.com
 MERCADOPAGO_CURRENCY=BRL

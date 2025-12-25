@@ -26,6 +26,7 @@ class MockPaymentService implements PaymentService
                     'type' => 'pix',
                     'copy_paste' => $copyPaste,
                     'expires_at' => now()->addMinutes(30)->toIso8601String(),
+                    'confirmable' => true,
                 ],
                 message: 'Pix gerado. Pague e aguarde a confirmação.',
                 raw: [

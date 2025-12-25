@@ -29,6 +29,11 @@ class StorePledgeRequest extends FormRequest
             // Card (tokenized). In mock mode we keep it optional.
             'card_token' => $cardTokenRules,
             'installments' => 'nullable|integer|min:1|max:12',
+
+            // Optional card metadata (helps approval rates / required by some regions)
+            'payment_method_id' => 'nullable|string|max:50',
+            'payer_identification_type' => 'nullable|string|in:CPF,CNPJ',
+            'payer_identification_number' => 'nullable|string|max:32',
         ];
     }
 }

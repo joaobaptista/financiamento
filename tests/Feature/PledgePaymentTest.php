@@ -11,6 +11,56 @@ class PledgePaymentTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_user_can_fetch_pledge_status(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+
+        $user = User::factory()->create();
+        $endsAt = now()->addDays(10)->toDateString();
+
+        $create = $this
+            ->actingAs($user)
+            ->withHeader('Accept', 'application/json')
+            ->post('/api/me/campaigns', [
+                'title' => 'Campanha para status do pledge',
+                'description' => 'Descrição',
+                'goal_amount' => '10.00',
+                'ends_at' => $endsAt,
+            ]);
+
+        $create->assertCreated();
+        $campaignId = (int) $create->json('data.id');
+
+        $publish = $this
+            ->actingAs($user)
+            ->withHeader('Accept', 'application/json')
+            ->post("/api/me/campaigns/{$campaignId}/publish", []);
+
+        $publish->assertOk();
+
+        $pledge = $this
+            ->actingAs($user)
+            ->withHeader('Accept', 'application/json')
+            ->post('/api/pledges', [
+                'campaign_id' => $campaignId,
+                'amount' => '10.00',
+                'payment_method' => 'pix',
+            ]);
+
+        $pledge->assertCreated();
+        $pledgeId = (int) $pledge->json('pledge_id');
+
+        $status = $this
+            ->actingAs($user)
+            ->withHeader('Accept', 'application/json')
+            ->get("/api/pledges/{$pledgeId}");
+
+        $status->assertOk();
+        $this->assertTrue((bool) $status->json('ok'));
+        $this->assertSame($pledgeId, (int) $status->json('pledge_id'));
+        $this->assertSame('pending', $status->json('status'));
+    }
+
     public function test_user_can_support_with_card_in_mock_mode_and_it_is_confirmed_immediately(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
@@ -102,5 +152,6 @@ class PledgePaymentTest extends TestCase
         $this->assertNotEmpty((string) $pledge->json('payment.payment_id'));
         $this->assertSame('pix', $pledge->json('payment.next_action.type'));
         $this->assertNotEmpty((string) $pledge->json('payment.next_action.copy_paste'));
+        $this->assertTrue((bool) $pledge->json('payment.next_action.confirmable'));
     }
 }
