@@ -65,10 +65,25 @@ Definidas em `routes/api.php` sob middleware `web`:
 
 **Pledges / pagamentos**
 - POST `/api/pledges` (throttle)
+- GET `/api/pledges/{id}` (throttle)
 - POST `/api/pledges/{id}/confirm` (throttle)
 
 ### Webhooks (sem `web`)
 - POST `/api/webhooks/mercadopago` (throttle)
+
+## Swagger / OpenAPI
+
+O projeto expõe uma UI do Swagger para inspecionar os endpoints e seus payloads.
+
+- UI: GET `/api/documentation`
+- JSON gerado: `storage/api-docs/api-docs.json`
+
+Gerar/atualizar a documentação:
+- `php artisan l5-swagger:generate`
+
+Notas:
+- As anotações OpenAPI ficam em `app/OpenApi`.
+- Em produção, prefira gerar o JSON no deploy (ou habilitar `L5_SWAGGER_GENERATE_ALWAYS=true` apenas em dev).
 
 ## Pagamentos
 

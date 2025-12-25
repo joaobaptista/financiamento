@@ -11,3 +11,6 @@
 /public/hot
 
 /public/storage
+
+# Swagger/OpenAPI generated output
+/storage/api-docs
