@@ -9,6 +9,20 @@ use OpenApi\Annotations as OA;
  *   path="/api/campaigns",
  *   tags={"Campaigns"},
  *   summary="Listar campanhas públicas",
+ *   @OA\Parameter(
+ *     name="q",
+ *     in="query",
+ *     required=false,
+ *     description="Busca por título/descrição",
+ *     @OA\Schema(type="string", example="musica")
+ *   ),
+ *   @OA\Parameter(
+ *     name="category",
+ *     in="query",
+ *     required=false,
+ *     description="Chave do nicho (ex: arte, tecnologia)",
+ *     @OA\Schema(type="string", example="arte")
+ *   ),
  *   @OA\Response(
  *     response=200,
  *     description="Lista",

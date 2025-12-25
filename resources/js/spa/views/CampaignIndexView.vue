@@ -76,11 +76,12 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { apiGet } from '../api';
 import { absoluteUrl } from '../seo';
+import { categories } from '../categories';
 
 const route = useRoute();
 
@@ -93,26 +94,21 @@ const { t, locale } = useI18n({ useScope: 'global' });
 const queryQ = computed(() => String(route.query.q || '').trim());
 const queryCategory = computed(() => String(route.query.category || '').trim());
 
+const categoryLabel = computed(() => {
+    const key = queryCategory.value;
+    if (!key) return '';
+    const found = categories.find(c => c.key === key);
+    if (!found) return key;
+    return t(found.labelKey);
+});
+
 const activeFilterLabel = computed(() => {
     if (queryQ.value) return t('campaignsIndex.filters.search', { q: queryQ.value });
-    if (queryCategory.value) return t('campaignsIndex.filters.category', { category: queryCategory.value });
+    if (queryCategory.value) return t('campaignsIndex.filters.category', { category: categoryLabel.value });
     return '';
 });
 
-const filteredCampaigns = computed(() => {
-    const all = campaigns.value || [];
-    const q = queryQ.value.toLowerCase();
-    const category = queryCategory.value.toLowerCase();
-
-    if (!q && !category) return all;
-
-    return all.filter((c) => {
-        const haystack = `${c?.title || ''} ${c?.description || ''}`.toLowerCase();
-        if (q && !haystack.includes(q)) return false;
-        if (category && !haystack.includes(category)) return false;
-        return true;
-    });
-});
+const filteredCampaigns = computed(() => campaigns.value || []);
 
 function formatMoney(cents) {
     const value = Number(cents || 0) / 100;
@@ -141,12 +137,17 @@ function daysRemaining(c) {
     return Math.max(Math.ceil(diff / (1000 * 60 * 60 * 24)), 0);
 }
 
-onMounted(async () => {
+async function load() {
     loadError.value = '';
     loading.value = true;
 
     try {
-        const data = await apiGet('/api/campaigns');
+        const params = new URLSearchParams();
+        if (queryQ.value) params.set('q', queryQ.value);
+        if (queryCategory.value) params.set('category', queryCategory.value);
+
+        const url = params.toString() ? `/api/campaigns?${params.toString()}` : '/api/campaigns';
+        const data = await apiGet(url);
         campaigns.value = data.data ?? [];
     } catch (error) {
         console.error('Failed to load /api/campaigns', error);
@@ -155,5 +156,8 @@ onMounted(async () => {
     } finally {
         loading.value = false;
     }
-});
+}
+
+onMounted(load);
+watch(() => route.query, load);
 </script>

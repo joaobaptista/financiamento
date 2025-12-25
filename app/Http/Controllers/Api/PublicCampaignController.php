@@ -4,15 +4,32 @@ namespace App\Http\Controllers\Api;
 
 use App\Domain\Campaign\Campaign;
 use App\Http\Resources\CampaignResource;
+use Illuminate\Http\Request;
 
 class PublicCampaignController
 {
-    public function index()
+    public function index(Request $request)
     {
-        $campaigns = Campaign::active()
+        $q = trim((string) $request->query('q', ''));
+        $category = trim((string) $request->query('category', ''));
+
+        $campaignsQuery = Campaign::active()
             ->with(['user', 'creatorPage'])
-            ->orderByDesc('created_at')
-            ->paginate(12);
+            ->orderByDesc('created_at');
+
+        if ($q !== '') {
+            $campaignsQuery->where(function ($builder) use ($q) {
+                $builder
+                    ->where('title', 'like', '%' . $q . '%')
+                    ->orWhere('description', 'like', '%' . $q . '%');
+            });
+        }
+
+        if ($category !== '') {
+            $campaignsQuery->where('niche', $category);
+        }
+
+        $campaigns = $campaignsQuery->paginate(12);
 
         return CampaignResource::collection($campaigns);
     }
