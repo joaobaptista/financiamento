@@ -36,6 +36,31 @@ use OpenApi\Annotations as OA;
  *   name="Campaigns",
  *   description="Campanhas"
  * )
+
+ * @OA\Tag(
+ *   name="Dashboard",
+ *   description="Dashboard do criador"
+ * )
+
+ * @OA\Tag(
+ *   name="Notifications",
+ *   description="Notificações in-app"
+ * )
+
+ * @OA\Tag(
+ *   name="Creators",
+ *   description="Apoiar/seguir criadores"
+ * )
+
+ * @OA\Tag(
+ *   name="CEP",
+ *   description="Consulta de CEP"
+ * )
+
+ * @OA\Tag(
+ *   name="OAuth",
+ *   description="Login social (Google)"
+ * )
  *
  * @OA\Tag(
  *   name="Webhooks",
