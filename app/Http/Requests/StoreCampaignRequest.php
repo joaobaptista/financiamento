@@ -16,6 +16,7 @@ class StoreCampaignRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
+            'niche' => 'required|string|max:50',
             'goal_amount' => 'required|numeric|min:1',
             'ends_at' => 'required|date|after:today',
             'cover_image_path' => 'nullable|string',

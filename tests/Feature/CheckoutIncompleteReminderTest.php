@@ -27,6 +27,7 @@ class CheckoutIncompleteReminderTest extends TestCase
             ->post('/api/me/campaigns', [
                 'title' => 'Campanha para lembrete',
                 'description' => 'Descrição',
+                'niche' => 'arte',
                 'goal_amount' => '10.00',
                 'ends_at' => $endsAt,
             ]);

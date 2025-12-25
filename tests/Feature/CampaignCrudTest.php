@@ -29,6 +29,7 @@ class CampaignCrudTest extends TestCase
             ->post('/api/me/campaigns', [
                 'title' => 'Minha campanha',
                 'description' => 'Descrição',
+                'niche' => 'arte',
                 'goal_amount' => '123.45',
                 'ends_at' => $endsAt,
                 'cover_image' => UploadedFile::fake()->image('cover.png', 1200, 630),
@@ -71,6 +72,7 @@ class CampaignCrudTest extends TestCase
             ->post('/api/me/campaigns', [
                 'title' => 'Campanha pra excluir',
                 'description' => 'Descrição',
+                'niche' => 'arte',
                 'goal_amount' => '50.00',
                 'ends_at' => $endsAt,
                 'cover_image' => UploadedFile::fake()->image('cover.jpg', 800, 600),
@@ -119,6 +121,7 @@ class CampaignCrudTest extends TestCase
             ->post('/api/me/campaigns', [
                 'title' => 'Campanha ativa',
                 'description' => 'Descrição',
+                'niche' => 'arte',
                 'goal_amount' => '10.00',
                 'ends_at' => $endsAt,
             ]);
@@ -155,6 +158,7 @@ class CampaignCrudTest extends TestCase
             ->post('/api/me/campaigns', [
                 'title' => 'Campanha ativa',
                 'description' => 'Descrição',
+                'niche' => 'arte',
                 'goal_amount' => '10.00',
                 'ends_at' => $endsAt,
             ]);
@@ -175,6 +179,7 @@ class CampaignCrudTest extends TestCase
             ->put("/api/me/campaigns/{$id}", [
                 'title' => 'Campanha ativa editada',
                 'description' => 'Nova descrição',
+                'niche' => 'arte',
                 'goal_amount' => '12.00',
                 'ends_at' => now()->addDays(12)->toDateString(),
                 'rewards' => [],

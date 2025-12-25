@@ -39,6 +39,7 @@ class MercadoPagoCardPaymentTest extends TestCase
             ->post('/api/me/campaigns', [
                 'title' => 'Campanha para apoio cartão MP',
                 'description' => 'Descrição',
+                'niche' => 'arte',
                 'goal_amount' => '10.00',
                 'ends_at' => $endsAt,
             ]);

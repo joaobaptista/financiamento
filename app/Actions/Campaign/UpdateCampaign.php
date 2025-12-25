@@ -24,6 +24,7 @@ class UpdateCampaign
             'creator_page_id' => $data->creatorPageId,
             'title' => $data->title,
             'description' => $data->description,
+            'niche' => $data->niche,
             'goal_amount' => $data->goalAmount,
             'ends_at' => $data->endsAt,
             'cover_image_path' => $data->coverImagePath,

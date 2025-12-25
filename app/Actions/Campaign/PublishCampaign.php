@@ -23,6 +23,10 @@ class PublishCampaign
             throw new \RuntimeException('Meta da campanha deve ser maior que zero.');
         }
 
+        if (empty($campaign->niche)) {
+            throw new \RuntimeException('Campanha precisa ter um nicho/categoria para ser publicada.');
+        }
+
         if (!$campaign->ends_at) {
             throw new \RuntimeException('Campanha precisa ter uma data de término.');
         }

@@ -13,6 +13,7 @@ final readonly class UpdateCampaignData
         public ?int $creatorPageId,
         public string $title,
         public string $description,
+        public ?string $niche,
         public int $goalAmount,
         public Carbon $endsAt,
         public ?string $coverImagePath,

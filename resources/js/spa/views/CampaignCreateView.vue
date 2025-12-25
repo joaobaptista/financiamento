@@ -22,6 +22,14 @@
                                 <textarea v-model="form.description" class="form-control" rows="10" required></textarea>
                             </div>
 
+                            <div class="mb-3">
+                                <label class="form-label">{{ t('campaignForm.nicheLabel') }} *</label>
+                                <select v-model="form.niche" class="form-select" required>
+                                    <option value="" disabled>{{ t('campaignForm.nichePlaceholder') }}</option>
+                                    <option v-for="c in categories" :key="c.key" :value="c.key">{{ t(c.labelKey) }}</option>
+                                </select>
+                            </div>
+
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">{{ t('campaignForm.goalLabel') }} *</label>
@@ -125,6 +133,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { apiPost } from '../api';
+import { categories } from '../categories';
 
 const router = useRouter();
 const { t } = useI18n({ useScope: 'global' });
@@ -137,6 +146,7 @@ const coverFile = ref(null);
 const form = ref({
     title: '',
     description: '',
+    niche: '',
     goal_amount: '100.00',
     ends_at: '',
     cover_image_path: '',
@@ -163,6 +173,7 @@ async function submit() {
             const fd = new FormData();
             fd.append('title', form.value.title);
             fd.append('description', form.value.description);
+            fd.append('niche', form.value.niche);
             fd.append('goal_amount', String(form.value.goal_amount || ''));
             fd.append('ends_at', String(form.value.ends_at || ''));
             if (form.value.cover_image_path) fd.append('cover_image_path', form.value.cover_image_path);

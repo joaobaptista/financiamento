@@ -20,6 +20,7 @@ class Campaign extends Model
         'title',
         'slug',
         'description',
+        'niche',
         'goal_amount',
         'pledged_amount',
         'goal_reached_notified_at',

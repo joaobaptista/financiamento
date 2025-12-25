@@ -50,6 +50,7 @@ class CreatorPageFollowTest extends TestCase
             'title' => 'Nova campanha',
             'slug' => 'nova-campanha',
             'description' => 'Descricao',
+            'niche' => 'arte',
             'goal_amount' => 10000,
             'pledged_amount' => 0,
             'ends_at' => now()->addDays(10),

@@ -24,6 +24,7 @@ class PledgePaymentTest extends TestCase
             ->post('/api/me/campaigns', [
                 'title' => 'Campanha para status do pledge',
                 'description' => 'Descrição',
+                'niche' => 'arte',
                 'goal_amount' => '10.00',
                 'ends_at' => $endsAt,
             ]);
@@ -74,6 +75,7 @@ class PledgePaymentTest extends TestCase
             ->post('/api/me/campaigns', [
                 'title' => 'Campanha para apoio cartão',
                 'description' => 'Descrição',
+                'niche' => 'arte',
                 'goal_amount' => '10.00',
                 'ends_at' => $endsAt,
             ]);
@@ -121,6 +123,7 @@ class PledgePaymentTest extends TestCase
             ->post('/api/me/campaigns', [
                 'title' => 'Campanha para apoio pix',
                 'description' => 'Descrição',
+                'niche' => 'arte',
                 'goal_amount' => '10.00',
                 'ends_at' => $endsAt,
             ]);

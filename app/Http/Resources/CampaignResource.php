@@ -24,6 +24,7 @@ class CampaignResource extends JsonResource
             'title' => $this->title,
             'slug' => $this->slug,
             'description' => $this->description,
+            'niche' => $this->niche,
             'goal_amount' => (int) $this->goal_amount,
             'pledged_amount' => (int) $this->pledged_amount,
             'pledges_count' => $this->when(isset($this->pledges_count), (int) $this->pledges_count),
