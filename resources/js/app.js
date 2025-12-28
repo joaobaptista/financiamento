@@ -1,6 +1,6 @@
 import './bootstrap';
 
-import Alpine from 'alpinejs';
+import Alpine from '@alpinejs/csp';
 import { createApp } from 'vue';
 import App from './vue/App.vue';
 
