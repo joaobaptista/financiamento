@@ -70,6 +70,7 @@ class PledgeController
                 'card_token' => $validated['card_token'] ?? null,
                 'installments' => $validated['installments'] ?? null,
                 'payment_method_id' => $validated['payment_method_id'] ?? null,
+                'issuer_id' => $validated['issuer_id'] ?? null,
                 'payer_identification_type' => $validated['payer_identification_type'] ?? null,
                 'payer_identification_number' => $validated['payer_identification_number'] ?? null,
             ]);

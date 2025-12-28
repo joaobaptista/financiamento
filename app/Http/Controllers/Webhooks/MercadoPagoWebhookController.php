@@ -21,11 +21,17 @@ class MercadoPagoWebhookController
         // - {"action":"payment.updated","data":{"id":"123"}}
         $payload = $request->all();
 
-        $paymentId = $payload['data']['id'] ?? ($payload['id'] ?? null);
-        if (!is_string($paymentId) || $paymentId === '') {
+        $paymentId = $payload['data']['id'] ?? ($payload['id'] ?? ($payload['data_id'] ?? null));
+        if (is_int($paymentId) || is_float($paymentId)) {
+            $paymentId = (string) $paymentId;
+        }
+
+        if (!is_string($paymentId) || trim($paymentId) === '') {
             Log::info('mercadopago.webhook.received', ['payload' => $payload]);
             return response()->json(['ok' => true]);
         }
+
+        $paymentId = trim($paymentId);
 
         // If we can't query MP (no token), just ack and keep payload for later debugging.
         $accessToken = config('mercadopago.access_token');
