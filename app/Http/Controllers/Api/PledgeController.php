@@ -13,8 +13,35 @@ use App\Notifications\PledgePaymentConfirmed;
 use App\Notifications\PledgePixGenerated;
 use App\Services\Money\Money;
 
+
 class PledgeController
 {
+
+    /**
+     * Lista todos os apoios (pledges) do usuário autenticado, incluindo dados da campanha.
+     */
+    public function myPledges()
+    {
+        $userId = (int) auth()->id();
+        $pledges = Pledge::with(['campaign'])
+            ->where('user_id', $userId)
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function ($pledge) {
+                return [
+                    'id' => $pledge->id,
+                    'status' => $pledge->status->value,
+                    'amount' => $pledge->amount,
+                    'paid_at' => $pledge->paid_at,
+                    'campaign' => [
+                        'id' => $pledge->campaign->id ?? null,
+                        'title' => $pledge->campaign->title ?? null,
+                        'cover_image_path' => $pledge->campaign->cover_image_path ?? null,
+                    ],
+                ];
+            });
+        return response()->json(['ok' => true, 'pledges' => $pledges]);
+    }
     public function show(int $id)
     {
         $userId = (int) auth()->id();

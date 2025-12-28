@@ -86,6 +86,7 @@ Route::middleware(['web'])->group(function () {
         Route::post('/me/campaigns/{id}/publish', [CampaignController::class, 'publish']);
 
         Route::post('/pledges', [PledgeController::class, 'store'])->middleware('throttle:10,1');
+            Route::get('/me/pledges', [PledgeController::class, 'myPledges']);
         Route::get('/pledges/{id}', [PledgeController::class, 'show'])->middleware('throttle:30,1');
         Route::post('/pledges/{id}/confirm', [PledgeController::class, 'confirm'])->middleware('throttle:10,1');
     });
