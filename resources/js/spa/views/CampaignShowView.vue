@@ -548,6 +548,7 @@ import { absoluteUrl, applyCampaignSeo } from '../seo';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import QRCode from 'qrcode';
+import { fetchIssuerId, fetchPaymentMethodIdByBin } from '../mercadopago';
 
 const props = defineProps({
     slug: { type: String, required: true },
@@ -673,20 +674,30 @@ async function createMercadoPagoCardToken() {
         throw new Error('Não foi possível tokenizar o cartão.');
     }
 
+    const publicKey = getMercadoPagoPublicKey();
+    const bin = number.slice(0, 6);
+
     let paymentMethodId = null;
+    let issuerId = null;
     try {
-        const bin = number.slice(0, 6);
-        if (bin.length === 6 && typeof mp.getPaymentMethods === 'function') {
-            const methods = await mp.getPaymentMethods({ bin });
-            paymentMethodId = methods?.results?.[0]?.id || methods?.[0]?.id || null;
+        if (bin.length === 6 && publicKey) {
+            paymentMethodId = await fetchPaymentMethodIdByBin({ publicKey, bin });
+            if (paymentMethodId) {
+                issuerId = await fetchIssuerId({ publicKey, paymentMethodId, bin });
+            }
         }
     } catch {
-        // ignore
+        // ignore (backend can still try with token only, but MP may reject without payment_method_id)
+    }
+
+    if (!paymentMethodId) {
+        throw new Error('Não foi possível identificar a bandeira do cartão.');
     }
 
     return {
         token,
         paymentMethodId,
+        issuerId,
         identification: { type: 'CPF', number: cpf },
     };
 }
@@ -961,6 +972,7 @@ async function submit() {
 
         let cardToken = undefined;
         let paymentMethodId = undefined;
+        let issuerId = undefined;
         let payerIdentificationType = undefined;
         let payerIdentificationNumber = undefined;
 
@@ -969,6 +981,7 @@ async function submit() {
                 const cardData = await createMercadoPagoCardToken();
                 cardToken = cardData.token;
                 paymentMethodId = cardData.paymentMethodId || undefined;
+                issuerId = cardData.issuerId || undefined;
                 payerIdentificationType = cardData.identification.type;
                 payerIdentificationNumber = cardData.identification.number;
             } catch (e) {
@@ -987,6 +1000,7 @@ async function submit() {
             card_token: cardToken,
             installments: paymentMethod.value === 'card' ? Number(cardInstallments.value || 1) : undefined,
             payment_method_id: paymentMethodId,
+            issuer_id: issuerId,
             payer_identification_type: payerIdentificationType,
             payer_identification_number: payerIdentificationNumber,
         });
