@@ -288,7 +288,6 @@ class MercadoPagoPaymentService implements PaymentService
         $token = (string) ($metadata['card_token'] ?? '');
         $installments = (int) ($metadata['installments'] ?? 1);
         $paymentMethodId = $metadata['payment_method_id'] ?? null;
-        $issuerId = $metadata['issuer_id'] ?? null;
         $payerIdentificationType = $metadata['payer_identification_type'] ?? null;
         $payerIdentificationNumber = $metadata['payer_identification_number'] ?? null;
 
@@ -313,10 +312,6 @@ class MercadoPagoPaymentService implements PaymentService
 
         if (is_string($paymentMethodId) && $paymentMethodId !== '') {
             $payload['payment_method_id'] = $paymentMethodId;
-        }
-
-        if (is_string($issuerId) && $issuerId !== '') {
-            $payload['issuer_id'] = $issuerId;
         }
 
         if (

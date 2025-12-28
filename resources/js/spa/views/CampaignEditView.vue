@@ -50,37 +50,19 @@
                                     type="text"
                                     class="form-control"
                                     :placeholder="t('campaignForm.coverUrlPlaceholder')"
-                                    :disabled="!!coverFile"
                                 />
-                                <div class="form-text">{{ t('campaignForm.coverUrlPlaceholder') }}</div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">{{ t('campaignForm.coverReplaceUploadLabel') }}</label>
                                 <input
-                                    :key="coverInputKey"
                                     type="file"
                                     class="form-control"
                                     accept="image/*"
                                     @change="onCoverFileChange"
                                 />
                                 <div class="form-text">
-                                    {{ t('campaignForm.coverUploadHelpEdit') }} (máx. 10MB)
-                                </div>
-
-                                <div v-if="coverPreviewUrl" class="mt-2">
-                                    <div class="small text-muted mb-2">Preview</div>
-                                    <img :src="coverPreviewUrl" class="img-fluid rounded border" alt="Cover preview" />
-                                    <div class="mt-2">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" @click="clearCoverSelection">
-                                            {{ t('common.cancel') }} upload
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div v-else-if="currentCoverUrl" class="mt-2">
-                                    <div class="small text-muted mb-2">Capa atual</div>
-                                    <img :src="currentCoverUrl" class="img-fluid rounded border" alt="Current cover" />
+                                    {{ t('campaignForm.coverUploadHelpEdit') }}
                                 </div>
                             </div>
                         </div>
@@ -155,9 +137,8 @@
 import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { apiDelete, apiErrorMessage, apiGet, apiPost, apiPut } from '../api';
+import { apiDelete, apiGet, apiPost, apiPut } from '../api';
 import { categories } from '../categories';
-import { absoluteUrl } from '../seo';
 
 const props = defineProps({
     id: { type: [String, Number], required: true },
@@ -171,24 +152,6 @@ const submitting = ref(false);
 const error = ref('');
 
 const coverFile = ref(null);
-const coverPreviewUrl = ref('');
-const coverInputKey = ref(0);
-const currentCoverUrl = ref('');
-
-const MAX_COVER_BYTES = 10 * 1024 * 1024;
-
-function setCoverFile(file) {
-    if (coverPreviewUrl.value) {
-        try {
-            URL.revokeObjectURL(coverPreviewUrl.value);
-        } catch {
-            // ignore
-        }
-    }
-
-    coverFile.value = file;
-    coverPreviewUrl.value = file ? URL.createObjectURL(file) : '';
-}
 
 const form = ref({
     title: '',
@@ -202,31 +165,7 @@ const form = ref({
 
 function onCoverFileChange(e) {
     const file = e?.target?.files?.[0] ?? null;
-    if (!file) {
-        setCoverFile(null);
-        return;
-    }
-
-    if (!String(file.type || '').startsWith('image/')) {
-        error.value = 'Selecione um arquivo de imagem válido.';
-        coverInputKey.value++;
-        setCoverFile(null);
-        return;
-    }
-
-    if (Number(file.size || 0) > MAX_COVER_BYTES) {
-        error.value = 'Imagem muito grande. Tamanho máximo: 10MB.';
-        coverInputKey.value++;
-        setCoverFile(null);
-        return;
-    }
-
-    setCoverFile(file);
-}
-
-function clearCoverSelection() {
-    coverInputKey.value++;
-    setCoverFile(null);
+    coverFile.value = file;
 }
 
 function toDateInput(iso) {
@@ -246,8 +185,6 @@ async function load() {
     loading.value = true;
     const payload = await apiGet(`/api/me/campaigns/${props.id}`);
     const campaign = payload?.data ?? payload;
-
-    currentCoverUrl.value = campaign.cover_image_path ? absoluteUrl(campaign.cover_image_path) : '';
 
     form.value = {
         title: campaign.title,
@@ -279,6 +216,7 @@ async function submit() {
             fd.append('niche', form.value.niche);
             fd.append('goal_amount', String(form.value.goal_amount || ''));
             fd.append('ends_at', String(form.value.ends_at || ''));
+            if (form.value.cover_image_path) fd.append('cover_image_path', form.value.cover_image_path);
             fd.append('cover_image', coverFile.value);
 
             (form.value.rewards || []).forEach((r, idx) => {
@@ -307,11 +245,7 @@ async function submit() {
 
         router.push('/dashboard');
     } catch (e) {
-        let msg = apiErrorMessage(e, t('campaignEdit.error'));
-        if (msg && (msg.includes('validation.uploaded') || msg.includes('upload'))) {
-            msg = 'Erro ao enviar a imagem. Verifique se o arquivo é uma imagem (jpg, png, webp) e tem no máximo 10MB.';
-        }
-        error.value = msg;
+        error.value = e?.response?.data?.message ?? t('campaignEdit.error');
     } finally {
         submitting.value = false;
     }
@@ -326,7 +260,7 @@ async function destroyCampaign() {
         await apiDelete(`/api/me/campaigns/${props.id}`);
         router.push('/dashboard');
     } catch (e) {
-        error.value = apiErrorMessage(e, t('campaignEdit.error'));
+        error.value = e?.response?.data?.message ?? t('campaignEdit.error');
     } finally {
         submitting.value = false;
     }
