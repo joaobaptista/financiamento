@@ -10,7 +10,7 @@ return [
     |
     */
 
-    'driver' => env('PAYMENTS_DRIVER', 'mock'),
+    'driver' => env('PAYMENTS_DRIVER', 'mercadopago'),
 
     'checkout_incomplete' => [
         'delay_minutes' => (int) env('CHECKOUT_INCOMPLETE_DELAY_MINUTES', 60),
