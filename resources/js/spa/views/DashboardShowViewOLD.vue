@@ -77,7 +77,7 @@
                     <div class="text-uppercase text-muted small">{{ t('dashboard.backersList') }}</div>
                 </div>
                 <div class="card-body">
-                    <div v-if="(data?.pledges?.data || data?.pledges || []).length" class="table-responsive">
+                    <div v-if="(data?.pledges || []).length" class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
@@ -88,7 +88,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="p in (data.pledges?.data || data.pledges || [])" :key="p.id">
+                                <tr v-for="p in data.pledges" :key="p.id">
                                     <td>{{ p.user?.name ?? '-' }}</td>
                                     <td><strong class="text-success">{{ formatMoney(p.amount) }}</strong></td>
                                     <td>{{ formatDateTime(p.paid_at) }}</td>

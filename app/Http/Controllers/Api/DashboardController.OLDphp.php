@@ -26,7 +26,7 @@ class DashboardController
         return response()->json([
             'campaign' => new CampaignResource($data['campaign']),
             'stats' => $data['stats']->toArray(),
-            'pledges' => PledgeResource::collection($data['pledges'])->response()->getData(true),
+            'pledges' => PledgeResource::collection($data['pledges']),
         ]);
     }
 }
