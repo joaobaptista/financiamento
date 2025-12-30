@@ -14,6 +14,10 @@ Route::middleware(['auth'])->group(function () {
 	Route::view('/dashboard', 'spa')->name('dashboard.index');
 	Route::view('/dashboard/campaigns/{id}', 'spa')->name('dashboard.show');
 
+	// Exportações (Downloads) - Prefixo único para evitar conflito com Vue Router
+	Route::get('/app-export/campaigns/{id}/excel', [\App\Http\Controllers\Api\DashboardController::class, 'exportExcel']);
+	Route::get('/app-export/campaigns/{id}/pdf', [\App\Http\Controllers\Api\DashboardController::class, 'exportPdf']);
+
 	Route::view('/me/creator/setup', 'spa')->name('creator.setup');
 
 	Route::view('/me/campaigns/create', 'spa')->name('campaigns.create');

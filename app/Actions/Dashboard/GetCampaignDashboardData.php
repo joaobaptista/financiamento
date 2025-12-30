@@ -18,7 +18,6 @@ class GetCampaignDashboardData
         $campaign = Campaign::query()
             ->where('id', $campaignId)
             ->where('user_id', $userId)
-            ->with(['user', 'rewards'])
             ->firstOrFail();
 
         $pledges = Pledge::query()
@@ -28,12 +27,12 @@ class GetCampaignDashboardData
             ->orderByDesc('paid_at')
             ->paginate($perPage);
 
-        $stats = new CampaignStatsData(
-            totalBackers: $campaign->pledges()->where('status', PledgeStatus::Paid->value)->count(),
-            totalRaised: $campaign->pledged_amount,
-            progress: $campaign->calculateProgress(),
-            daysRemaining: $campaign->daysRemaining(),
-        );
+        $stats = [
+            'total_backers' => $campaign->pledges()->where('status', PledgeStatus::Paid->value)->count(),
+            'total_raised' => (int) $campaign->pledged_amount,
+            'progress' => (float) $campaign->calculateProgress(),
+            'days_remaining' => (int) $campaign->daysRemaining(),
+        ];
 
         return [
             'campaign' => $campaign,

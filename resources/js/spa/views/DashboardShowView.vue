@@ -1,6 +1,20 @@
 <template>
     <div class="container">
-        <div v-if="loading" class="text-muted">{{ t('common.loading') }}</div>
+        <div v-if="loading" class="py-5 text-center">
+            <div class="spinner-border text-primary mb-2" role="status"></div>
+            <div class="text-muted">{{ t('common.loading') }}</div>
+        </div>
+
+        <div v-else-if="error" class="py-5 text-center">
+            <div class="alert alert-danger">
+                {{ error }}
+                <div class="mt-2">
+                    <button class="btn btn-outline-danger btn-sm" @click="load">
+                        <i class="bi bi-arrow-clockwise"></i> Tentar novamente
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <div v-else>
             <div class="mb-4">
@@ -11,7 +25,7 @@
 
             <div class="py-2">
                 <div class="text-uppercase text-muted small">{{ t('dashboard.stats') }}</div>
-                <h1 class="h3 fw-normal mb-0">{{ data?.campaign?.title }}</h1>
+                <h1 class="h3 fw-normal mb-0">{{ data?.campaign?.title || 'Campanha' }}</h1>
             </div>
 
             <div class="row mb-4">
@@ -73,11 +87,19 @@
             </div>
 
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <div class="text-uppercase text-muted small">{{ t('dashboard.backersList') }}</div>
+                    <div class="d-flex gap-2">
+                        <a :href="`/app-export/campaigns/${props.id}/excel`" target="_blank" class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-file-earmark-excel"></i> Excel
+                        </a>
+                        <a :href="`/app-export/campaigns/${props.id}/pdf`" target="_blank" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-file-earmark-pdf"></i> Etiquetas
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <div v-if="(data?.pledges?.data || data?.pledges || []).length" class="table-responsive">
+                    <div v-if="pledgesList.length" class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
@@ -88,7 +110,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="p in (data.pledges?.data || data.pledges || [])" :key="p.id">
+                                <tr v-for="p in pledgesList" :key="p.id">
                                     <td>{{ p.user?.name ?? '-' }}</td>
                                     <td><strong class="text-success">{{ formatMoney(p.amount) }}</strong></td>
                                     <td>{{ formatDateTime(p.paid_at) }}</td>
@@ -101,13 +123,13 @@
                 </div>
             </div>
 
-            <div v-if="message" class="text-muted mt-3">{{ message }}</div>
+            <div v-if="message" class="alert alert-info mt-3">{{ message }}</div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { apiDelete, apiGet, apiPost } from '../api';
 
@@ -116,11 +138,19 @@ const props = defineProps({
 });
 
 const loading = ref(true);
+const error = ref('');
 const data = ref(null);
 const publishing = ref(false);
+const exporting = ref(false);
 const message = ref('');
 
 const { t, locale } = useI18n({ useScope: 'global' });
+
+const pledgesList = computed(() => {
+    const p = data.value?.pledges;
+    if (!p) return [];
+    return p.data || (Array.isArray(p) ? p : []);
+});
 
 function formatMoney(cents) {
     const value = Number(cents || 0) / 100;
@@ -130,20 +160,33 @@ function formatMoney(cents) {
 
 function formatDateTime(iso) {
     if (!iso) return '-';
-    const date = new Date(iso);
+    try {
+        const date = new Date(iso);
         const intlLocale = String(locale.value || 'pt_BR').replace('_', '-');
         return date.toLocaleString(intlLocale);
+    } catch (e) {
+        return iso;
+    }
 }
 
 async function load() {
     loading.value = true;
-    const payload = await apiGet(`/api/dashboard/campaigns/${props.id}`);
-    data.value = {
-        ...payload,
-        campaign: payload?.campaign?.data ?? payload?.campaign,
-        pledges: payload?.pledges?.data ?? payload?.pledges,
-    };
-    loading.value = false;
+    error.value = '';
+    try {
+        const payload = await apiGet(`/api/dashboard/campaigns/${props.id}`);
+        if (!payload) throw new Error('Resposta vazia da API');
+        
+        data.value = {
+            ...payload,
+            campaign: payload?.campaign?.data ?? payload?.campaign,
+            pledges: payload?.pledges?.data ?? payload?.pledges,
+        };
+    } catch (e) {
+        console.error('Failed to load dashboard data:', e);
+        error.value = e?.response?.data?.message ?? 'Não foi possível carregar os dados da campanha.';
+    } finally {
+        loading.value = false;
+    }
 }
 
 async function publish() {
@@ -168,11 +211,14 @@ async function destroyCampaign() {
     try {
         await apiDelete(`/api/me/campaigns/${props.id}`);
         message.value = t('dashboard.deleteSuccess');
-        await load();
+        // Redirecionar após excluir
+        window.location.href = '/dashboard';
     } catch (e) {
         message.value = e?.response?.data?.message ?? t('dashboard.deleteError');
     }
 }
+
+// Funções de download via token removidas em favor de rotas web diretas que usam a sessão do navegador
 
 onMounted(load);
 watch(() => props.id, load);

@@ -12,18 +12,24 @@ class PledgeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        if (!$this->resource) {
+            return [];
+        }
+
         return [
             'id' => $this->id,
-            'amount' => (int) $this->amount,
-            'status' => (string) $this->status,
+            'amount' => (int) ($this->amount ?? 0),
+            'status' => (string) ($this->status instanceof \BackedEnum ? $this->status->value : $this->status),
             'paid_at' => $this->paid_at?->toISOString(),
-            'user' => new UserResource($this->whenLoaded('user')),
-            'reward' => $this->whenLoaded('reward', function () {
-                return [
-                    'id' => $this->reward?->id,
-                    'title' => $this->reward?->title,
-                ];
-            }),
+            'user' => $this->relationLoaded('user') && $this->user ? [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+                'email' => $this->user->email,
+            ] : null,
+            'reward' => $this->relationLoaded('reward') && $this->reward ? [
+                'id' => $this->reward->id,
+                'title' => $this->reward->title,
+            ] : null,
         ];
     }
 }
