@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+	.origo-footer-heading {
+		color: #B44075;
+	}
+
+	@supports (color: color-mix(in srgb, #000 50%, #fff)) {
+		.origo-footer-heading {
+			color: color-mix(in srgb, #B44075 85%, white);
+		}
+	}
+}

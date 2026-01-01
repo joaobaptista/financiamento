@@ -132,17 +132,13 @@
             <div class="container">
                 <div class="row g-4">
                     <div class="col-6 col-md-3">
-                        <h6 class="fw-semibold">{{ t('footer.welcome') }}</h6>
+                        <h6 class="fw-semibold origo-footer-heading">{{ t('footer.welcome') }}</h6>
                         <ul class="list-unstyled mt-3 mb-0">
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/about">{{ t('footer.aboutUs') }}</RouterLink></li>
-                            <li class="mb-2">
-                                <RouterLink class="link-light text-decoration-none" to="/how-it-works">{{ t('footer.howItWorks') }}</RouterLink>
-                            </li>
                             <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/blog">{{ t('footer.blog') }}</RouterLink></li>
                         </ul>
 
                         <div class="mt-4">
-                            <h6 class="fw-semibold">{{ t('footer.socialTitle') }}</h6>
+                            <h6 class="fw-semibold origo-footer-heading">{{ t('footer.socialTitle') }}</h6>
                             <ul class="list-unstyled mt-3 mb-0">
                                 <li class="mb-2">
                                     <a class="link-light text-decoration-none" href="https://facebook.com" target="_blank" rel="noopener">
@@ -164,35 +160,20 @@
                     </div>
 
                     <div class="col-6 col-md-3">
-                        <h6 class="fw-semibold">{{ t('footer.help') }}</h6>
+                        <h6 class="fw-semibold origo-footer-heading">{{ t('footer.help') }}</h6>
                         <ul class="list-unstyled mt-3 mb-0">
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/support">{{ t('footer.supportCenter') }}</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/contact">{{ t('footer.contact') }}</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/updates">{{ t('footer.updates') }}</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/fees">{{ t('footer.fees') }}</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/security">{{ t('footer.security') }}</RouterLink></li>
                             <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/terms">{{ t('footer.terms') }}</RouterLink></li>
                             <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/privacy">{{ t('footer.privacy') }}</RouterLink></li>
                         </ul>
                     </div>
 
                     <div class="col-6 col-md-3">
-                        <h6 class="fw-semibold">{{ t('footer.makeCampaign') }}</h6>
+                        <h6 class="fw-semibold origo-footer-heading">{{ t('footer.makeCampaign') }}</h6>
                         <ul class="list-unstyled mt-3 mb-0">
                             <li class="mb-2">
                                 <RouterLink class="link-light text-decoration-none" to="/me/creator/setup">{{ t('footer.startProject') }}</RouterLink>
                             </li>
                         </ul>
-
-                        <div class="mt-4">
-                            <h6 class="fw-semibold">{{ t('footer.supportProjects') }}</h6>
-                            <ul class="list-unstyled mt-3 mb-0">
-                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/campaigns">{{ t('footer.explore') }}</RouterLink></li>
-                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/popular">{{ t('footer.popular') }}</RouterLink></li>
-                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/no-ar">{{ t('footer.live') }}</RouterLink></li>
-                                <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/finalizados">{{ t('footer.finished') }}</RouterLink></li>
-                            </ul>
-                        </div>
                     </div>
 
                     <div class="col-12 col-md-3">
@@ -217,7 +198,6 @@
                 </div>
 
                 <div class="border-top border-secondary mt-4 pt-4 d-flex flex-column flex-md-row justify-content-between gap-2">
-                    <div class="text-secondary small">{{ t('footer.tagline') }}</div>
                     <div class="text-secondary small">&copy; {{ year }} Origo. {{ t('footer.rights') }}</div>
                     <div class="d-flex align-items-center gap-2">
                         <div class="text-secondary small">{{ t('footer.language') }}</div>
