@@ -27,20 +27,25 @@
                                 </div>
 
                                 <div class="mb-2">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <label class="form-label mb-0">Senha</label>
-                                        <div class="form-check mb-0">
-                                            <input id="showPassword" v-model="showPassword" class="form-check-input" type="checkbox" />
-                                            <label class="form-check-label small" for="showPassword">{{ t('auth.register.showPassword') }}</label>
-                                        </div>
+                                    <label class="form-label mb-1">Senha</label>
+                                    <div class="input-group">
+                                        <input
+                                            v-model="password"
+                                            :type="showPassword ? 'text' : 'password'"
+                                            class="form-control"
+                                            autocomplete="new-password"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-secondary"
+                                            :disabled="submitting"
+                                            :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+                                            @click="showPassword = !showPassword"
+                                        >
+                                            <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                                        </button>
                                     </div>
-                                    <input
-                                        v-model="password"
-                                        :type="showPassword ? 'text' : 'password'"
-                                        class="form-control"
-                                        autocomplete="new-password"
-                                        required
-                                    />
                                 </div>
 
                                 <div class="form-check my-3">

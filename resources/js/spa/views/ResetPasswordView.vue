@@ -28,26 +28,48 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <input
-                                        v-model="password"
-                                        type="password"
-                                        class="form-control"
-                                        :placeholder="t('auth.resetPassword.newPassword')"
-                                        autocomplete="new-password"
-                                        required
-                                    />
+                                    <div class="input-group">
+                                        <input
+                                            v-model="password"
+                                            :type="showPassword ? 'text' : 'password'"
+                                            class="form-control"
+                                            :placeholder="t('auth.resetPassword.newPassword')"
+                                            autocomplete="new-password"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-secondary"
+                                            :disabled="submitting"
+                                            :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+                                            @click="showPassword = !showPassword"
+                                        >
+                                            <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                                        </button>
+                                    </div>
                                     <div v-if="fieldError('password')" class="invalid-feedback d-block">{{ fieldError('password') }}</div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <input
-                                        v-model="passwordConfirmation"
-                                        type="password"
-                                        class="form-control"
-                                        :placeholder="t('auth.resetPassword.confirmPassword')"
-                                        autocomplete="new-password"
-                                        required
-                                    />
+                                    <div class="input-group">
+                                        <input
+                                            v-model="passwordConfirmation"
+                                            :type="showPasswordConfirmation ? 'text' : 'password'"
+                                            class="form-control"
+                                            :placeholder="t('auth.resetPassword.confirmPassword')"
+                                            autocomplete="new-password"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-secondary"
+                                            :disabled="submitting"
+                                            :aria-label="showPasswordConfirmation ? 'Ocultar senha' : 'Mostrar senha'"
+                                            @click="showPasswordConfirmation = !showPasswordConfirmation"
+                                        >
+                                            <i :class="showPasswordConfirmation ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <button type="submit" class="btn btn-success w-100 py-2" :disabled="submitting">
@@ -97,6 +119,8 @@ const token = ref('');
 const email = ref('');
 const password = ref('');
 const passwordConfirmation = ref('');
+const showPassword = ref(false);
+const showPasswordConfirmation = ref(false);
 
 const submitting = ref(false);
 const success = ref('');

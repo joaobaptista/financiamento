@@ -26,14 +26,25 @@
                                 </div>
 
                                 <div class="mb-2">
-                                    <input
-                                        v-model="password"
-                                        type="password"
-                                        class="form-control"
-                                        :placeholder="t('auth.common.password')"
-                                        autocomplete="current-password"
-                                        required
-                                    />
+                                    <div class="input-group">
+                                        <input
+                                            v-model="password"
+                                            :type="showPassword ? 'text' : 'password'"
+                                            class="form-control"
+                                            :placeholder="t('auth.common.password')"
+                                            autocomplete="current-password"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-secondary"
+                                            :disabled="submitting"
+                                            :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+                                            @click="showPassword = !showPassword"
+                                        >
+                                            <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div class="mb-3">
@@ -88,6 +99,7 @@ const logoUrl = '/img/logo.svg';
 
 const email = ref('');
 const password = ref('');
+const showPassword = ref(false);
 const remember = ref(false);
 const error = ref('');
 const submitting = ref(false);

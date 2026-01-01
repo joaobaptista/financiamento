@@ -483,14 +483,25 @@
                                                 </div>
                                                 <div class="col-6">
                                                     <label class="form-label mb-1">{{ t('campaignShow.cardCvvLabel') }}</label>
-                                                    <input
-                                                        v-model="cardCvv"
-                                                        type="password"
-                                                        class="form-control"
-                                                        autocomplete="cc-csc"
-                                                        inputmode="numeric"
-                                                        :disabled="submitting || !isCampaignOpen"
-                                                    />
+                                                    <div class="input-group">
+                                                        <input
+                                                            v-model="cardCvv"
+                                                            :type="showCardCvv ? 'text' : 'password'"
+                                                            class="form-control"
+                                                            autocomplete="cc-csc"
+                                                            inputmode="numeric"
+                                                            :disabled="submitting || !isCampaignOpen"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-outline-secondary"
+                                                            :disabled="submitting || !isCampaignOpen"
+                                                            :aria-label="showCardCvv ? 'Ocultar' : 'Mostrar'"
+                                                            @click="showCardCvv = !showCardCvv"
+                                                        >
+                                                            <i :class="showCardCvv ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -576,6 +587,7 @@ const cardName = ref('');
 const cardCpf = ref('');
 const cardExpiry = ref('');
 const cardCvv = ref('');
+const showCardCvv = ref(false);
 const cardInstallments = ref(1);
 
 let mercadoPagoInstance = null;

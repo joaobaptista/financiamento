@@ -142,15 +142,66 @@
                     <div class="row g-2">
                         <div class="col-12">
                             <label class="form-label mb-1">{{ t('profile.currentPasswordLabel') }}</label>
-                            <input v-model="currentPassword" type="password" class="form-control" :disabled="passwordSaving" />
+                            <div class="input-group">
+                                <input
+                                    v-model="currentPassword"
+                                    :type="showCurrentPassword ? 'text' : 'password'"
+                                    class="form-control"
+                                    :disabled="passwordSaving"
+                                    autocomplete="current-password"
+                                />
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    :disabled="passwordSaving"
+                                    :aria-label="showCurrentPassword ? 'Ocultar senha' : 'Mostrar senha'"
+                                    @click="showCurrentPassword = !showCurrentPassword"
+                                >
+                                    <i :class="showCurrentPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label mb-1">{{ t('profile.newPasswordLabel') }}</label>
-                            <input v-model="newPassword" type="password" class="form-control" :disabled="passwordSaving" />
+                            <div class="input-group">
+                                <input
+                                    v-model="newPassword"
+                                    :type="showNewPassword ? 'text' : 'password'"
+                                    class="form-control"
+                                    :disabled="passwordSaving"
+                                    autocomplete="new-password"
+                                />
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    :disabled="passwordSaving"
+                                    :aria-label="showNewPassword ? 'Ocultar senha' : 'Mostrar senha'"
+                                    @click="showNewPassword = !showNewPassword"
+                                >
+                                    <i :class="showNewPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label mb-1">{{ t('profile.newPasswordConfirmLabel') }}</label>
-                            <input v-model="newPasswordConfirm" type="password" class="form-control" :disabled="passwordSaving" />
+                            <div class="input-group">
+                                <input
+                                    v-model="newPasswordConfirm"
+                                    :type="showNewPasswordConfirm ? 'text' : 'password'"
+                                    class="form-control"
+                                    :disabled="passwordSaving"
+                                    autocomplete="new-password"
+                                />
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    :disabled="passwordSaving"
+                                    :aria-label="showNewPasswordConfirm ? 'Ocultar senha' : 'Mostrar senha'"
+                                    @click="showNewPasswordConfirm = !showNewPasswordConfirm"
+                                >
+                                    <i :class="showNewPasswordConfirm ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -199,6 +250,9 @@ const message = ref('');
 const currentPassword = ref('');
 const newPassword = ref('');
 const newPasswordConfirm = ref('');
+const showCurrentPassword = ref(false);
+const showNewPassword = ref(false);
+const showNewPasswordConfirm = ref(false);
 const passwordSaving = ref(false);
 const passwordMessage = ref('');
 
