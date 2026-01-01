@@ -27,13 +27,13 @@ class PledgePaymentFailed extends Notification
         $this->pledge->loadMissing(['campaign']);
 
         $baseUrl = rtrim((string) config('app.url'), '/');
-        $logoUrl = $baseUrl . '/img/logo.svg';
+            $recipientName = (string) ($notifiable->name ?? '');
         $campaignUrl = $baseUrl . '/campaigns/' . $this->pledge->campaign->slug;
 
         return (new MailMessage)
             ->subject('Não conseguimos confirmar seu pagamento')
             ->markdown('emails.pledges.payment-failed', [
-                'logoUrl' => $logoUrl,
+                'recipientName' => $recipientName,
                 'campaignTitle' => $this->pledge->campaign->title,
                 'campaignUrl' => $campaignUrl,
                 'amount' => $this->pledge->formatted_amount,

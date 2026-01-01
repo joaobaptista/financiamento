@@ -26,12 +26,12 @@ class PledgeCheckoutIncomplete extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $baseUrl = rtrim((string) config('app.url'), '/');
-        $logoUrl = $baseUrl . '/img/logo.svg';
+        $recipientName = (string) ($notifiable->name ?? '');
 
         return (new MailMessage)
             ->subject('Finalize seu apoio')
             ->markdown('emails.pledges.checkout-incomplete', [
-                'logoUrl' => $logoUrl,
+                'recipientName' => $recipientName,
                 'projectTitle' => $this->projectTitle,
                 'projectUrl' => $this->projectUrl,
                 'supportCenterUrl' => $this->supportCenterUrl,

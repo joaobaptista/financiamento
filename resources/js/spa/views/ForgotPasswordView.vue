@@ -8,10 +8,11 @@
             </div>
 
             <div class="row justify-content-center">
-                <div class="col-12 col-sm-10 col-md-6 col-lg-4">
+                <div class="col-12 col-sm-10 col-md-7 col-lg-5">
                     <div class="card shadow-sm">
                         <div class="card-body p-4">
-                            <h1 class="h3 fw-normal mb-3">{{ t('auth.login.title') }}</h1>
+                            <h1 class="h3 fw-normal mb-2">{{ t('auth.forgotPassword.title') }}</h1>
+                            <p class="text-muted mb-4">{{ t('auth.forgotPassword.subtitle') }}</p>
 
                             <form @submit.prevent="submit">
                                 <div class="mb-3">
@@ -23,42 +24,26 @@
                                         autocomplete="email"
                                         required
                                     />
-                                </div>
 
-                                <div class="mb-2">
-                                    <input
-                                        v-model="password"
-                                        type="password"
-                                        class="form-control"
-                                        :placeholder="t('auth.common.password')"
-                                        autocomplete="current-password"
-                                        required
-                                    />
-                                </div>
-
-                                <div class="mb-3">
-                                    <a href="#" class="small link-primary" @click.prevent="goToForgotPassword">{{ t('auth.login.forgotPassword') }}</a>
+                                    <div v-if="fieldError" class="invalid-feedback d-block">{{ fieldError }}</div>
                                 </div>
 
                                 <button type="submit" class="btn btn-success w-100 py-2" :disabled="submitting">
-                                    {{ submitting ? t('auth.login.submitting') : t('auth.login.submit') }}
+                                    {{ submitting ? t('auth.forgotPassword.submitting') : t('auth.forgotPassword.submit') }}
                                 </button>
 
-                                <div class="form-check mt-3">
-                                    <input id="remember" v-model="remember" class="form-check-input" type="checkbox" />
-                                    <label class="form-check-label" for="remember">{{ t('auth.login.rememberMe') }}</label>
+                                <div v-if="success" class="alert alert-success mt-3 mb-0" role="alert">
+                                    {{ success }}
                                 </div>
 
                                 <div v-if="error" class="alert alert-danger mt-3 mb-0" role="alert">
                                     {{ error }}
                                 </div>
-
                             </form>
                         </div>
 
                         <div class="border-top p-3 text-center">
-                            <span class="text-muted">{{ t('auth.login.newHere') }}</span>
-                            <RouterLink to="/register" class="link-primary">{{ t('auth.login.signUp') }}</RouterLink>
+                            <RouterLink to="/login" class="link-primary">{{ t('auth.forgotPassword.backToLogin') }}</RouterLink>
                         </div>
 
                         <div class="border-top p-3 text-center text-muted small">
@@ -76,42 +61,39 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { apiPost } from '../api';
 
-const emit = defineEmits(['auth-updated']);
-const router = useRouter();
-
 const logoUrl = '/img/logo.svg';
-
-const email = ref('');
-const password = ref('');
-const remember = ref(false);
-const error = ref('');
-const submitting = ref(false);
 
 const { t } = useI18n({ useScope: 'global' });
 
-function goToForgotPassword() {
-    router.push('/forgot-password');
-}
+const email = ref('');
+const submitting = ref(false);
+const success = ref('');
+const error = ref('');
+const errors = ref({});
+
+const fieldError = computed(() => {
+    const msg = errors.value?.email;
+    if (Array.isArray(msg)) return msg[0];
+    if (typeof msg === 'string') return msg;
+    return '';
+});
 
 async function submit() {
+    success.value = '';
     error.value = '';
+    errors.value = {};
     submitting.value = true;
 
     try {
-        await apiPost('/api/login', {
-            email: email.value,
-            password: password.value,
-            remember: remember.value,
-        });
-        emit('auth-updated');
-        router.push('/dashboard');
+        const data = await apiPost('/forgot-password', { email: email.value });
+        success.value = data?.status ?? t('auth.forgotPassword.success');
     } catch (e) {
-        error.value = e?.response?.data?.message ?? t('auth.login.error');
+        errors.value = e?.response?.data?.errors ?? {};
+        error.value = e?.response?.data?.message ?? t('auth.forgotPassword.error');
     } finally {
         submitting.value = false;
     }

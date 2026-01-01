@@ -25,13 +25,13 @@ class PledgePaymentRefunded extends Notification
         $this->pledge->loadMissing(['campaign']);
 
         $baseUrl = rtrim((string) config('app.url'), '/');
-        $logoUrl = $baseUrl . '/img/logo.svg';
+        $recipientName = (string) ($notifiable->name ?? '');
         $campaignUrl = $baseUrl . '/campaigns/' . $this->pledge->campaign->slug;
 
         return (new MailMessage)
             ->subject('Reembolso processado')
             ->markdown('emails.pledges.payment-refunded', [
-                'logoUrl' => $logoUrl,
+                'recipientName' => $recipientName,
                 'campaignTitle' => $this->pledge->campaign->title,
                 'campaignUrl' => $campaignUrl,
                 'amount' => $this->pledge->formatted_amount,

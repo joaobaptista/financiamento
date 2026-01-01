@@ -240,6 +240,26 @@ const messages = {
                 email: 'Email',
                 password: 'Senha',
             },
+            forgotPassword: {
+                title: 'Redefinir senha',
+                subtitle: 'Informe seu email e enviaremos um link para redefinir sua senha.',
+                submitting: 'Enviando…',
+                submit: 'Enviar link de redefinição',
+                success: 'Se este email estiver cadastrado, enviaremos um link para redefinir sua senha.',
+                error: 'Não foi possível enviar o link de redefinição.',
+                backToLogin: 'Voltar para entrar',
+            },
+            resetPassword: {
+                title: 'Redefinir senha',
+                subtitle: 'Crie uma nova senha para sua conta.',
+                newPassword: 'Nova senha',
+                confirmPassword: 'Confirmar nova senha',
+                submitting: 'Salvando…',
+                submit: 'Salvar nova senha',
+                success: 'Senha redefinida com sucesso.',
+                error: 'Não foi possível redefinir a senha.',
+                backToLogin: 'Voltar para entrar',
+            },
             recaptcha: {
                 prefix: 'Este site é protegido pelo reCAPTCHA e a ',
                 privacy: 'Política de Privacidade',
@@ -327,6 +347,14 @@ const messages = {
             login: {
                 title: 'Entrar',
                 description: 'Acesse sua conta para apoiar campanhas e acompanhar recompensas.',
+            },
+            forgotPassword: {
+                title: 'Redefinir senha',
+                description: 'Solicite um link para redefinir sua senha.',
+            },
+            resetPassword: {
+                title: 'Redefinir senha',
+                description: 'Defina uma nova senha para sua conta.',
             },
             register: {
                 title: 'Criar conta',
@@ -702,6 +730,26 @@ const messages = {
                 email: 'Email',
                 password: 'Password',
             },
+            forgotPassword: {
+                title: 'Reset password',
+                subtitle: 'Enter your email and we’ll send you a link to reset your password.',
+                submitting: 'Sending…',
+                submit: 'Send reset link',
+                success: 'If this email is registered, we’ll send a reset link.',
+                error: 'Could not send reset link.',
+                backToLogin: 'Back to sign in',
+            },
+            resetPassword: {
+                title: 'Reset password',
+                subtitle: 'Create a new password for your account.',
+                newPassword: 'New password',
+                confirmPassword: 'Confirm new password',
+                submitting: 'Saving…',
+                submit: 'Save new password',
+                success: 'Password reset successfully.',
+                error: 'Could not reset password.',
+                backToLogin: 'Back to sign in',
+            },
             recaptcha: {
                 prefix: 'This site is protected by reCAPTCHA and the ',
                 privacy: 'Privacy Policy',
@@ -771,6 +819,14 @@ const messages = {
             login: {
                 title: 'Sign in',
                 description: 'Access your account to support campaigns and track rewards.',
+            },
+            forgotPassword: {
+                title: 'Reset password',
+                description: 'Request a link to reset your password.',
+            },
+            resetPassword: {
+                title: 'Reset password',
+                description: 'Set a new password for your account.',
             },
             register: {
                 title: 'Create account',
@@ -1142,6 +1198,26 @@ const messages = {
                 email: 'Correo',
                 password: 'Contraseña',
             },
+            forgotPassword: {
+                title: 'Restablecer contraseña',
+                subtitle: 'Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.',
+                submitting: 'Enviando…',
+                submit: 'Enviar enlace',
+                success: 'Si este email está registrado, enviaremos un enlace para restablecer tu contraseña.',
+                error: 'No se pudo enviar el enlace.',
+                backToLogin: 'Volver a iniciar sesión',
+            },
+            resetPassword: {
+                title: 'Restablecer contraseña',
+                subtitle: 'Crea una nueva contraseña para tu cuenta.',
+                newPassword: 'Nueva contraseña',
+                confirmPassword: 'Confirmar nueva contraseña',
+                submitting: 'Guardando…',
+                submit: 'Guardar nueva contraseña',
+                success: 'Contraseña restablecida con éxito.',
+                error: 'No se pudo restablecer la contraseña.',
+                backToLogin: 'Volver a iniciar sesión',
+            },
             recaptcha: {
                 prefix: 'Este sitio está protegido por reCAPTCHA y la ',
                 privacy: 'Política de Privacidad',
@@ -1211,6 +1287,14 @@ const messages = {
             login: {
                 title: 'Iniciar sesión',
                 description: 'Accede a tu cuenta para apoyar campañas y seguir recompensas.',
+            },
+            forgotPassword: {
+                title: 'Restablecer contraseña',
+                description: 'Solicita un enlace para restablecer tu contraseña.',
+            },
+            resetPassword: {
+                title: 'Restablecer contraseña',
+                description: 'Define una nueva contraseña para tu cuenta.',
             },
             register: {
                 title: 'Crear cuenta',

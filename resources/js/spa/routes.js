@@ -2,6 +2,8 @@ import HomeView from './views/HomeView.vue';
 import CampaignIndexView from './views/CampaignIndexView.vue';
 import CampaignShowView from './views/CampaignShowView.vue';
 import LoginView from './views/LoginView.vue';
+import ForgotPasswordView from './views/ForgotPasswordView.vue';
+import ResetPasswordView from './views/ResetPasswordView.vue';
 import RegisterView from './views/RegisterView.vue';
 import DashboardIndexView from './views/DashboardIndexView.vue';
 import DashboardShowView from './views/DashboardShowView.vue';
@@ -241,6 +243,27 @@ export const routes = [
         meta: {
             titleKey: 'routes.login.title',
             descriptionKey: 'routes.login.description',
+            robots: 'noindex, nofollow',
+        },
+    },
+    {
+        path: '/forgot-password',
+        name: 'password.request',
+        component: ForgotPasswordView,
+        meta: {
+            titleKey: 'routes.forgotPassword.title',
+            descriptionKey: 'routes.forgotPassword.description',
+            robots: 'noindex, nofollow',
+        },
+    },
+    {
+        path: '/reset-password/:token',
+        name: 'password.reset',
+        component: ResetPasswordView,
+        props: true,
+        meta: {
+            titleKey: 'routes.resetPassword.title',
+            descriptionKey: 'routes.resetPassword.description',
             robots: 'noindex, nofollow',
         },
     },

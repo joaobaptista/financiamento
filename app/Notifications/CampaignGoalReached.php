@@ -22,15 +22,14 @@ class CampaignGoalReached extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $baseUrl = rtrim((string) config('app.url'), '/');
-        $logoUrl = $baseUrl . '/img/logo.svg';
+        $recipientName = (string) ($notifiable->name ?? '');
 
         $campaignUrl = route('campaigns.show', ['slug' => $this->campaign->slug]);
 
         return (new MailMessage)
             ->subject('Meta atingida: ' . (string) $this->campaign->title)
             ->markdown('emails.campaigns.goal-reached', [
-                'logoUrl' => $logoUrl,
+                'recipientName' => $recipientName,
                 'campaignTitle' => (string) $this->campaign->title,
                 'campaignUrl' => $campaignUrl,
             ]);

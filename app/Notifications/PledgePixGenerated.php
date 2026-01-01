@@ -30,13 +30,13 @@ class PledgePixGenerated extends Notification
         $this->pledge->loadMissing(['campaign']);
 
         $baseUrl = rtrim((string) config('app.url'), '/');
-        $logoUrl = $baseUrl . '/img/logo.svg';
+        $recipientName = (string) ($notifiable->name ?? '');
         $campaignUrl = $baseUrl . '/campaigns/' . $this->pledge->campaign->slug;
 
         return (new MailMessage)
             ->subject('Seu Pix para apoiar uma campanha')
             ->markdown('emails.pledges.pix-generated', [
-                'logoUrl' => $logoUrl,
+                'recipientName' => $recipientName,
                 'campaignTitle' => $this->pledge->campaign->title,
                 'campaignUrl' => $campaignUrl,
                 'amount' => $this->pledge->formatted_amount,

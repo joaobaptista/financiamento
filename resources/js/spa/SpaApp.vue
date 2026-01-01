@@ -240,7 +240,12 @@ const { t, locale } = useI18n({ useScope: 'global' });
 
 const year = computed(() => new Date().getFullYear());
 
-const isAuthRoute = computed(() => route.name === 'login' || route.name === 'register');
+const isAuthRoute = computed(() =>
+    route.name === 'login' ||
+    route.name === 'register' ||
+    route.name === 'password.request' ||
+    route.name === 'password.reset'
+);
 
 const logoUrl = '/img/logo.svg';
 

@@ -1,5 +1,5 @@
 @php
-    /** @var string $logoUrl */
+    /** @var string $recipientName */
     /** @var string $campaignTitle */
     /** @var string $campaignUrl */
     /** @var string $amount */
@@ -8,9 +8,11 @@
 @endphp
 
 @component('mail::message')
-<div style="text-align: center; margin: 6px 0 24px;">
-    <img src="{{ $logoUrl }}" alt="Origo" width="140" style="display: inline-block; height: auto; max-width: 100%;" />
-</div>
+@if(!empty($recipientName))
+Olá, {{ $recipientName }}!
+@else
+Olá!
+@endif
 
 # Seu Pix foi gerado
 
@@ -31,7 +33,4 @@ Válido até: {{ $expiresAt }}
 @component('mail::button', ['url' => $campaignUrl])
 Ver campanha
 @endcomponent
-
-Abraços,
-**Equipe do Origo**
 @endcomponent
