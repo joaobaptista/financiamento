@@ -33,8 +33,6 @@ Route::middleware(['web'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/login', [AuthController::class, 'login'])->middleware(['guest', 'throttle:20,1']);
     Route::post('/register', [AuthController::class, 'register'])->middleware(['guest', 'throttle:10,1']);
-    Route::get('/oauth/google/redirect', [AuthController::class, 'redirectToGoogle'])->middleware(['guest', 'throttle:30,1']);
-    Route::get('/oauth/google/callback', [AuthController::class, 'handleGoogleCallback'])->middleware(['guest', 'throttle:30,1']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');
 
     // Public campaigns

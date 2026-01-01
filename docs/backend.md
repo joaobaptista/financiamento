@@ -30,8 +30,6 @@ Definidas em `routes/api.php` sob middleware `web`:
 - GET `/api/me`
 - POST `/api/login` (guest + throttle)
 - POST `/api/register` (guest + throttle)
-- GET `/api/oauth/google/redirect` (guest)
-- GET `/api/oauth/google/callback` (guest)
 - POST `/api/logout` (auth)
 
 **Campanhas públicas**

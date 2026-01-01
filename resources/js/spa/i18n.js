@@ -235,7 +235,6 @@ const messages = {
         },
 
         auth: {
-            googleNotConfigured: 'Login com Google não está configurado.',
             common: {
                 name: 'Nome',
                 email: 'Email',
@@ -250,7 +249,6 @@ const messages = {
             },
             login: {
                 title: 'Entrar',
-                withGoogle: 'Entrar com Google',
                 forgotPassword: 'Esqueci minha senha',
                 submitting: 'Entrando…',
                 submit: 'Entrar',
@@ -261,7 +259,6 @@ const messages = {
             },
             register: {
                 title: 'Criar conta',
-                withGoogle: 'Cadastrar com Google',
                 showPassword: 'Mostrar senha',
                 newsletterOptIn: 'Quero receber novidades por email',
                 notRobot: 'Não sou um robô',
@@ -700,7 +697,6 @@ const messages = {
         },
 
         auth: {
-            googleNotConfigured: 'Google sign-in is not configured.',
             common: {
                 name: 'Name',
                 email: 'Email',
@@ -715,7 +711,6 @@ const messages = {
             },
             login: {
                 title: 'Sign in',
-                withGoogle: 'Sign in with Google',
                 forgotPassword: 'Forgot password',
                 submitting: 'Signing in…',
                 submit: 'Sign in',
@@ -726,7 +721,6 @@ const messages = {
             },
             register: {
                 title: 'Create account',
-                withGoogle: 'Sign up with Google',
                 showPassword: 'Show password',
                 newsletterOptIn: 'Send me updates by email',
                 notRobot: 'I\'m not a robot',
@@ -1143,7 +1137,6 @@ const messages = {
         },
 
         auth: {
-            googleNotConfigured: 'El inicio de sesión con Google no está configurado.',
             common: {
                 name: 'Nombre',
                 email: 'Correo',
@@ -1158,7 +1151,6 @@ const messages = {
             },
             login: {
                 title: 'Iniciar sesión',
-                withGoogle: 'Iniciar con Google',
                 forgotPassword: 'Olvidé mi contraseña',
                 submitting: 'Ingresando…',
                 submit: 'Entrar',
@@ -1169,7 +1161,6 @@ const messages = {
             },
             register: {
                 title: 'Crear cuenta',
-                withGoogle: 'Registrarse con Google',
                 showPassword: 'Mostrar contraseña',
                 newsletterOptIn: 'Quiero recibir novedades por correo',
                 notRobot: 'No soy un robot',

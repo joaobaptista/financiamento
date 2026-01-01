@@ -58,11 +58,6 @@ use OpenApi\Annotations as OA;
  * )
 
  * @OA\Tag(
- *   name="OAuth",
- *   description="Login social (Google)"
- * )
- *
- * @OA\Tag(
  *   name="Webhooks",
  *   description="Webhooks de provedores de pagamento"
  * )

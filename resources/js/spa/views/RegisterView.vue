@@ -15,17 +15,6 @@
                 <div class="col-12 col-sm-10 col-md-8 col-lg-6">
                     <div class="card shadow-sm">
                         <div class="card-body p-4">
-                            <button type="button" class="btn btn-outline-secondary w-100 py-2" @click="onGoogleSignIn">
-                                <span class="me-2" aria-hidden="true">G</span>
-                                {{ t('auth.register.withGoogle') }}
-                            </button>
-
-                            <div class="d-flex align-items-center my-4">
-                                <hr class="flex-grow-1" />
-                                <span class="mx-3 text-muted small">{{ t('common.or') }}</span>
-                                <hr class="flex-grow-1" />
-                            </div>
-
                             <form @submit.prevent="submit">
                                 <div class="mb-3">
                                     <label class="form-label">{{ t('auth.common.name') }}</label>
@@ -101,14 +90,13 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { apiPost } from '../api';
 
 const emit = defineEmits(['auth-updated']);
 const router = useRouter();
-const route = useRoute();
 
 const logoUrl = '/img/logo.svg';
 
@@ -122,16 +110,6 @@ const error = ref('');
 const submitting = ref(false);
 
 const { t } = useI18n({ useScope: 'global' });
-
-onMounted(() => {
-    if (route.query?.oauth === 'google_not_configured') {
-        error.value = t('auth.googleNotConfigured');
-    }
-});
-
-async function onGoogleSignIn() {
-    window.location.href = '/api/oauth/google/redirect';
-}
 
 async function submit() {
     error.value = '';
