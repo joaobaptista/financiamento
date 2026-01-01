@@ -139,11 +139,6 @@
                                 <RouterLink class="link-light text-decoration-none" to="/how-it-works">{{ t('footer.howItWorks') }}</RouterLink>
                             </li>
                             <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/blog">{{ t('footer.blog') }}</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/team">{{ t('footer.team') }}</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/press">{{ t('footer.press') }}</RouterLink></li>
-                            <li class="mb-2">
-                                <RouterLink class="link-light text-decoration-none" to="/retrospectiva-2020">{{ t('footer.retro2020') }}</RouterLink>
-                            </li>
                         </ul>
 
                         <div class="mt-4">
@@ -162,11 +157,6 @@
                                 <li class="mb-2">
                                     <a class="link-light text-decoration-none" href="https://instagram.com" target="_blank" rel="noopener">
                                         <i class="bi bi-instagram me-2"></i>Instagram
-                                    </a>
-                                </li>
-                                <li class="mb-2">
-                                    <a class="link-light text-decoration-none" href="https://github.com" target="_blank" rel="noopener">
-                                        <i class="bi bi-github me-2"></i>Github
                                     </a>
                                 </li>
                             </ul>
@@ -192,25 +182,6 @@
                             <li class="mb-2">
                                 <RouterLink class="link-light text-decoration-none" to="/me/creator/setup">{{ t('footer.startProject') }}</RouterLink>
                             </li>
-                            <li class="mb-2">
-                                <RouterLink class="link-light text-decoration-none" :to="{ path: '/campaigns', query: { category: 'musica' } }">
-                                    {{ t('footer.musicOnOrigo') }}
-                                </RouterLink>
-                            </li>
-                            <li class="mb-2">
-                                <RouterLink
-                                    class="link-light text-decoration-none"
-                                    :to="{ path: '/campaigns', query: { category: 'publicacao' } }"
-                                >
-                                    {{ t('footer.indiePublishing') }}
-                                </RouterLink>
-                            </li>
-                            <li class="mb-2">
-                                <RouterLink class="link-light text-decoration-none" :to="{ path: '/campaigns', query: { category: 'jornalismo' } }">
-                                    {{ t('footer.journalism') }}
-                                </RouterLink>
-                            </li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/assinaturas">{{ t('footer.subscriptions') }}</RouterLink></li>
                         </ul>
 
                         <div class="mt-4">
