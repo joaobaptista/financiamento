@@ -38,11 +38,20 @@ class PledgeController extends Controller
 
             $pledge = $createPledge->execute($data);
 
-            // Processar pagamento (mock)
+            // Processar pagamento
             $paymentResult = $paymentService->processPayment($amount, $paymentMethod, [
                 'campaign_id' => (int) $validated['campaign_id'],
                 'user_id' => auth()->id(),
                 'pledge_id' => $pledge->id,
+                'payer_email' => (string) (auth()->user()?->email ?? ''),
+                'description' => 'Apoio campanha #' . (int) $validated['campaign_id'],
+                'idempotency_key' => 'pledge_' . $pledge->id,
+                'card_token' => $validated['card_token'] ?? null,
+                'installments' => $validated['installments'] ?? null,
+                'payment_method_id' => $validated['payment_method_id'] ?? null,
+                'issuer_id' => $validated['issuer_id'] ?? null,
+                'payer_identification_type' => $validated['payer_identification_type'] ?? null,
+                'payer_identification_number' => $validated['payer_identification_number'] ?? null,
             ]);
 
             if ($paymentResult->success) {
@@ -71,11 +80,14 @@ class PledgeController extends Controller
                     'pledge_id' => $pledge->id,
                 ], 201);
             } else {
+                $pledge->markAsCanceled();
                 return redirect()->back()
+                    ->withInput()
                     ->with('error', 'Erro ao processar pagamento. Tente novamente.');
             }
         } catch (\Exception $e) {
             return redirect()->back()
+                ->withInput()
                 ->with('error', $e->getMessage());
         }
     }
