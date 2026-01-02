@@ -79,10 +79,10 @@ class PledgeController
                 $pledge->markAsCanceled();
 
                 $response = [
-                    'message' => 'Erro ao processar pagamento. Tente novamente.',
+                    'message' => $paymentResult->message ?? 'Erro desconhecido no processamento do pagamento.',
                 ];
 
-                if ((bool) config('app.debug') && is_array($paymentResult->raw)) {
+                if (is_array($paymentResult->raw)) {
                     $response['provider'] = $paymentResult->raw;
                 }
 

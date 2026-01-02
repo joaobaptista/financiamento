@@ -391,6 +391,36 @@
                                             </div>
                                         </div>
 
+                                        <!-- Campos de identificação para Pix -->
+                                        <div v-if="paymentMethod === 'pix' && !pixNextAction?.copy_paste" class="alert alert-light border mb-3" role="alert">
+                                            <div class="small mb-2">{{ t('campaignShow.pixIdentificationInfo') || 'Informe seu CPF ou CNPJ para gerar o Pix' }}</div>
+                                            <div class="row g-2">
+                                                <div class="col-12">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.pixIdentificationTypeLabel') || 'Tipo de Documento' }}</label>
+                                                    <select
+                                                        v-model="pixIdentificationType"
+                                                        class="form-select"
+                                                        :disabled="submitting || !isCampaignOpen"
+                                                    >
+                                                        <option value="CPF">CPF</option>
+                                                        <option value="CNPJ">CNPJ</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label mb-1">{{ t('campaignShow.pixIdentificationNumberLabel') || 'Número do Documento' }}</label>
+                                                    <input
+                                                        v-model="pixIdentificationNumber"
+                                                        type="text"
+                                                        class="form-control"
+                                                        inputmode="numeric"
+                                                        autocomplete="off"
+                                                        :placeholder="pixIdentificationType === 'CPF' ? '000.000.000-00' : '00.000.000/0000-00'"
+                                                        :disabled="submitting || !isCampaignOpen"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div v-if="pixNextAction?.copy_paste" class="alert alert-info mb-3" role="alert">
                                             <div class="small">
                                                 {{ pixNextAction.confirmable === false ? t('campaignShow.pixWaitingConfirmation') : t('campaignShow.pixInstructions') }}
@@ -589,6 +619,10 @@ const cardExpiry = ref('');
 const cardCvv = ref('');
 const showCardCvv = ref(false);
 const cardInstallments = ref(1);
+
+// Campos para identificação no Pix
+const pixIdentificationType = ref('CPF');
+const pixIdentificationNumber = ref('');
 
 let mercadoPagoInstance = null;
 let mercadoPagoSdkPromise = null;
@@ -1001,6 +1035,21 @@ async function submit() {
                 submitting.value = false;
                 return;
             }
+        } else if (paymentMethod.value === 'pix') {
+            // Validar e enviar identificação para Pix
+            const pixDocNumber = onlyDigits(pixIdentificationNumber.value);
+            const expectedLength = pixIdentificationType.value === 'CPF' ? 11 : 14;
+            
+            if (pixDocNumber.length !== expectedLength) {
+                message.value = pixIdentificationType.value === 'CPF' 
+                    ? 'CPF inválido. Deve conter 11 dígitos.' 
+                    : 'CNPJ inválido. Deve conter 14 dígitos.';
+                submitting.value = false;
+                return;
+            }
+            
+            payerIdentificationType = pixIdentificationType.value;
+            payerIdentificationNumber = pixDocNumber;
         }
 
         const result = await apiPost('/api/pledges', {
@@ -1157,6 +1206,10 @@ watch(
             pixNextAction.value = null;
             pixQrCodeDataUrl.value = '';
             lastPledgeId.value = null;
+        } else {
+            // Limpar campos de Pix ao selecionar
+            pixIdentificationType.value = 'CPF';
+            pixIdentificationNumber.value = '';
         }
     }
 );

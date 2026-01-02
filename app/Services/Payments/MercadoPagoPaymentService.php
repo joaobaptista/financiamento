@@ -56,7 +56,29 @@ class MercadoPagoPaymentService implements PaymentService
                 ->post('/v1/payments', $payload);
 
             if (!$response->successful()) {
-                return new PaymentResultData(success: false, paymentId: null, amount: $amount, status: PledgeStatus::Canceled->value, paymentMethod: $paymentMethod, raw: $response->json());
+                $errorData = $response->json();
+                Log::error('Mercado Pago Payment Error', [
+                    'status' => $response->status(),
+                    'body' => $errorData,
+                    'payload' => $payload
+                ]);
+                $errorMessage = $errorData['message'] ?? 'Erro ao processar pagamento no Mercado Pago.';
+                
+                // Se houver erros específicos de validação (causa)
+                if (isset($errorData['cause']) && is_array($errorData['cause'])) {
+                    $causes = array_map(fn($c) => $c['description'] ?? '', $errorData['cause']);
+                    $errorMessage .= ' Detalhes: ' . implode(', ', array_filter($causes));
+                }
+
+                return new PaymentResultData(
+                    success: false, 
+                    paymentId: null, 
+                    amount: $amount, 
+                    status: PledgeStatus::Canceled->value, 
+                    paymentMethod: $paymentMethod, 
+                    message: $errorMessage,
+                    raw: $errorData
+                );
             }
 
             $body = $response->json();
@@ -158,5 +180,53 @@ class MercadoPagoPaymentService implements PaymentService
             $email = config('mercadopago.test_payer_email', 'test_user_123@testuser.com');
         }
         return $email;
+    }
+
+    public function refundPayment(string $paymentId): PaymentResultData
+    {
+        if (!is_string($this->accessToken) || $this->accessToken === '') {
+            return new PaymentResultData(
+                success: false,
+                paymentId: $paymentId,
+                amount: 0,
+                status: PledgeStatus::Paid->value,
+                message: 'Mercado Pago não configurado.',
+            );
+        }
+
+        try {
+            $response = Http::baseUrl($this->baseUrl)
+                ->withToken($this->accessToken)
+                ->post("/v1/payments/{$paymentId}/refunds");
+
+            if (!$response->successful()) {
+                return new PaymentResultData(
+                    success: false,
+                    paymentId: $paymentId,
+                    amount: 0,
+                    status: PledgeStatus::Paid->value,
+                    message: 'Falha ao processar reembolso no Mercado Pago.',
+                    raw: $response->json()
+                );
+            }
+
+            $body = $response->json();
+            
+            return new PaymentResultData(
+                success: true,
+                paymentId: $paymentId,
+                amount: 0, // O valor exato pode ser extraído do body se necessário
+                status: PledgeStatus::Refunded->value,
+                raw: $body
+            );
+        } catch (\Throwable $e) {
+            return new PaymentResultData(
+                success: false,
+                paymentId: $paymentId,
+                amount: 0,
+                status: PledgeStatus::Paid->value,
+                message: $e->getMessage()
+            );
+        }
     }
 }

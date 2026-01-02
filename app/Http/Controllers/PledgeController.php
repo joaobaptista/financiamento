@@ -81,9 +81,18 @@ class PledgeController extends Controller
                 ], 201);
             } else {
                 $pledge->markAsCanceled();
+                $errorMessage = $paymentResult->message ?? 'Erro desconhecido no processamento do pagamento.';
+                
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'message' => $errorMessage,
+                        'raw' => $paymentResult->raw
+                    ], 422);
+                }
+
                 return redirect()->back()
                     ->withInput()
-                    ->with('error', 'Erro ao processar pagamento. Tente novamente.');
+                    ->with('error', $errorMessage);
             }
         } catch (\Exception $e) {
             return redirect()->back()
