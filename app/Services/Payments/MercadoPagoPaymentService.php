@@ -35,13 +35,12 @@ class MercadoPagoPaymentService implements PaymentService
 
         $transactionAmount = round($amount / 100, 2);
         $payerEmail = $this->resolvePayerEmail($metadata);
-        $currencyId = (string) config('mercadopago.currency', 'BRL');
         $externalReference = isset($metadata['pledge_id']) ? 'pledge_' . $metadata['pledge_id'] : null;
         $idempotencyKey = (string) ($metadata['idempotency_key'] ?? Str::uuid()->toString());
 
         $payload = match ($paymentMethod) {
-            'pix' => $this->buildPixPayload($transactionAmount, (string)($metadata['description'] ?? 'Apoio'), $payerEmail, $externalReference, $currencyId, $metadata),
-            'card' => $this->buildCardPayload($transactionAmount, (string)($metadata['description'] ?? 'Apoio'), $payerEmail, $externalReference, $metadata, $currencyId),
+            'pix' => $this->buildPixPayload($transactionAmount, (string)($metadata['description'] ?? 'Apoio'), $payerEmail, $externalReference, $metadata),
+            'card' => $this->buildCardPayload($transactionAmount, (string)($metadata['description'] ?? 'Apoio'), $payerEmail, $externalReference, $metadata),
             default => null,
         };
 
@@ -111,11 +110,10 @@ class MercadoPagoPaymentService implements PaymentService
         }
     }
 
-    private function buildPixPayload($transactionAmount, $description, $payerEmail, $externalReference, $currencyId, $metadata): array
+    private function buildPixPayload($transactionAmount, $description, $payerEmail, $externalReference, $metadata): array
     {
         $payload = [
             'transaction_amount' => $transactionAmount,
-            'currency_id' => $currencyId,
             'description' => $description,
             'payment_method_id' => 'pix',
             'payer' => ['email' => $payerEmail],
@@ -133,14 +131,13 @@ class MercadoPagoPaymentService implements PaymentService
         return $payload;
     }
 
-    private function buildCardPayload($transactionAmount, $description, $payerEmail, $externalReference, $metadata, $currencyId): array
+    private function buildCardPayload($transactionAmount, $description, $payerEmail, $externalReference, $metadata): array
     {
         $token = (string)($metadata['card_token'] ?? '');
         if ($token === '') return [];
 
         $payload = [
             'transaction_amount' => $transactionAmount,
-            'currency_id' => $currencyId,
             'description' => $description,
             'token' => $token,
             'installments' => max(1, min(12, (int)($metadata['installments'] ?? 1))),
