@@ -22,8 +22,7 @@ class CreateCampaign
         ]);
 
         foreach ($data->rewards as $rewardData) {
-            Reward::create([
-                'campaign_id' => $campaign->id,
+            $campaign->rewards()->create([
                 'title' => $rewardData->title,
                 'description' => $rewardData->description,
                 'min_amount' => $rewardData->minAmount,

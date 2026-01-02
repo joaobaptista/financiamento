@@ -30,6 +30,7 @@ class CampaignResource extends JsonResource
             'ends_at' => $this->ends_at?->toISOString(),
             'status' => $status instanceof \BackedEnum ? $status->value : $status,
             'cover_image_path' => $this->cover_image_path,
+            'rewards' => RewardResource::collection($this->whenLoaded('rewards')),
             'created_at' => $this->created_at?->toISOString(),
         ];
     }

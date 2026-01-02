@@ -220,11 +220,13 @@ async function submit() {
             fd.append('cover_image', coverFile.value);
 
             (form.value.rewards || []).forEach((r, idx) => {
-                fd.append(`rewards[${idx}][title]`, r.title || '');
-                fd.append(`rewards[${idx}][description]`, r.description || '');
-                fd.append(`rewards[${idx}][min_amount]`, String(r.min_amount || '0'));
-                if (r.quantity !== '' && r.quantity !== null && r.quantity !== undefined) {
-                    fd.append(`rewards[${idx}][quantity]`, String(r.quantity));
+                if (r.title) {
+                    fd.append(`rewards[${idx}][title]`, r.title);
+                    fd.append(`rewards[${idx}][description]`, r.description || '');
+                    fd.append(`rewards[${idx}][min_amount]`, String(r.min_amount || '0'));
+                    if (r.quantity !== '' && r.quantity !== null && r.quantity !== undefined) {
+                        fd.append(`rewards[${idx}][quantity]`, String(r.quantity));
+                    }
                 }
             });
 
@@ -232,12 +234,14 @@ async function submit() {
         } else {
             const payload = {
                 ...form.value,
-                rewards: form.value.rewards.map(r => ({
-                    title: r.title,
-                    description: r.description,
-                    min_amount: r.min_amount,
-                    quantity: r.quantity === '' ? null : Number(r.quantity),
-                })),
+                rewards: form.value.rewards
+                    .filter(r => r.title)
+                    .map(r => ({
+                        title: r.title,
+                        description: r.description,
+                        min_amount: r.min_amount,
+                        quantity: r.quantity === '' ? null : Number(r.quantity),
+                    })),
             };
 
             await apiPut(`/api/me/campaigns/${props.id}`, payload);
