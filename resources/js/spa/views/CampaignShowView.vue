@@ -34,9 +34,7 @@
                                 <RouterLink to="/login" class="btn btn-sm btn-outline-primary">{{ t('campaignShow.loginToFollow') }}</RouterLink>
                             </template>
                         </template>
-
-                        <span class="mx-2">•</span>
-                        <span v-if="isCampaignOpen">{{ t('common.daysRemaining', { days: daysRemaining }) }}</span>
+                        <span v-if="isCampaignOpen">- {{ t('common.daysRemaining', { days: daysRemaining }) }}</span>
                         <span v-else>{{ t('campaignShow.finished') }}</span>
                     </div>
                 </div>
