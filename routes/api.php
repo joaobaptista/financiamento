@@ -12,7 +12,6 @@ use App\Http\Controllers\Api\PublicCampaignController;
 use App\Http\Controllers\Api\PledgeController;
 use App\Http\Controllers\Api\SupporterProfileController;
 use App\Http\Controllers\Api\CepController;
-use App\Http\Controllers\Webhooks\MercadoPagoWebhookController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,7 +25,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Webhooks must NOT use the `web` middleware (no CSRF/session cookies).
-Route::post('/webhooks/mercadopago', MercadoPagoWebhookController::class)->middleware(['throttle:60,1']);
 
 Route::middleware(['web'])->group(function () {
     // Auth (session-based)

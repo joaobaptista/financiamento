@@ -37,3 +37,5 @@ Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 // Fallback for Vue Router
 Route::view('/{any}', 'spa')->where('any', '.*');
 
+//Edu
+Route::post('/webhooks/mercadopago', \App\Http\Controllers\Webhooks\MercadoPagoWebhookController::class)->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
