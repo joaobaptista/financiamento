@@ -16,9 +16,6 @@ class MercadoPagoWebhookController
 {
     public function __invoke(Request $request, ConfirmPayment $confirmPayment)
     {
-        // MP payloads vary by topic. Common patterns include:
-        // - {"type":"payment","data":{"id":"123"}}
-        // - {"action":"payment.updated","data":{"id":"123"}}
         $payload = $request->all();
 
         $paymentId = $payload['data']['id'] ?? ($payload['id'] ?? ($payload['data_id'] ?? null));
@@ -33,23 +30,52 @@ class MercadoPagoWebhookController
 
         $paymentId = trim($paymentId);
 
-        // If we can't query MP (no token), just ack and keep payload for later debugging.
         $accessToken = config('mercadopago.access_token');
-        $baseUrl = (string) config('mercadopago.base_url', 'https://api.mercadopago.com');
+        $baseUrl = (string) config('mercadopago.base_url', 'https://api.mercadopago.com' );
         if (!is_string($accessToken) || $accessToken === '') {
             Log::warning('mercadopago.webhook.no_token', ['payment_id' => $paymentId, 'payload' => $payload]);
             return response()->json(['ok' => true]);
         }
 
-        // Find our pledge by provider payment id.
+        // Tenta encontrar o apoio pelo ID do pagamento
         /** @var Pledge|null $pledge */
         $pledge = Pledge::query()->where('provider', 'mercadopago')->where('provider_payment_id', $paymentId)->first();
+
+        // Se não encontrar pelo ID, busca os detalhes na API do Mercado Pago para usar a external_reference
         if (!$pledge) {
-            Log::info('mercadopago.webhook.unknown_payment', ['payment_id' => $paymentId]);
+            try {
+                $response = Http::baseUrl($baseUrl)
+                    ->withToken($accessToken)
+                    ->acceptJson()
+                    ->get("/v1/payments/{$paymentId}");
+
+                if ($response->successful()) {
+                    $body = (array) $response->json();
+                    $externalReference = (string) ($body['external_reference'] ?? '');
+                    
+                    if (str_starts_with($externalReference, 'pledge_')) {
+                        $pledgeId = (int) str_replace('pledge_', '', $externalReference);
+                        $pledge = Pledge::query()->find($pledgeId);
+                        
+                        // Se encontrou, vincula o ID do pagamento para processar a confirmação
+                        if ($pledge && empty($pledge->provider_payment_id)) {
+                            $pledge->provider_payment_id = $paymentId;
+                            $pledge->save();
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::error('mercadopago.webhook.fetch_error_during_lookup', ['payment_id' => $paymentId, 'error' => $e->getMessage()]);
+            }
+        }
+
+        if (!$pledge) {
+            Log::info('mercadopago.webhook.unknown_payment', ['payment_id' => $paymentId, 'payload' => $payload]);
             return response()->json(['ok' => true]);
         }
 
         try {
+            // Re-consulta para garantir o status mais atualizado
             $response = Http::baseUrl($baseUrl)
                 ->withToken($accessToken)
                 ->acceptJson()
@@ -67,12 +93,12 @@ class MercadoPagoWebhookController
             $body = (array) $response->json();
             $mpStatus = (string) ($body['status'] ?? '');
 
-            // Store latest provider payload for auditing.
             $pledge->provider_payload = $body;
             $pledge->save();
 
             if ($mpStatus === 'approved') {
                 $wasPaid = $pledge->status === PledgeStatus::Paid;
+                // Esta Action atualiza o saldo da campanha automaticamente
                 $confirmPayment->execute($pledge, $paymentId);
 
                 $pledge->refresh();
@@ -108,19 +134,12 @@ class MercadoPagoWebhookController
                 return response()->json(['ok' => true]);
             }
 
-            // pending / in_process etc -> keep pending
-            if ($pledge->status === PledgeStatus::Paid) {
-                return response()->json(['ok' => true]);
-            }
-
             return response()->json(['ok' => true]);
         } catch (\Throwable $e) {
             Log::error('mercadopago.webhook.exception', [
                 'payment_id' => $paymentId,
                 'error' => $e->getMessage(),
             ]);
-
-            // Always ACK to avoid repeated deliveries during development.
             return response()->json(['ok' => true]);
         }
     }

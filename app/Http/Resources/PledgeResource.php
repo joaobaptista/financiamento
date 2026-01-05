@@ -21,12 +21,12 @@ class PledgeResource extends JsonResource
             'amount' => (int) ($this->amount ?? 0),
             'status' => (string) ($this->status instanceof \BackedEnum ? $this->status->value : $this->status),
             'paid_at' => $this->paid_at?->toISOString(),
-            'user' => $this->relationLoaded('user') && $this->user ? [
+            'user' => $this->user ? [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
                 'email' => $this->user->email,
             ] : null,
-            'reward' => $this->relationLoaded('reward') && $this->reward ? [
+            'reward' => $this->reward ? [
                 'id' => $this->reward->id,
                 'title' => $this->reward->title,
             ] : null,

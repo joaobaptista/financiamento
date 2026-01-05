@@ -12,7 +12,9 @@ class ListUserCampaigns
     {
         return Campaign::query()
             ->where('user_id', $userId)
-            ->withCount('pledges')
+            ->withCount(['pledges' => function ($query) {
+                $query->where('status', \App\Enums\PledgeStatus::Paid);
+            }])
             ->orderBy('created_at', 'desc')
             ->get();
     }

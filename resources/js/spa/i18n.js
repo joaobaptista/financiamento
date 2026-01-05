@@ -230,6 +230,7 @@ const messages = {
             backersList: 'Lista de apoiadores',
             table: {
                 backer: 'Apoiador',
+                anonymous: 'Apoiador',
                 amount: 'Valor',
                 date: 'Data',
                 reward: 'Recompensa',

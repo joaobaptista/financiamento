@@ -111,10 +111,10 @@
                             </thead>
                             <tbody>
                                 <tr v-for="p in pledgesList" :key="p.id">
-                                    <td>{{ p.user?.name ?? '-' }}</td>
+                                    <td>{{ p.user?.name || t('dashboard.table.anonymous') || 'Apoiador' }}</td>
                                     <td><strong class="text-success">{{ formatMoney(p.amount) }}</strong></td>
                                     <td>{{ formatDateTime(p.paid_at) }}</td>
-                                    <td>{{ p.reward?.title ?? '-' }}</td>
+                                    <td>{{ p.reward?.title || t('campaignShow.freeSupport.label') || 'Apoio livre' }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -217,8 +217,6 @@ async function destroyCampaign() {
         message.value = e?.response?.data?.message ?? t('dashboard.deleteError');
     }
 }
-
-// Funções de download via token removidas em favor de rotas web diretas que usam a sessão do navegador
 
 onMounted(load);
 watch(() => props.id, load);
