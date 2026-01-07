@@ -5,6 +5,7 @@ namespace App\Actions\Campaign;
 use App\Data\Campaign\CreateCampaignData;
 use App\Domain\Campaign\Campaign;
 use App\Domain\Campaign\Reward;
+use App\Domain\Campaign\Frete;
 
 class CreateCampaign
 {
@@ -22,13 +23,23 @@ class CreateCampaign
         ]);
 
         foreach ($data->rewards as $rewardData) {
-            $campaign->rewards()->create([
+            $reward = $campaign->rewards()->create([
                 'title' => $rewardData->title,
                 'description' => $rewardData->description,
                 'min_amount' => $rewardData->minAmount,
                 'quantity' => $rewardData->quantity,
                 'remaining' => $rewardData->quantity,
             ]);
+
+            // Salvar fretes se existirem
+            if ($rewardData->fretes && is_array($rewardData->fretes)) {
+                foreach ($rewardData->fretes as $regiao => $valor) {
+                    $reward->fretes()->create([
+                        'regiao' => $regiao,
+                        'valor' => $valor,
+                    ]);
+                }
+            }
         }
 
         return $campaign;

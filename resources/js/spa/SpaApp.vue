@@ -131,71 +131,78 @@
         <footer v-if="!isAuthRoute" class="bg-dark text-light pt-5 pb-4 mt-5">
             <div class="container">
                 <div class="row g-4">
-                    <div class="col-6 col-md-3">
-                        <h6 class="fw-semibold origo-footer-heading">{{ t('footer.welcome') }}</h6>
-                        <ul class="list-unstyled mt-3 mb-0">
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/blog">{{ t('footer.blog') }}</RouterLink></li>
-                        </ul>
+    <!-- Coluna 1: Bem-vindo -->
+    <div class="col-6 col-md-2">
+        <h6 class="fw-semibold origo-footer-heading">{{ t('footer.welcome') }}</h6>
+        <ul class="list-unstyled mt-3 mb-0">
+            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/blog">{{ t('footer.blog') }}</RouterLink></li>
+        </ul>
+    </div>
 
-                        <div class="mt-4">
-                            <h6 class="fw-semibold origo-footer-heading">{{ t('footer.socialTitle') }}</h6>
-                            <ul class="list-unstyled mt-3 mb-0">
-                                <li class="mb-2">
-                                    <a class="link-light text-decoration-none" href="https://facebook.com" target="_blank" rel="noopener">
-                                        <i class="bi bi-facebook me-2"></i>Facebook
-                                    </a>
-                                </li>
-                                <li class="mb-2">
-                                    <a class="link-light text-decoration-none" href="https://twitter.com" target="_blank" rel="noopener">
-                                        <i class="bi bi-twitter-x me-2"></i>Twitter
-                                    </a>
-                                </li>
-                                <li class="mb-2">
-                                    <a class="link-light text-decoration-none" href="https://instagram.com" target="_blank" rel="noopener">
-                                        <i class="bi bi-instagram me-2"></i>Instagram
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+    <!-- Coluna 2: Ajuda -->
+    <div class="col-6 col-md-2">
+        <h6 class="fw-semibold origo-footer-heading">{{ t('footer.help') }}</h6>
+        <ul class="list-unstyled mt-3 mb-0">
+            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/terms">{{ t('footer.terms') }}</RouterLink></li>
+            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/privacy">{{ t('footer.privacy') }}</RouterLink></li>
+        </ul>
+    </div>
 
-                    <div class="col-6 col-md-3">
-                        <h6 class="fw-semibold origo-footer-heading">{{ t('footer.help') }}</h6>
-                        <ul class="list-unstyled mt-3 mb-0">
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/terms">{{ t('footer.terms') }}</RouterLink></li>
-                            <li class="mb-2"><RouterLink class="link-light text-decoration-none" to="/privacy">{{ t('footer.privacy') }}</RouterLink></li>
-                        </ul>
-                    </div>
+    <!-- Coluna 3: Faça uma campanha -->
+    <div class="col-6 col-md-2">
+        <h6 class="fw-semibold origo-footer-heading">{{ t('footer.makeCampaign') }}</h6>
+        <ul class="list-unstyled mt-3 mb-0">
+            <li class="mb-2">
+                <RouterLink class="link-light text-decoration-none" to="/me/creator/setup">{{ t('footer.startProject') }}</RouterLink>
+            </li>
+        </ul>
+    </div>
 
-                    <div class="col-6 col-md-3">
-                        <h6 class="fw-semibold origo-footer-heading">{{ t('footer.makeCampaign') }}</h6>
-                        <ul class="list-unstyled mt-3 mb-0">
-                            <li class="mb-2">
-                                <RouterLink class="link-light text-decoration-none" to="/me/creator/setup">{{ t('footer.startProject') }}</RouterLink>
-                            </li>
-                        </ul>
-                    </div>
+    <!-- Coluna 4: Redes Sociais -->
+    <div class="col-6 col-md-3">
+        <h6 class="fw-semibold origo-footer-heading">{{ t('footer.socialTitle') }}</h6>
+        <ul class="list-unstyled mt-3 mb-0">
+            <li class="mb-2">
+                <a class="link-light text-decoration-none" href="https://facebook.com" target="_blank" rel="noopener">
+                    <i class="bi bi-facebook me-2"></i>Facebook
+                </a>
+            </li>
+            <li class="mb-2">
+                <a class="link-light text-decoration-none" href="https://twitter.com" target="_blank" rel="noopener">
+                    <i class="bi bi-twitter-x me-2"></i>Twitter
+                </a>
+            </li>
+            <li class="mb-2">
+                <a class="link-light text-decoration-none" href="https://instagram.com" target="_blank" rel="noopener">
+                    <i class="bi bi-instagram me-2"></i>Instagram
+                </a>
+            </li>
+        </ul>
+    </div>
 
-                    <div class="col-12 col-md-3">
-                        <h6 class="fw-semibold">{{ t('footer.subscribeTitle') }}</h6>
-                        <form class="mt-3" @submit.prevent="subscribeNewsletter">
-                            <div class="input-group">
-                                <input
-                                    v-model="newsletterEmail"
-                                    type="email"
-                                    class="form-control"
-                                    :placeholder="t('footer.emailPlaceholder')"
-                                    :aria-label="t('footer.emailPlaceholder')"
-                                    autocomplete="email"
-                                />
-                                <button class="btn btn-primary" type="submit" :aria-label="t('footer.subscribeAria')">
-                                    <i class="bi bi-arrow-right"></i>
-                                </button>
-                            </div>
-                            <div class="form-text text-secondary mt-2">{{ t('footer.cancelAnytime') }}</div>
-                        </form>
-                    </div>
-                </div>
+    <!-- Coluna 5: Assine nossa news -->
+    <div class="col-12 col-md-3">
+        <h6 class="fw-semibold">{{ t('footer.subscribeTitle') }}</h6>
+        <form class="mt-3" @submit.prevent="subscribeNewsletter">
+            <div class="input-group">
+                <input
+                    v-model="newsletterEmail"
+                    type="email"
+                    class="form-control"
+                    :placeholder="t('footer.emailPlaceholder')"
+                    :aria-label="t('footer.emailPlaceholder')"
+                    autocomplete="email"
+                />
+                <button class="btn btn-primary" type="submit" :aria-label="t('footer.subscribeAria')">
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+            <div class="form-text text-secondary mt-2">{{ t('footer.cancelAnytime') }}</div>
+        </form>
+    </div>
+</div>
+                    
+    
 
                 <div class="border-top border-secondary mt-4 pt-4 d-flex flex-column flex-md-row justify-content-between gap-2">
                     <div class="text-secondary small">&copy; {{ year }} Origo. {{ t('footer.rights') }}</div>

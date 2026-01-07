@@ -92,24 +92,6 @@
                                 </div>
 
                                 <div class="mt-3">
-                                    <div class="card border mb-3">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-start gap-3">
-                                                <div>
-                                                    <div class="text-uppercase text-muted small">{{ t('campaignShow.freeSupport.label') }}</div>
-                                                    <div class="fw-semibold">{{ t('campaignShow.freeSupport.title') }}</div>
-                                                    <div class="text-muted small">{{ t('campaignShow.freeSupport.subtitle') }}</div>
-                                                </div>
-                                                <button
-                                                    type="button"
-                                                    class="btn btn-outline-primary"
-                                                    @click="selectNoReward()"
-                                                >
-                                                    {{ t('common.select') }}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
 
                                     <div v-for="r in sortedRewards" :key="r.id" class="card border mb-3">
                                         <div class="card-body">
@@ -342,7 +324,8 @@
                                             </div>
                                         </div>
 
-                                        <div class="mb-2">
+                                       <!-- CAMPO VALOR COMENTADO - AGORA USA VALOR DA RECOMPENSA
+					<div class="mb-2">
                                             <label class="form-label">{{ t('campaignShow.amountLabel') }}</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">R$</span>
@@ -360,6 +343,25 @@
                                                 {{ t('campaignShow.minForReward', { min: formatMoney(selectedReward.min_amount) }) }}
                                             </div>
                                         </div>
+				       -->
+
+				       
+					<!-- Campo Recompensa movido para o topo -->
+					<div v-if="(campaign.rewards || []).length" class="mb-3">
+    						<label class="form-label">{{ t('campaignShow.rewardLabel') }}</label>
+    						<select v-model="rewardId" class="form-select" :disabled="submitting || !isCampaignOpen" required>
+        					<option :value="null">{{ t('campaignShow.noReward') }}</option>
+        					<option
+            						v-for="r in sortedRewards"
+            						:key="r.id"
+            						:value="r.id"
+            						:disabled="!isRewardAvailable(r)"
+        					>
+            					{{ r.title }} — {{ formatMoney(r.min_amount) }}
+            					<template v-if="!isRewardAvailable(r)"> ({{ t('campaignShow.soldOut') }})</template>
+        					</option>
+    						</select>
+					</div>
 
                                         <div class="mb-3">
                                             <label class="form-label">{{ t('campaignShow.paymentMethodLabel') }}</label>
@@ -534,7 +536,8 @@
                                             </div>
                                         </div>
 
-                                        <div v-if="(campaign.rewards || []).length" class="mb-3">
+                                        <!-- Campo Recompensa REMOVIDO - agora está no topo
+					<div v-if="(campaign.rewards || []).length" class="mb-3">
                                             <label class="form-label">{{ t('campaignShow.rewardLabel') }}</label>
                                             <select v-model="rewardId" class="form-select" :disabled="submitting || !isCampaignOpen">
                                                 <option :value="null">{{ t('campaignShow.noReward') }}</option>
@@ -549,6 +552,7 @@
                                                 </option>
                                             </select>
                                         </div>
+					-->
 
                                         <button
                                             type="submit"
@@ -1213,6 +1217,16 @@ watch(
 );
 
 onMounted(fetchCampaign);
+
+// Atualiza amount automaticamente quando seleciona recompensa
+watch(
+    () => rewardId.value,
+    (newRewardId) => {
+        if (newRewardId && selectedReward.value) {
+            amount.value = centsToAmountInput(selectedReward.value.min_amount);
+        }
+    }
+);
 watch(() => props.slug, fetchCampaign);
 </script>
 

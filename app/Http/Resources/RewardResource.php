@@ -12,6 +12,13 @@ class RewardResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $fretes = [];
+        if ($this->relationLoaded('fretes')) {
+            foreach ($this->fretes as $frete) {
+                $fretes[$frete->regiao] = (int) $frete->valor;
+            }
+        }
+
         return [
             'id' => $this->id,
             'title' => $this->title,
@@ -19,6 +26,7 @@ class RewardResource extends JsonResource
             'min_amount' => (int) $this->min_amount,
             'quantity' => $this->quantity,
             'remaining' => $this->remaining,
+            'fretes' => !empty($fretes) ? $fretes : null,
         ];
     }
 }

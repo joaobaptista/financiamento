@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Domain\Pledge\Pledge;
+use App\Domain\Campaign\Frete;
+
 
 class Reward extends Model
 {
@@ -43,7 +45,13 @@ class Reward extends Model
 
     public function pledges(): HasMany
     {
-        return $this->hasMany(Pledge::class);
+	return $this->hasMany(Pledge::class);
+    }
+
+
+    public function fretes(): HasMany
+    {
+        return $this->hasMany(Frete::class);
     }
 
     // Business Logic

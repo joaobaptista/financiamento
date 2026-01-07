@@ -84,13 +84,128 @@
                                             <input v-model="r.title" type="text" class="form-control" :placeholder="t('campaignForm.rewardTitlePlaceholder')" />
                                         </div>
                                         <div class="col-md-3 mb-2">
-                                            <input v-model="r.min_amount" type="number" class="form-control" :placeholder="t('campaignForm.rewardMinPlaceholder')" step="0.01" />
+                                            <input v-model="r.min_amount" type="text" class="form-control" :placeholder="t('campaignForm.rewardMinPlaceholder')" @input="formatMoneyInput($event, 'min_amount', r)" />
                                         </div>
                                         <div class="col-md-3 mb-2">
                                             <input v-model="r.quantity" type="number" class="form-control" :placeholder="t('campaignForm.rewardQtyPlaceholder')" />
                                         </div>
-                                        <div class="col-12">
+                                        <div class="col-12 mb-2">
                                             <textarea v-model="r.description" class="form-control" rows="2" :placeholder="t('campaignForm.rewardDescPlaceholder')"></textarea>
+                                        </div>
+                                        
+                                        <!-- Seção de Frete -->
+                                        <div class="col-12 mt-3">
+                                            <div class="form-check form-switch mb-2 d-flex align-items-center">
+                                                <input 
+                                                    v-model="r.has_shipping" 
+                                                    type="checkbox" 
+                                                    class="form-check-input" 
+                                                    role="switch"
+                                                    :id="`has_shipping_${idx}`"
+                                                />
+                                                <label class="form-check-label ms-2" :for="`has_shipping_${idx}`">
+                                                    <strong>Possui frete</strong>
+                                                </label>
+                                                <i 
+                                                    class="bi bi-question-circle-fill text-primary ms-2" 
+                                                    style="cursor: help; font-size: 1.1rem;"
+                                                    :id="`shippingTooltip_${idx}`"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    :title="'O frete é opcional para cada recompensa. Se marcado, você deve preencher o valor para todas as 5 regiões do Brasil (Norte, Nordeste, Centro-Oeste, Sudeste e Sul).'"
+                                                ></i>
+                                            </div>
+
+                                            <div v-if="r.has_shipping" class="border rounded p-3 bg-light mt-2">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h6 class="mb-0 small fw-semibold">Valores de frete por região *</h6>
+                                                    <button 
+                                                        type="button" 
+                                                        class="btn btn-sm btn-outline-secondary"
+                                                        @click="openShippingModal(r)"
+                                                    >
+                                                        Aplicar mesmo valor para todas
+                                                    </button>
+                                                </div>
+                                                
+                                                <div class="row g-2">
+                                                    <div class="col-md-6 mb-2">
+                                                        <label class="form-label small">Norte *</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text">R$</span>
+                                                            <input 
+                                                                v-model="r.shipping_costs.norte" 
+                                                                type="text" 
+                                                                class="form-control" 
+                                                                :class="{ 'is-invalid': r.has_shipping && !r.shipping_costs.norte }"
+                                                                placeholder="0,00"
+                                                                required
+                                                                @input="formatMoneyInput($event, 'norte', r.shipping_costs)"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 mb-2">
+                                                        <label class="form-label small">Nordeste *</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text">R$</span>
+                                                            <input 
+                                                                v-model="r.shipping_costs.nordeste" 
+                                                                type="text" 
+                                                                class="form-control" 
+                                                                :class="{ 'is-invalid': r.has_shipping && !r.shipping_costs.nordeste }"
+                                                                placeholder="0,00"
+                                                                required
+                                                                @input="formatMoneyInput($event, 'nordeste', r.shipping_costs)"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 mb-2">
+                                                        <label class="form-label small">Centro-Oeste *</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text">R$</span>
+                                                            <input 
+                                                                v-model="r.shipping_costs['centro-oeste']" 
+                                                                type="text" 
+                                                                class="form-control" 
+                                                                :class="{ 'is-invalid': r.has_shipping && !r.shipping_costs['centro-oeste'] }"
+                                                                placeholder="0,00"
+                                                                required
+                                                                @input="formatMoneyInput($event, 'centro-oeste', r.shipping_costs)"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 mb-2">
+                                                        <label class="form-label small">Sudeste *</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text">R$</span>
+                                                            <input 
+                                                                v-model="r.shipping_costs.sudeste" 
+                                                                type="text" 
+                                                                class="form-control" 
+                                                                :class="{ 'is-invalid': r.has_shipping && !r.shipping_costs.sudeste }"
+                                                                placeholder="0,00"
+                                                                required
+                                                                @input="formatMoneyInput($event, 'sudeste', r.shipping_costs)"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 mb-2">
+                                                        <label class="form-label small">Sul *</label>
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text">R$</span>
+                                                            <input 
+                                                                v-model="r.shipping_costs.sul" 
+                                                                type="text" 
+                                                                class="form-control" 
+                                                                :class="{ 'is-invalid': r.has_shipping && !r.shipping_costs.sul }"
+                                                                placeholder="0,00"
+                                                                required
+                                                                @input="formatMoneyInput($event, 'sul', r.shipping_costs)"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -130,11 +245,42 @@
                 </div>
             </div>
         </form>
+
+        <!-- Modal para aplicar mesmo valor de frete -->
+        <div class="modal fade" id="shippingModal" tabindex="-1" aria-labelledby="shippingModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="shippingModalLabel">Aplicar mesmo valor para todas as regiões</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label class="form-label">Digite o valor para todas as regiões:</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input 
+                                v-model="shippingModalValue" 
+                                type="text" 
+                                class="form-control" 
+                                placeholder="15,00"
+                                @input="formatMoneyInput($event, 'modal', { modal: true })"
+                                @keyup.enter="applyShippingToAll"
+                            />
+                        </div>
+                        <div class="form-text">Use vírgula para decimais (ex: 15,00)</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" @click="applyShippingToAll">Aplicar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { apiDelete, apiGet, apiPost, apiPut } from '../api';
@@ -152,6 +298,10 @@ const submitting = ref(false);
 const error = ref('');
 
 const coverFile = ref(null);
+const shippingModalValue = ref('');
+const currentRewardForShipping = ref(null);
+let shippingModalInstance = null;
+let tooltipInstances = [];
 
 const form = ref({
     title: '',
@@ -174,11 +324,122 @@ function toDateInput(iso) {
 }
 
 function centsToMoney(cents) {
-    return (Number(cents || 0) / 100).toFixed(2);
+    const value = (Number(cents || 0) / 100).toFixed(2);
+    return value.replace('.', ',');
+}
+
+function formatMoneyInput(event, field, target) {
+    let value = event.target.value;
+    
+    // Remove tudo exceto números e vírgula
+    value = value.replace(/[^\d,]/g, '');
+    
+    // Garante apenas uma vírgula
+    const parts = value.split(',');
+    if (parts.length > 2) {
+        value = parts[0] + ',' + parts.slice(1).join('');
+    }
+    
+    // Limita a 2 casas decimais após vírgula
+    if (parts.length === 2 && parts[1].length > 2) {
+        value = parts[0] + ',' + parts[1].slice(0, 2);
+    }
+    
+    if (target.modal) {
+        shippingModalValue.value = value;
+    } else if (field === 'min_amount') {
+        target.min_amount = value;
+    } else {
+        target[field] = value;
+    }
 }
 
 function addReward() {
-    form.value.rewards.push({ title: '', description: '', min_amount: '0.00', quantity: '' });
+    form.value.rewards.push({ 
+        title: '', 
+        description: '', 
+        min_amount: '0,00', 
+        quantity: '',
+        has_shipping: false,
+        shipping_costs: {
+            'norte': '',
+            'nordeste': '',
+            'centro-oeste': '',
+            'sudeste': '',
+            'sul': ''
+        }
+    });
+    
+    // Inicializar tooltip após adicionar recompensa
+    nextTick(() => {
+        initTooltips();
+    });
+}
+
+function initTooltips() {
+    // Destruir tooltips existentes
+    tooltipInstances.forEach(instance => {
+        if (instance && typeof instance.disable === 'function') {
+            instance.disable();
+        }
+    });
+    tooltipInstances = [];
+    
+    // Inicializar novos tooltips
+    if (typeof window !== 'undefined' && window.bootstrap && window.bootstrap.Tooltip) {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+            const tooltip = new window.bootstrap.Tooltip(el);
+            tooltipInstances.push(tooltip);
+        });
+    }
+}
+
+function openShippingModal(reward) {
+    currentRewardForShipping.value = reward;
+    shippingModalValue.value = '';
+    
+    // Inicializar modal Bootstrap se ainda não foi
+    if (!shippingModalInstance && typeof window !== 'undefined' && window.bootstrap) {
+        const modalEl = document.getElementById('shippingModal');
+        shippingModalInstance = new window.bootstrap.Modal(modalEl);
+    }
+    
+    if (shippingModalInstance) {
+        shippingModalInstance.show();
+    }
+}
+
+function applyShippingToAll() {
+    if (!currentRewardForShipping.value) return;
+    
+    const valor = shippingModalValue.value || '0,00';
+    const reward = currentRewardForShipping.value;
+    
+    reward.shipping_costs.norte = valor;
+    reward.shipping_costs.nordeste = valor;
+    reward.shipping_costs['centro-oeste'] = valor;
+    reward.shipping_costs.sudeste = valor;
+    reward.shipping_costs.sul = valor;
+    
+    if (shippingModalInstance) {
+        shippingModalInstance.hide();
+    }
+    shippingModalValue.value = '';
+    currentRewardForShipping.value = null;
+}
+
+function validateShipping() {
+    for (const reward of form.value.rewards) {
+        if (reward.has_shipping) {
+            const regions = ['norte', 'nordeste', 'centro-oeste', 'sudeste', 'sul'];
+            for (const region of regions) {
+                if (!reward.shipping_costs[region] || reward.shipping_costs[region].trim() === '') {
+                    return `A recompensa "${reward.title || 'Sem título'}" possui frete marcado, mas o valor da região "${region}" não foi preenchido.`;
+                }
+            }
+        }
+    }
+    return null;
 }
 
 async function load() {
@@ -190,24 +451,60 @@ async function load() {
         title: campaign.title,
         description: campaign.description,
         niche: campaign.niche ?? '',
-        goal_amount: centsToMoney(campaign.goal_amount),
+        goal_amount: (Number(campaign.goal_amount || 0) / 100).toFixed(2), // Converter de centavos para reais com ponto
         ends_at: toDateInput(campaign.ends_at),
         cover_image_path: campaign.cover_image_path ?? '',
-        rewards: (campaign.rewards ?? []).map(r => ({
-            title: r.title,
-            description: r.description,
-            min_amount: centsToMoney(r.min_amount),
-            quantity: r.quantity ?? '',
-        })),
+        rewards: (campaign.rewards ?? []).map(r => {
+            const shippingCosts = {};
+            if (r.fretes) {
+                Object.keys(r.fretes).forEach(regiao => {
+                    shippingCosts[regiao] = centsToMoney(r.fretes[regiao]);
+                });
+            }
+            
+            return {
+                title: r.title,
+                description: r.description,
+                min_amount: centsToMoney(r.min_amount),
+                quantity: r.quantity ?? '',
+                has_shipping: !!r.fretes && Object.keys(r.fretes).length > 0,
+                shipping_costs: {
+                    'norte': shippingCosts.norte || '',
+                    'nordeste': shippingCosts.nordeste || '',
+                    'centro-oeste': shippingCosts['centro-oeste'] || '',
+                    'sudeste': shippingCosts.sudeste || '',
+                    'sul': shippingCosts.sul || ''
+                }
+            };
+        }),
     };
 
     loading.value = false;
+    
+    // Inicializar tooltips após carregar
+    nextTick(() => {
+        initTooltips();
+    });
 }
 
 async function submit() {
     error.value = '';
+    
+    // Validar fretes obrigatórios
+    const shippingError = validateShipping();
+    if (shippingError) {
+        error.value = shippingError;
+        submitting.value = false;
+        return;
+    }
+    
     submitting.value = true;
     try {
+        // Converter valores de dinheiro de vírgula para ponto antes de enviar
+        const convertMoneyToNumber = (moneyStr) => {
+            return String(moneyStr || '0').replace(',', '.');
+        };
+
         if (coverFile.value) {
             const fd = new FormData();
             fd.append('_method', 'PUT');
@@ -223,9 +520,19 @@ async function submit() {
                 if (r.title) {
                     fd.append(`rewards[${idx}][title]`, r.title);
                     fd.append(`rewards[${idx}][description]`, r.description || '');
-                    fd.append(`rewards[${idx}][min_amount]`, String(r.min_amount || '0'));
+                    fd.append(`rewards[${idx}][min_amount]`, convertMoneyToNumber(r.min_amount || '0'));
                     if (r.quantity !== '' && r.quantity !== null && r.quantity !== undefined) {
                         fd.append(`rewards[${idx}][quantity]`, String(r.quantity));
+                    }
+                    
+                    // Adicionar fretes
+                    if (r.has_shipping && r.shipping_costs) {
+                        fd.append(`rewards[${idx}][has_shipping]`, '1');
+                        Object.keys(r.shipping_costs).forEach(regiao => {
+                            if (r.shipping_costs[regiao]) {
+                                fd.append(`rewards[${idx}][shipping_costs][${regiao}]`, convertMoneyToNumber(r.shipping_costs[regiao]));
+                            }
+                        });
                     }
                 }
             });
@@ -234,14 +541,30 @@ async function submit() {
         } else {
             const payload = {
                 ...form.value,
+                goal_amount: String(form.value.goal_amount || '').replace(',', '.'), // Garantir ponto no goal_amount
                 rewards: form.value.rewards
                     .filter(r => r.title)
-                    .map(r => ({
-                        title: r.title,
-                        description: r.description,
-                        min_amount: r.min_amount,
-                        quantity: r.quantity === '' ? null : Number(r.quantity),
-                    })),
+                    .map(r => {
+                        const rewardPayload = {
+                            title: r.title,
+                            description: r.description,
+                            min_amount: convertMoneyToNumber(r.min_amount || '0'),
+                            quantity: r.quantity === '' ? null : Number(r.quantity),
+                        };
+                        
+                        // Adicionar fretes se existirem
+                        if (r.has_shipping && r.shipping_costs) {
+                            rewardPayload.has_shipping = true;
+                            rewardPayload.shipping_costs = {};
+                            Object.keys(r.shipping_costs).forEach(regiao => {
+                                if (r.shipping_costs[regiao]) {
+                                    rewardPayload.shipping_costs[regiao] = convertMoneyToNumber(r.shipping_costs[regiao]);
+                                }
+                            });
+                        }
+                        
+                        return rewardPayload;
+                    }),
             };
 
             await apiPut(`/api/me/campaigns/${props.id}`, payload);
@@ -270,6 +593,10 @@ async function destroyCampaign() {
     }
 }
 
-onMounted(load);
+onMounted(() => {
+    load().then(() => {
+        initTooltips();
+    });
+});
 watch(() => props.id, load);
 </script>

@@ -26,7 +26,7 @@ class CampaignController
         $campaign = Campaign::query()
             ->where('id', $id)
             ->where('user_id', auth()->id())
-            ->with(['user', 'rewards'])
+            ->with(['user', 'rewards.fretes'])
             ->firstOrFail();
 
         return new CampaignResource($campaign);
@@ -47,11 +47,14 @@ class CampaignController
             foreach ($request->rewards as $rewardData) {
                 if (!empty($rewardData['title'])) {
                     $rewards[] = new RewardData(
-                        title: $rewardData['title'],
-                        description: $rewardData['description'] ?? '',
-                        minAmount: Money::toCents($rewardData['min_amount'] ?? 0),
-                        quantity: $rewardData['quantity'] ?? null,
-                    );
+    			title: $rewardData['title'],
+    			description: $rewardData['description'] ?? '',
+    			minAmount: Money::toCents($rewardData['min_amount'] ?? 0),
+    			quantity: $rewardData['quantity'] ?? null,
+    			fretes: !empty($rewardData['has_shipping']) && $rewardData['has_shipping'] 
+        			? array_map(fn($v) => Money::toCents($v), $rewardData['shipping_costs'] ?? []) 
+        			: null,
+		    );
                 }
             }
         }
@@ -94,12 +97,15 @@ class CampaignController
         if ($request->has('rewards')) {
             foreach ($request->rewards as $rewardData) {
                 if (!empty($rewardData['title'])) {
-                    $rewards[] = new RewardData(
-                        title: $rewardData['title'],
-                        description: $rewardData['description'] ?? '',
-                        minAmount: Money::toCents($rewardData['min_amount'] ?? 0),
-                        quantity: $rewardData['quantity'] ?? null,
-                    );
+                 	$rewards[] = new RewardData(
+    				title: $rewardData['title'],
+    				description: $rewardData['description'] ?? '',
+    				minAmount: Money::toCents($rewardData['min_amount'] ?? 0),
+    				quantity: $rewardData['quantity'] ?? null,
+    				fretes: !empty($rewardData['has_shipping']) && $rewardData['has_shipping'] 
+        		? array_map(fn($v) => Money::toCents($v), $rewardData['shipping_costs'] ?? []) 
+        		: null,
+		);
                 }
             }
         }
