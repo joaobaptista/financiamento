@@ -324,44 +324,48 @@
                                             </div>
                                         </div>
 
-                                       <!-- CAMPO VALOR COMENTADO - AGORA USA VALOR DA RECOMPENSA
-					<div class="mb-2">
-                                            <label class="form-label">{{ t('campaignShow.amountLabel') }}</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">R$</span>
-                                                <input
-                                                    v-model="amount"
-                                                    type="number"
-                                                    class="form-control"
-                                                    min="1"
-                                                    step="0.01"
-                                                    :disabled="submitting || !isCampaignOpen"
-                                                    required
-                                                />
-                                            </div>
-                                            <div v-if="selectedReward" class="form-text">
-                                                {{ t('campaignShow.minForReward', { min: formatMoney(selectedReward.min_amount) }) }}
+                                        <!-- Campo Recompensa -->
+                                        <div v-if="(campaign.rewards || []).length" class="mb-3">
+                                            <label class="form-label">{{ t('campaignShow.rewardLabel') }}</label>
+                                            <select v-model="rewardId" class="form-select" :disabled="submitting || !isCampaignOpen" required>
+                                                <option :value="null">{{ t('campaignShow.noReward') }}</option>
+                                                <option
+                                                    v-for="r in sortedRewards"
+                                                    :key="r.id"
+                                                    :value="r.id"
+                                                    :disabled="!isRewardAvailable(r)"
+                                                >
+                                                    {{ r.title }} — {{ formatMoney(r.min_amount) }}
+                                                    <template v-if="!isRewardAvailable(r)"> ({{ t('campaignShow.soldOut') }})</template>
+                                                </option>
+                                            </select>
+
+                                            <!-- Exibir valor da recompensa + frete -->
+                                            <div v-if="selectedReward && shippingCost" class="mt-2 p-2 bg-light rounded small">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span>Valor da recompensa:</span>
+                                                    <strong>{{ formatMoney(selectedReward.min_amount) }}</strong>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center mt-1">
+                                                    <span class="d-flex align-items-center gap-1">
+                                                        Frete:
+                                                        <i 
+                                                            class="bi bi-question-circle-fill text-primary" 
+                                                            style="cursor: help; font-size: 0.9rem;"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-placement="top"
+                                                            :title="'O valor do frete é calculado automaticamente com base no estado (UF) do endereço informado.'"
+                                                        ></i>
+                                                    </span>
+                                                    <strong>{{ formatMoney(shippingCost) }}</strong>
+                                                </div>
+                                                <hr class="my-2" />
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="fw-semibold">Total:</span>
+                                                    <strong class="text-success fs-6">{{ formatMoney(totalAmount) }}</strong>
+                                                </div>
                                             </div>
                                         </div>
-				       -->
-
-				       
-					<!-- Campo Recompensa movido para o topo -->
-					<div v-if="(campaign.rewards || []).length" class="mb-3">
-    						<label class="form-label">{{ t('campaignShow.rewardLabel') }}</label>
-    						<select v-model="rewardId" class="form-select" :disabled="submitting || !isCampaignOpen" required>
-        					<option :value="null">{{ t('campaignShow.noReward') }}</option>
-        					<option
-            						v-for="r in sortedRewards"
-            						:key="r.id"
-            						:value="r.id"
-            						:disabled="!isRewardAvailable(r)"
-        					>
-            					{{ r.title }} — {{ formatMoney(r.min_amount) }}
-            					<template v-if="!isRewardAvailable(r)"> ({{ t('campaignShow.soldOut') }})</template>
-        					</option>
-    						</select>
-					</div>
 
                                         <div class="mb-3">
                                             <label class="form-label">{{ t('campaignShow.paymentMethodLabel') }}</label>
@@ -536,24 +540,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- Campo Recompensa REMOVIDO - agora está no topo
-					<div v-if="(campaign.rewards || []).length" class="mb-3">
-                                            <label class="form-label">{{ t('campaignShow.rewardLabel') }}</label>
-                                            <select v-model="rewardId" class="form-select" :disabled="submitting || !isCampaignOpen">
-                                                <option :value="null">{{ t('campaignShow.noReward') }}</option>
-                                                <option
-                                                    v-for="r in sortedRewards"
-                                                    :key="r.id"
-                                                    :value="r.id"
-                                                    :disabled="!isRewardAvailable(r)"
-                                                >
-                                                    {{ r.title }} — {{ formatMoney(r.min_amount) }}
-                                                    <template v-if="!isRewardAvailable(r)"> ({{ t('campaignShow.soldOut') }})</template>
-                                                </option>
-                                            </select>
-                                        </div>
-					-->
-
                                         <button
                                             type="submit"
                                             class="btn btn-success w-100"
@@ -592,6 +578,7 @@ import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import QRCode from 'qrcode';
 import { fetchIssuerId, fetchPaymentMethodIdByBin } from '../mercadopago';
+import { getRegiaoFromUF } from '../utils/ufToRegiao';
 
 const props = defineProps({
     slug: { type: String, required: true },
@@ -628,6 +615,7 @@ const pixIdentificationNumber = ref('');
 
 let mercadoPagoInstance = null;
 let mercadoPagoSdkPromise = null;
+let tooltipInstances = [];
 
 function getMercadoPagoPublicKey() {
     return String(import.meta.env?.VITE_MERCADOPAGO_PUBLIC_KEY || '').trim();
@@ -815,6 +803,31 @@ const selectedReward = computed(() => {
     return (campaign.value?.rewards || []).find((r) => String(r.id) === String(rewardId.value)) || null;
 });
 
+// Calcular frete baseado na UF do usuário e na recompensa selecionada
+const shippingCost = computed(() => {
+    if (!selectedReward.value) return null;
+    if (!supporterAddressState.value) return null;
+    
+    const regiao = getRegiaoFromUF(supporterAddressState.value);
+    if (!regiao) return null;
+    
+    // Verificar se a recompensa tem fretes e se tem frete para essa região
+    const fretes = selectedReward.value.fretes || {};
+    const freteValue = fretes[regiao];
+    
+    if (freteValue === undefined || freteValue === null) return null;
+    
+    // Retornar o valor em centavos (já vem do backend em centavos)
+    return Number(freteValue);
+});
+
+// Calcular valor total (recompensa + frete)
+const totalAmount = computed(() => {
+    const rewardAmount = selectedReward.value ? Number(selectedReward.value.min_amount || 0) : 0;
+    const shipping = shippingCost.value ? Number(shippingCost.value) : 0;
+    return rewardAmount + shipping;
+});
+
 const storyHtml = computed(() => {
     const raw = String(campaign.value?.description || '').trim();
     if (!raw) return '';
@@ -837,6 +850,24 @@ function centsToAmountInput(cents) {
     return (Number(cents || 0) / 100).toFixed(2);
 }
 
+function initTooltips() {
+    // Destruir tooltips existentes
+    tooltipInstances.forEach(instance => {
+        if (instance && typeof instance.disable === 'function') {
+            instance.disable();
+        }
+    });
+    tooltipInstances = [];
+    
+    // Inicializar novos tooltips
+    if (typeof window !== 'undefined' && window.bootstrap && window.bootstrap.Tooltip) {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+            const tooltip = new window.bootstrap.Tooltip(el);
+            tooltipInstances.push(tooltip);
+        });
+    }
+}
+
 async function scrollToSupport() {
     await nextTick();
     const el = supportBox.value;
@@ -847,8 +878,11 @@ async function scrollToSupport() {
 async function selectReward(r) {
     rewardId.value = r?.id ?? null;
     const min = Number(r?.min_amount || 0);
-    amount.value = centsToAmountInput(min);
+    const shipping = shippingCost.value ? Number(shippingCost.value) : 0;
+    amount.value = centsToAmountInput(min + shipping);
     await scrollToSupport();
+    await nextTick();
+    initTooltips();
 }
 
 async function selectNoReward() {
@@ -869,13 +903,6 @@ async function fetchCampaign() {
 
         applyCampaignSeo(campaign.value);
 
-        // Escolha inicial de valor: se houver recompensa selecionada, usa mínimo; senão, um valor sugerido.
-        if (selectedReward.value) {
-            amount.value = centsToAmountInput(selectedReward.value.min_amount);
-        } else if (!amount.value) {
-            amount.value = '25.00';
-        }
-
         await fetchPageFollow();
         if (props.user) {
             await fetchSupporterProfile();
@@ -888,6 +915,8 @@ async function fetchCampaign() {
         message.value = e?.response?.data?.message ?? '';
     } finally {
         loading.value = false;
+        await nextTick();
+        initTooltips();
     }
 }
 
@@ -1009,12 +1038,24 @@ async function submit() {
     lastPledgeId.value = null;
 
     try {
+        // Usar o valor total (recompensa + frete) se houver recompensa selecionada
+        let finalAmount = amount.value;
+        let shippingAmountValue = null;
+        
         if (selectedReward.value) {
+            finalAmount = centsToAmountInput(totalAmount.value);
+            
             const min = Number(selectedReward.value.min_amount || 0) / 100;
-            if (Number(amount.value) < min) {
+            const totalInReais = Number(finalAmount);
+            if (totalInReais < min) {
                 message.value = t('campaignShow.minRewardError', { min: formatMoney(selectedReward.value.min_amount) });
                 submitting.value = false;
                 return;
+            }
+            
+            // Se tem frete, calcular o valor do frete em reais
+            if (shippingCost.value) {
+                shippingAmountValue = centsToAmountInput(shippingCost.value);
             }
         }
 
@@ -1041,24 +1082,25 @@ async function submit() {
             // Validar e enviar identificação para Pix
             const pixDocNumber = onlyDigits(pixIdentificationNumber.value);
             const expectedLength = pixIdentificationType.value === 'CPF' ? 11 : 14;
-            
+
             if (pixDocNumber.length !== expectedLength) {
-                message.value = pixIdentificationType.value === 'CPF' 
-                    ? 'CPF inválido. Deve conter 11 dígitos.' 
+                message.value = pixIdentificationType.value === 'CPF'
+                    ? 'CPF inválido. Deve conter 11 dígitos.'
                     : 'CNPJ inválido. Deve conter 14 dígitos.';
                 submitting.value = false;
                 return;
             }
-            
+
             payerIdentificationType = pixIdentificationType.value;
             payerIdentificationNumber = pixDocNumber;
         }
 
         const result = await apiPost('/api/pledges', {
             campaign_id: campaign.value.id,
-            amount: amount.value,
+            amount: finalAmount, // Valor total (recompensa + frete) para pagamento
             reward_id: rewardId.value,
             payment_method: paymentMethod.value,
+            shipping_amount: shippingAmountValue, // Valor do frete separado (em reais)
             // Card: send only a token (mock for now). Never send raw card data to the backend.
             card_token: cardToken,
             installments: paymentMethod.value === 'card' ? Number(cardInstallments.value || 1) : undefined,
@@ -1216,17 +1258,44 @@ watch(
     }
 );
 
-onMounted(fetchCampaign);
-
-// Atualiza amount automaticamente quando seleciona recompensa
+// Atualizar amount quando seleciona recompensa ou quando muda UF/frete
 watch(
-    () => rewardId.value,
-    (newRewardId) => {
-        if (newRewardId && selectedReward.value) {
-            amount.value = centsToAmountInput(selectedReward.value.min_amount);
+    () => [rewardId.value, shippingCost.value],
+    () => {
+        if (selectedReward.value) {
+            const rewardAmount = Number(selectedReward.value.min_amount || 0);
+            const shipping = shippingCost.value ? Number(shippingCost.value) : 0;
+            amount.value = centsToAmountInput(rewardAmount + shipping);
+        } else {
+            amount.value = '10.00';
         }
+        nextTick(() => {
+            initTooltips();
+        });
     }
 );
+
+watch(
+    () => supporterAddressState.value,
+    () => {
+        // Quando muda a UF, recalcular o frete e atualizar amount
+        if (selectedReward.value) {
+            const rewardAmount = Number(selectedReward.value.min_amount || 0);
+            const shipping = shippingCost.value ? Number(shippingCost.value) : 0;
+            amount.value = centsToAmountInput(rewardAmount + shipping);
+        }
+        nextTick(() => {
+            initTooltips();
+        });
+    }
+);
+
+onMounted(() => {
+    fetchCampaign().then(() => {
+        initTooltips();
+    });
+});
+
 watch(() => props.slug, fetchCampaign);
 </script>
 

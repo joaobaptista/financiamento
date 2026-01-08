@@ -28,37 +28,46 @@
                 <h1 class="h3 fw-normal mb-0">{{ data?.campaign?.title || 'Campanha' }}</h1>
             </div>
 
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6 class="text-muted">Total Arrecadado</h6>
-                            <h3 class="text-success">{{ formatMoney(data?.campaign?.pledged_amount) }}</h3>
-                            <small class="text-muted">{{ t('common.ofGoal', { goal: formatMoney(data?.campaign?.goal_amount) }) }}</small>
+            <div class="row mb-4 g-2">
+                <div class="col-md">
+                    <div class="card text-center h-100">
+                        <div class="card-body py-3">
+                            <h6 class="text-muted small mb-2">Total Arrecadado + Frete</h6>
+                            <h4 class="text-primary mb-1">{{ formatMoney(data?.stats?.total_raised_with_shipping ?? 0) }}</h4>
+                            <small class="text-muted" style="font-size: 0.7rem;">Total com frete</small>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6 class="text-muted">{{ t('dashboard.backers') }}</h6>
-                            <h3>{{ data?.stats?.total_backers ?? 0 }}</h3>
+                <div class="col-md">
+                    <div class="card text-center h-100">
+                        <div class="card-body py-3">
+                            <h6 class="text-muted small mb-2">Total Arrecadado</h6>
+                            <h4 class="text-success mb-1">{{ formatMoney(data?.campaign?.pledged_amount) }}</h4>
+                            <small class="text-muted" style="font-size: 0.7rem;">{{ t('common.ofGoal', { goal: formatMoney(data?.campaign?.goal_amount) }) }}</small>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6 class="text-muted">{{ t('dashboard.progress') }}</h6>
-                            <h3>{{ Math.round(data?.stats?.progress ?? 0) }}%</h3>
+                <div class="col-md">
+                    <div class="card text-center h-100">
+                        <div class="card-body py-3">
+                            <h6 class="text-muted small mb-2">{{ t('dashboard.backers') }}</h6>
+                            <h4 class="mb-1">{{ data?.stats?.total_backers ?? 0 }}</h4>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6 class="text-muted">{{ t('dashboard.daysRemaining') }}</h6>
-                            <h3>{{ data?.stats?.days_remaining ?? 0 }}</h3>
+                <div class="col-md">
+                    <div class="card text-center h-100">
+                        <div class="card-body py-3">
+                            <h6 class="text-muted small mb-2">{{ t('dashboard.progress') }}</h6>
+                            <h4 class="mb-1">{{ Math.round(data?.stats?.progress ?? 0) }}%</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="card text-center h-100">
+                        <div class="card-body py-3">
+                            <h6 class="text-muted small mb-2">{{ t('dashboard.daysRemaining') }}</h6>
+                            <h4 class="mb-1">{{ data?.stats?.days_remaining ?? 0 }}</h4>
                         </div>
                     </div>
                 </div>
@@ -104,7 +113,9 @@
                             <thead>
                                 <tr>
                                     <th>{{ t('dashboard.table.backer') }}</th>
-                                    <th>{{ t('dashboard.table.amount') }}</th>
+                                    <th>Valor Total Pago</th>
+                                    <th>Valor da Recompensa</th>
+                                    <th>Valor do Frete</th>
                                     <th>{{ t('dashboard.table.date') }}</th>
                                     <th>{{ t('dashboard.table.reward') }}</th>
                                 </tr>
@@ -112,7 +123,9 @@
                             <tbody>
                                 <tr v-for="p in pledgesList" :key="p.id">
                                     <td>{{ p.user?.name || t('dashboard.table.anonymous') || 'Apoiador' }}</td>
-                                    <td><strong class="text-success">{{ formatMoney(p.amount) }}</strong></td>
+                                    <td><strong class="text-primary">{{ formatMoney((p.amount || 0) + (p.shipping_amount || 0)) }}</strong></td>
+                                    <td><strong class="text-success">{{ formatMoney(p.amount || 0) }}</strong></td>
+                                    <td><strong class="text-info">{{ formatMoney(p.shipping_amount || 0) }}</strong></td>
                                     <td>{{ formatDateTime(p.paid_at) }}</td>
                                     <td>{{ p.reward?.title || t('campaignShow.freeSupport.label') || 'Apoio livre' }}</td>
                                 </tr>
@@ -175,7 +188,7 @@ async function load() {
     try {
         const payload = await apiGet(`/api/dashboard/campaigns/${props.id}`);
         if (!payload) throw new Error('Resposta vazia da API');
-        
+
         data.value = {
             ...payload,
             campaign: payload?.campaign?.data ?? payload?.campaign,

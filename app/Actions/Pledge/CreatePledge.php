@@ -47,6 +47,7 @@ class CreatePledge
             'user_id' => $user->id,
             'reward_id' => $data->rewardId,
             'amount' => $data->amount,
+            'shipping_amount' => $data->shippingAmount,
             'status' => PledgeStatus::Pending,
             'payment_method' => $data->paymentMethod,
             'provider' => (string) config('payments.driver', 'mock'),

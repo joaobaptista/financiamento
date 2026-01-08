@@ -10,6 +10,7 @@ final readonly class CreatePledgeData
         public int $amount,
         public ?int $rewardId,
         public string $paymentMethod,
+        public ?int $shippingAmount = null,
     ) {
     }
 }

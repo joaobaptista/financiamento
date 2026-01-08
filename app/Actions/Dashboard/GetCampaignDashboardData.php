@@ -27,9 +27,17 @@ class GetCampaignDashboardData
             ->orderByDesc('paid_at')
             ->paginate($perPage);
 
+        // Calcular total de frete arrecadado
+        $totalShipping = Pledge::query()
+            ->where('campaign_id', $campaign->id)
+            ->where('status', PledgeStatus::Paid)
+            ->sum('shipping_amount') ?? 0;
+
         $stats = [
             'total_backers' => $campaign->pledges()->where('status', PledgeStatus::Paid)->count(),
-            'total_raised' => (int) $campaign->pledged_amount,
+            'total_raised' => (int) $campaign->pledged_amount, // Apenas recompensas (sem frete)
+            'total_shipping' => (int) $totalShipping, // Total de frete arrecadado
+            'total_raised_with_shipping' => (int) $campaign->pledged_amount + (int) $totalShipping, // Total com frete
             'progress' => (float) $campaign->calculateProgress(),
             'days_remaining' => (int) $campaign->daysRemaining(),
         ];

@@ -43,7 +43,7 @@ class PublicCampaignController
                     $query->where('status', 'paid');
                 },
             ])
-            ->with(['user', 'rewards', 'creatorPage'])
+            ->with(['user', 'rewards.fretes', 'creatorPage'])
             ->firstOrFail();
 
         return new CampaignResource($campaign);

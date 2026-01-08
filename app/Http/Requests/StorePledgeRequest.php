@@ -35,6 +35,7 @@ class StorePledgeRequest extends FormRequest
             'amount' => 'required|numeric|min:1',
             'reward_id' => 'nullable|exists:rewards,id',
             'payment_method' => 'required|in:pix,card',
+            'shipping_amount' => 'nullable|numeric|min:0',
 
             // Card (tokenized)
             'card_token' => $cardTokenRules,

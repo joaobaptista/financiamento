@@ -57,7 +57,7 @@ class DashboardController
             ->get();
 
         $filename = "apoiadores_campanha_{$id}.csv";
-        
+
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
@@ -69,14 +69,20 @@ class DashboardController
         return response()->stream(function() use ($pledges) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
-            
-            fputcsv($file, ['Nome', 'Email', 'Valor', 'Data', 'Recompensa', 'CEP', 'Endereço', 'Número', 'Complemento', 'Bairro', 'Cidade', 'UF', 'Telefone']);
+
+            fputcsv($file, ['Nome', 'Email', 'Valor Total Pago', 'Valor da Recompensa', 'Valor do Frete', 'Data', 'Recompensa', 'CEP', 'Endereço', 'Número', 'Complemento', 'Bairro', 'Cidade', 'UF', 'Telefone']);
 
             foreach ($pledges as $p) {
+                $amount = (int) ($p->amount ?? 0);
+                $shippingAmount = (int) ($p->shipping_amount ?? 0);
+                $totalAmount = $amount + $shippingAmount;
+
                 fputcsv($file, [
                     $p->user?->name ?? 'N/A',
                     $p->user?->email ?? 'N/A',
-                    number_format($p->amount / 100, 2, ',', '.'),
+                    number_format($totalAmount / 100, 2, ',', '.'),
+                    number_format($amount / 100, 2, ',', '.'),
+                    number_format($shippingAmount / 100, 2, ',', '.'),
                     $p->paid_at ? $p->paid_at->format('d/m/Y H:i') : 'N/A',
                     $p->reward?->title ?? 'Apoio livre',
                     $p->user?->postal_code ?? '',
@@ -97,7 +103,7 @@ class DashboardController
     {
         $token = bin2hex(random_bytes(16));
         \Illuminate\Support\Facades\Cache::put('download_token_' . $token, auth()->id(), 60);
-        
+
         // Retornamos um array simples que o Laravel converte para JSON
         return [
             'token' => $token

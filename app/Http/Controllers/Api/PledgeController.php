@@ -46,21 +46,37 @@ class PledgeController
     {
         $validated = $request->validated();
 
-        $amount = Money::toCents($validated['amount']);
+        // O amount total que vem do frontend já é (recompensa + frete)
+        // Mas precisamos separar: amount = recompensa, shipping_amount = frete
+        $totalAmount = Money::toCents($validated['amount']);
+        
+        // Se tem shipping_amount vindo do frontend, usa ele; senão calcula
+        $shippingAmount = isset($validated['shipping_amount']) 
+            ? Money::toCents($validated['shipping_amount']) 
+            : null;
+        
+        // Se tem shipping_amount, o amount real da recompensa é total - shipping
+        // Se não tem, o amount já é só a recompensa (sem frete)
+        $rewardAmount = $shippingAmount 
+            ? ($totalAmount - $shippingAmount) 
+            : $totalAmount;
+
         $paymentMethod = (string) $validated['payment_method'];
 
         try {
             $data = new CreatePledgeData(
                 campaignId: (int) $validated['campaign_id'],
                 userId: auth()->id(),
-                amount: $amount,
+                amount: $rewardAmount, // Apenas o valor da recompensa (sem frete)
                 rewardId: $validated['reward_id'] ?? null,
                 paymentMethod: $paymentMethod,
+                shippingAmount: $shippingAmount, // Valor do frete separado
             );
 
             $pledge = $createPledge->execute($data);
 
-            $paymentResult = $paymentService->processPayment($amount, $paymentMethod, [
+            // Para pagamento, usa o valor total (recompensa + frete)
+            $paymentResult = $paymentService->processPayment($totalAmount, $paymentMethod, [
                 'campaign_id' => (int) $validated['campaign_id'],
                 'user_id' => auth()->id(),
                 'pledge_id' => $pledge->id,

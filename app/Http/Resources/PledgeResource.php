@@ -19,6 +19,7 @@ class PledgeResource extends JsonResource
         return [
             'id' => $this->id,
             'amount' => (int) ($this->amount ?? 0),
+            'shipping_amount' => $this->shipping_amount ? (int) $this->shipping_amount : null,
             'status' => (string) ($this->status instanceof \BackedEnum ? $this->status->value : $this->status),
             'paid_at' => $this->paid_at?->toISOString(),
             'user' => $this->user ? [

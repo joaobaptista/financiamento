@@ -16,6 +16,7 @@ class Pledge extends Model
         'user_id',
         'reward_id',
         'amount',
+        'shipping_amount',
         'status',
         'payment_method',
         'provider',
@@ -27,6 +28,7 @@ class Pledge extends Model
 
     protected $casts = [
         'amount' => 'integer',
+        'shipping_amount' => 'integer',
         'paid_at' => 'datetime',
         'checkout_incomplete_reminded_at' => 'datetime',
         'status' => PledgeStatus::class,
